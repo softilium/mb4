@@ -1,0 +1,1 @@
+ent generate ./ent/schema

@@ -1,0 +1,23 @@
+extends layout.pug
+
+    block title
+        title Вход
+
+    block content
+        script[src="/assets/lib/vue/vue.global.prod.js"]
+
+        h1 Вход
+
+        div#vueapp
+            form
+                p {{userName}} {{password}}
+                div.mb-3
+                    label.form-label[for="exampleInputEmail1"] Email address
+                    input#email.form-control[type="email"][aria-describedby="emailHelp"][v-model="userName"]
+                    div.form-text#emailHelp We'll never share your email with anyone else.
+                div.mb-3
+                    label.form-label[for="exampleInputPassword1"] Password
+                    input#password.form-control[type="password"][v-model="password"]
+                button.btn.btn-primary[type="submit"] Submit
+
+        script[src="/assets/js/login.js"]
