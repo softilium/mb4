@@ -35,7 +35,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if len(users) == 1 {
-			session, _ := sessionsStore.Get(r, config.C.SessionCookieName)
+			session, _ := SessionsStore.Get(r, config.C.SessionCookieName)
 			session.Values["authenticated"] = true
 			session.Values["userName"] = username
 			session.Save(r, w)

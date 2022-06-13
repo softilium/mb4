@@ -12,7 +12,7 @@ import (
 
 var (
 	templates     map[string]*template.Template
-	sessionsStore *sessions.CookieStore
+	SessionsStore *sessions.CookieStore
 )
 
 type authInfo struct {
@@ -22,7 +22,7 @@ type authInfo struct {
 
 func sessionUserName(s *sessions.Session) string {
 	v, ok := s.Values["userName"].(string)
-	if !ok {
+	if ok {
 		return v
 	}
 	return ""
@@ -37,7 +37,7 @@ func loadAuthInfo(r *http.Request) authInfo {
 
 	data := authInfo{Authenticated: false, UserName: ""}
 
-	session, _ := sessionsStore.Get(r, config.C.SessionCookieName)
+	session, _ := SessionsStore.Get(r, config.C.SessionCookieName)
 
 	if sessionIsAuth(session) {
 		data.Authenticated = true
@@ -56,6 +56,6 @@ func init() {
 	}
 
 	sessionkey := []byte("super-secret-key")
-	sessionsStore = sessions.NewCookieStore(sessionkey)
+	SessionsStore = sessions.NewCookieStore(sessionkey)
 
 }

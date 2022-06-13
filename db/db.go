@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"crypto/sha256"
+	"crypto/sha512"
 
 	"github.com/softilium/mb4/config"
 	"github.com/softilium/mb4/ent"
@@ -19,7 +19,7 @@ var DB *ent.Client
 
 func PasswordHash(Password string) string {
 
-	v := sha256.Sum256([]byte(Password))
+	v := sha512.Sum512([]byte(Password))
 	return fmt.Sprintf("%x", v)
 
 }
