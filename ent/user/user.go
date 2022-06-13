@@ -2,6 +2,10 @@
 
 package user
 
+import (
+	"github.com/rs/xid"
+)
+
 const (
 	// Label holds the string label denoting the user type in the database.
 	Label = "user"
@@ -47,4 +51,6 @@ var (
 	AuthTypeValidator func(int32) error
 	// DefaultAdmin holds the default value on creation for the "Admin" field.
 	DefaultAdmin bool
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() xid.ID
 )

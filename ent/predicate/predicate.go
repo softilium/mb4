@@ -6,14 +6,5 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Emitent is the predicate function for emitent builders.
-type Emitent func(*sql.Selector)
-
-// Industry is the predicate function for industry builders.
-type Industry func(*sql.Selector)
-
-// Ticker is the predicate function for ticker builders.
-type Ticker func(*sql.Selector)
-
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

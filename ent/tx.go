@@ -12,12 +12,6 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
-	// Emitent is the client for interacting with the Emitent builders.
-	Emitent *EmitentClient
-	// Industry is the client for interacting with the Industry builders.
-	Industry *IndustryClient
-	// Ticker is the client for interacting with the Ticker builders.
-	Ticker *TickerClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -155,9 +149,6 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
-	tx.Emitent = NewEmitentClient(tx.config)
-	tx.Industry = NewIndustryClient(tx.config)
-	tx.Ticker = NewTickerClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 
@@ -168,7 +159,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Emitent.QueryXXX(), the query will be executed
+// applies a query, for example: User.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

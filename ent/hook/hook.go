@@ -9,45 +9,6 @@ import (
 	"github.com/softilium/mb4/ent"
 )
 
-// The EmitentFunc type is an adapter to allow the use of ordinary
-// function as Emitent mutator.
-type EmitentFunc func(context.Context, *ent.EmitentMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f EmitentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.EmitentMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EmitentMutation", m)
-	}
-	return f(ctx, mv)
-}
-
-// The IndustryFunc type is an adapter to allow the use of ordinary
-// function as Industry mutator.
-type IndustryFunc func(context.Context, *ent.IndustryMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f IndustryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.IndustryMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.IndustryMutation", m)
-	}
-	return f(ctx, mv)
-}
-
-// The TickerFunc type is an adapter to allow the use of ordinary
-// function as Ticker mutator.
-type TickerFunc func(context.Context, *ent.TickerMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f TickerFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.TickerMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TickerMutation", m)
-	}
-	return f(ctx, mv)
-}
-
 // The UserFunc type is an adapter to allow the use of ordinary
 // function as User mutator.
 type UserFunc func(context.Context, *ent.UserMutation) (ent.Value, error)

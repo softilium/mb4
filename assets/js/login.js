@@ -1,10 +1,16 @@
 const App = {
     data() {
         return {
+
             userName: "",
             password: "",
+            showAlert: false,
+            alertText: "",
+
             userNameReg: "",
-            passwordReg: ""
+            passwordReg: "",
+            showAlertReg: false,
+            alertTextReg: ""
         }
     },
     methods: {
@@ -15,9 +21,10 @@ const App = {
             );
             if (res.ok)
                 window.location.href = '/'
-            else
-                alert("Login failed");
-
+            else {
+                this.showAlert = true;
+                this.alertText = await res.text();
+            }
         },
         async register() {
             let res = await fetch(
@@ -26,9 +33,10 @@ const App = {
             );
             if (res.ok)
                 window.location.href = '/'
-            else
-                alert("Register failed");
-
+            else {
+                this.showAlertReg = true;
+                this.alertTextReg = await res.text();
+            }
 
         }
     }

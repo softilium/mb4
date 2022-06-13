@@ -7,11 +7,9 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/migrate"
 
-	"github.com/softilium/mb4/ent/emitent"
-	"github.com/softilium/mb4/ent/industry"
-	"github.com/softilium/mb4/ent/ticker"
 	"github.com/softilium/mb4/ent/user"
 
 	"entgo.io/ent/dialect"
@@ -23,12 +21,6 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
-	// Emitent is the client for interacting with the Emitent builders.
-	Emitent *EmitentClient
-	// Industry is the client for interacting with the Industry builders.
-	Industry *IndustryClient
-	// Ticker is the client for interacting with the Ticker builders.
-	Ticker *TickerClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -44,9 +36,6 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
-	c.Emitent = NewEmitentClient(c.config)
-	c.Industry = NewIndustryClient(c.config)
-	c.Ticker = NewTickerClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -79,12 +68,9 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:      ctx,
-		config:   cfg,
-		Emitent:  NewEmitentClient(cfg),
-		Industry: NewIndustryClient(cfg),
-		Ticker:   NewTickerClient(cfg),
-		User:     NewUserClient(cfg),
+		ctx:    ctx,
+		config: cfg,
+		User:   NewUserClient(cfg),
 	}, nil
 }
 
@@ -102,19 +88,16 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:      ctx,
-		config:   cfg,
-		Emitent:  NewEmitentClient(cfg),
-		Industry: NewIndustryClient(cfg),
-		Ticker:   NewTickerClient(cfg),
-		User:     NewUserClient(cfg),
+		ctx:    ctx,
+		config: cfg,
+		User:   NewUserClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Emitent.
+//		User.
 //		Query().
 //		Count(ctx)
 //
@@ -137,280 +120,7 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Emitent.Use(hooks...)
-	c.Industry.Use(hooks...)
-	c.Ticker.Use(hooks...)
 	c.User.Use(hooks...)
-}
-
-// EmitentClient is a client for the Emitent schema.
-type EmitentClient struct {
-	config
-}
-
-// NewEmitentClient returns a client for the Emitent from the given config.
-func NewEmitentClient(c config) *EmitentClient {
-	return &EmitentClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `emitent.Hooks(f(g(h())))`.
-func (c *EmitentClient) Use(hooks ...Hook) {
-	c.hooks.Emitent = append(c.hooks.Emitent, hooks...)
-}
-
-// Create returns a create builder for Emitent.
-func (c *EmitentClient) Create() *EmitentCreate {
-	mutation := newEmitentMutation(c.config, OpCreate)
-	return &EmitentCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of Emitent entities.
-func (c *EmitentClient) CreateBulk(builders ...*EmitentCreate) *EmitentCreateBulk {
-	return &EmitentCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for Emitent.
-func (c *EmitentClient) Update() *EmitentUpdate {
-	mutation := newEmitentMutation(c.config, OpUpdate)
-	return &EmitentUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *EmitentClient) UpdateOne(e *Emitent) *EmitentUpdateOne {
-	mutation := newEmitentMutation(c.config, OpUpdateOne, withEmitent(e))
-	return &EmitentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *EmitentClient) UpdateOneID(id int) *EmitentUpdateOne {
-	mutation := newEmitentMutation(c.config, OpUpdateOne, withEmitentID(id))
-	return &EmitentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for Emitent.
-func (c *EmitentClient) Delete() *EmitentDelete {
-	mutation := newEmitentMutation(c.config, OpDelete)
-	return &EmitentDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a delete builder for the given entity.
-func (c *EmitentClient) DeleteOne(e *Emitent) *EmitentDeleteOne {
-	return c.DeleteOneID(e.ID)
-}
-
-// DeleteOneID returns a delete builder for the given id.
-func (c *EmitentClient) DeleteOneID(id int) *EmitentDeleteOne {
-	builder := c.Delete().Where(emitent.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &EmitentDeleteOne{builder}
-}
-
-// Query returns a query builder for Emitent.
-func (c *EmitentClient) Query() *EmitentQuery {
-	return &EmitentQuery{
-		config: c.config,
-	}
-}
-
-// Get returns a Emitent entity by its id.
-func (c *EmitentClient) Get(ctx context.Context, id int) (*Emitent, error) {
-	return c.Query().Where(emitent.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *EmitentClient) GetX(ctx context.Context, id int) *Emitent {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// Hooks returns the client hooks.
-func (c *EmitentClient) Hooks() []Hook {
-	return c.hooks.Emitent
-}
-
-// IndustryClient is a client for the Industry schema.
-type IndustryClient struct {
-	config
-}
-
-// NewIndustryClient returns a client for the Industry from the given config.
-func NewIndustryClient(c config) *IndustryClient {
-	return &IndustryClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `industry.Hooks(f(g(h())))`.
-func (c *IndustryClient) Use(hooks ...Hook) {
-	c.hooks.Industry = append(c.hooks.Industry, hooks...)
-}
-
-// Create returns a create builder for Industry.
-func (c *IndustryClient) Create() *IndustryCreate {
-	mutation := newIndustryMutation(c.config, OpCreate)
-	return &IndustryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of Industry entities.
-func (c *IndustryClient) CreateBulk(builders ...*IndustryCreate) *IndustryCreateBulk {
-	return &IndustryCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for Industry.
-func (c *IndustryClient) Update() *IndustryUpdate {
-	mutation := newIndustryMutation(c.config, OpUpdate)
-	return &IndustryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *IndustryClient) UpdateOne(i *Industry) *IndustryUpdateOne {
-	mutation := newIndustryMutation(c.config, OpUpdateOne, withIndustry(i))
-	return &IndustryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *IndustryClient) UpdateOneID(id int) *IndustryUpdateOne {
-	mutation := newIndustryMutation(c.config, OpUpdateOne, withIndustryID(id))
-	return &IndustryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for Industry.
-func (c *IndustryClient) Delete() *IndustryDelete {
-	mutation := newIndustryMutation(c.config, OpDelete)
-	return &IndustryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a delete builder for the given entity.
-func (c *IndustryClient) DeleteOne(i *Industry) *IndustryDeleteOne {
-	return c.DeleteOneID(i.ID)
-}
-
-// DeleteOneID returns a delete builder for the given id.
-func (c *IndustryClient) DeleteOneID(id int) *IndustryDeleteOne {
-	builder := c.Delete().Where(industry.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &IndustryDeleteOne{builder}
-}
-
-// Query returns a query builder for Industry.
-func (c *IndustryClient) Query() *IndustryQuery {
-	return &IndustryQuery{
-		config: c.config,
-	}
-}
-
-// Get returns a Industry entity by its id.
-func (c *IndustryClient) Get(ctx context.Context, id int) (*Industry, error) {
-	return c.Query().Where(industry.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *IndustryClient) GetX(ctx context.Context, id int) *Industry {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// Hooks returns the client hooks.
-func (c *IndustryClient) Hooks() []Hook {
-	return c.hooks.Industry
-}
-
-// TickerClient is a client for the Ticker schema.
-type TickerClient struct {
-	config
-}
-
-// NewTickerClient returns a client for the Ticker from the given config.
-func NewTickerClient(c config) *TickerClient {
-	return &TickerClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `ticker.Hooks(f(g(h())))`.
-func (c *TickerClient) Use(hooks ...Hook) {
-	c.hooks.Ticker = append(c.hooks.Ticker, hooks...)
-}
-
-// Create returns a create builder for Ticker.
-func (c *TickerClient) Create() *TickerCreate {
-	mutation := newTickerMutation(c.config, OpCreate)
-	return &TickerCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of Ticker entities.
-func (c *TickerClient) CreateBulk(builders ...*TickerCreate) *TickerCreateBulk {
-	return &TickerCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for Ticker.
-func (c *TickerClient) Update() *TickerUpdate {
-	mutation := newTickerMutation(c.config, OpUpdate)
-	return &TickerUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *TickerClient) UpdateOne(t *Ticker) *TickerUpdateOne {
-	mutation := newTickerMutation(c.config, OpUpdateOne, withTicker(t))
-	return &TickerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *TickerClient) UpdateOneID(id int) *TickerUpdateOne {
-	mutation := newTickerMutation(c.config, OpUpdateOne, withTickerID(id))
-	return &TickerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for Ticker.
-func (c *TickerClient) Delete() *TickerDelete {
-	mutation := newTickerMutation(c.config, OpDelete)
-	return &TickerDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a delete builder for the given entity.
-func (c *TickerClient) DeleteOne(t *Ticker) *TickerDeleteOne {
-	return c.DeleteOneID(t.ID)
-}
-
-// DeleteOneID returns a delete builder for the given id.
-func (c *TickerClient) DeleteOneID(id int) *TickerDeleteOne {
-	builder := c.Delete().Where(ticker.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &TickerDeleteOne{builder}
-}
-
-// Query returns a query builder for Ticker.
-func (c *TickerClient) Query() *TickerQuery {
-	return &TickerQuery{
-		config: c.config,
-	}
-}
-
-// Get returns a Ticker entity by its id.
-func (c *TickerClient) Get(ctx context.Context, id int) (*Ticker, error) {
-	return c.Query().Where(ticker.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *TickerClient) GetX(ctx context.Context, id int) *Ticker {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// Hooks returns the client hooks.
-func (c *TickerClient) Hooks() []Hook {
-	return c.hooks.Ticker
 }
 
 // UserClient is a client for the User schema.
@@ -453,7 +163,7 @@ func (c *UserClient) UpdateOne(u *User) *UserUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *UserClient) UpdateOneID(id int) *UserUpdateOne {
+func (c *UserClient) UpdateOneID(id xid.ID) *UserUpdateOne {
 	mutation := newUserMutation(c.config, OpUpdateOne, withUserID(id))
 	return &UserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -470,7 +180,7 @@ func (c *UserClient) DeleteOne(u *User) *UserDeleteOne {
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *UserClient) DeleteOneID(id int) *UserDeleteOne {
+func (c *UserClient) DeleteOneID(id xid.ID) *UserDeleteOne {
 	builder := c.Delete().Where(user.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -485,12 +195,12 @@ func (c *UserClient) Query() *UserQuery {
 }
 
 // Get returns a User entity by its id.
-func (c *UserClient) Get(ctx context.Context, id int) (*User, error) {
+func (c *UserClient) Get(ctx context.Context, id xid.ID) (*User, error) {
 	return c.Query().Where(user.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *UserClient) GetX(ctx context.Context, id int) *User {
+func (c *UserClient) GetX(ctx context.Context, id xid.ID) *User {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

@@ -13,20 +13,26 @@ extends layout.pug
                     form
                         div.mb-3
                             label.form-label Email address
-                            input#email.form-control[type="email"][v-model="userName"]
+                            input#email.form-control[type="email"][v-model="userName"][required]
                         div.mb-3
                             label.form-label Password
                             input#password.form-control[type="password"][v-model="password"]
-                        button.btn.btn-primary[v-on:click.prevent="login()"] Вход
+                        div
+                            button.btn.btn-primary[v-on:click.prevent="login()"] Вход
+                            &nbsp;
+                            span.alert[v-show="showAlert"] {{alertText}}
                 div.col-6
                     h1 Регистрация
                     form
                         div.mb-3
                             label.form-label Email address
-                            input#emailreg.form-control[type="email"][v-model="userNameReg"]
+                            input#emailreg.form-control[type="email"][v-model="userNameReg"][required]
                         div.mb-3
                             label.form-label Password
-                            input#passwordreg.form-control[type="password"][v-model="passwordReg"]
-                        button.btn.btn-primary[v-on:click.prevent="register()"] Регистрация
+                            input#passwordreg.form-control[type="password"][v-model="passwordReg"][required]
+                        div 
+                            button.btn.btn-primary[v-on:click.prevent="register()"] Регистрация
+                            &nbsp;
+                            span.alert[v-show="showAlertReg"] {{alertTextReg}}
 
         script[src="/assets/js/login.js"]
