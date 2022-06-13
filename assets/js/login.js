@@ -9,6 +9,7 @@ const App = {
 
             userNameReg: "",
             passwordReg: "",
+            passwordReg1: "",
             showAlertReg: false,
             alertTextReg: ""
         }
@@ -27,6 +28,11 @@ const App = {
             }
         },
         async register() {
+            if (this.passwordReg != this.passwordReg1) {
+                this.showAlertReg = true;
+                this.alertTextReg = "Пароли не совпадают";
+                return;
+            }
             let res = await fetch(
                 "/api/register?username=" + this.userNameReg + "&password=" + this.passwordReg,
                 { method: 'POST' }

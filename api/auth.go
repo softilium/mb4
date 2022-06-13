@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"strings"
-	"time"
 
 	"net/http"
 
@@ -38,7 +37,7 @@ func ApiLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	if len(u) == 1 {
 		session, _ := pages.SessionsStore.Get(r, config.C.SessionCookieName)
-		session.Values["userName"] = userName
+		session.Values["userId"] = u[0].ID.String()
 		session.Values["authenticated"] = true
 		session.Save(r, w)
 		w.WriteHeader(http.StatusOK)
@@ -49,28 +48,17 @@ func ApiLogin(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func Auth_Logout(w http.ResponseWriter, r *http.Request) {
+func ApiLogout(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:     "access_token",
-		Value:    "",
-		Expires:  time.Now(),
-		HttpOnly: true,
-	})
-
-	http.SetCookie(w, &http.Cookie{
-		Name:     "refresh_token",
-		Value:    "",
-		Expires:  time.Now(),
-		HttpOnly: true,
-		Path:     "/auth/refresh",
-	})
-
+	session, _ := pages.SessionsStore.Get(r, config.C.SessionCookieName)
+	session.Values["userId"] = ""
+	session.Values["authenticated"] = false
+	session.Save(r, w)
 	w.WriteHeader(http.StatusOK)
 
 }
@@ -97,7 +85,7 @@ func ApiRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = db.DB.User.Create().
+	nu, err := db.DB.User.Create().
 		SetAuthType(schema.Auth_Type_email).
 		SetUserName(strings.TrimSpace(strings.ToLower(userName))).
 		SetPasswordHash(db.PasswordHash(password)).
@@ -108,7 +96,7 @@ func ApiRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	session, _ := pages.SessionsStore.Get(r, config.C.SessionCookieName)
-	session.Values["userName"] = userName
+	session.Values["userId"] = nu.ID.String()
 	session.Values["authenticated"] = true
 	session.Save(r, w)
 	w.WriteHeader(http.StatusOK)

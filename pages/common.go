@@ -1,13 +1,17 @@
 package pages
 
 import (
+	"context"
 	"html/template"
 	"log"
 	"net/http"
 
 	"github.com/eknkc/amber"
 	"github.com/gorilla/sessions"
+	"github.com/rs/xid"
 	"github.com/softilium/mb4/config"
+	"github.com/softilium/mb4/db"
+	"github.com/softilium/mb4/ent/user"
 )
 
 var (
@@ -15,17 +19,10 @@ var (
 	SessionsStore *sessions.CookieStore
 )
 
-type authInfo struct {
+type sessionStruct struct {
 	Authenticated bool
 	UserName      string
-}
-
-func sessionUserName(s *sessions.Session) string {
-	v, ok := s.Values["userName"].(string)
-	if ok {
-		return v
-	}
-	return ""
+	UserId        string // run-time, not in the session data
 }
 
 func sessionIsAuth(s *sessions.Session) bool {
@@ -33,15 +30,37 @@ func sessionIsAuth(s *sessions.Session) bool {
 	return !ok || (ok && v)
 }
 
-func loadAuthInfo(r *http.Request) authInfo {
+func loadSessionStruct(r *http.Request) sessionStruct {
 
-	data := authInfo{Authenticated: false, UserName: ""}
+	data := sessionStruct{Authenticated: false, UserName: ""}
 
 	session, _ := SessionsStore.Get(r, config.C.SessionCookieName)
 
 	if sessionIsAuth(session) {
-		data.Authenticated = true
-		data.UserName = sessionUserName(session)
+
+		userId, ok := session.Values["userId"].(string)
+		if !ok {
+			return data
+		}
+
+		xid, err := xid.FromString(userId)
+		if err != nil {
+			log.Println(err)
+			return data
+		}
+
+		users, err := db.DB.User.Query().Limit(1).Where(user.IDEQ(xid)).All(context.Background())
+		if err != nil {
+			log.Println(err)
+			return data
+		}
+
+		if len(users) == 1 {
+			data.Authenticated = true
+			data.UserId = users[0].ID.String()
+			data.UserName = users[0].UserName
+		}
+
 	}
 
 	return data
@@ -57,5 +76,6 @@ func init() {
 
 	sessionkey := []byte("super-secret-key")
 	SessionsStore = sessions.NewCookieStore(sessionkey)
+	SessionsStore.Options.HttpOnly = true
 
 }

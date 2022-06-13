@@ -1,0 +1,15 @@
+extends layout.pug
+
+    block title
+        title Профиль пользователя
+
+    block content
+        script[src="/assets/lib/vue/vue.global.prod.js"]
+
+        h1 Профиль пользователя
+        div#vueapp
+            div.row
+                div.col 
+                    button.btn.btn-primary[v-on:click.prevent="logout()"] Выйти
+                    
+        script[src="/assets/js/profile.js"]

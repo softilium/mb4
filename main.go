@@ -39,14 +39,11 @@ func initServer(listenAddr string) *http.Server {
 
 	router.HandleFunc("/", pages.Index)
 	router.HandleFunc("/login", pages.Login)
+	router.HandleFunc("/profile", pages.Profile)
 
 	router.HandleFunc("/api/login", api.ApiLogin)
 	router.HandleFunc("/api/register", api.ApiRegister)
-	//router.HandleFunc("/auth/logout", api.Auth_Logout)
-	//router.HandleFunc("/auth/refresh", api.Auth_RefreshToken)
-	//router.HandleFunc("/auth/me", api.Auth_Me)
-	//router.HandleFunc("/auth/reset-password", api.Auth_ResetPassword)
-	//router.HandleFunc("/auth/update-user", api.Auth_UpdateUser)
+	router.HandleFunc("/api/logout", api.ApiLogout)
 
 	server := &http.Server{
 		Addr:         listenAddr,

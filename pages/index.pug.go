@@ -6,6 +6,11 @@ import (
 
 func Index(w http.ResponseWriter, r *http.Request) {
 
-	templates["index"].Execute(w, loadAuthInfo(r))
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
+
+	templates["index"].Execute(w, loadSessionStruct(r))
 
 }

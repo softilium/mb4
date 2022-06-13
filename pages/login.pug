@@ -26,10 +26,13 @@ extends layout.pug
                     form
                         div.mb-3
                             label.form-label Email address
-                            input#emailreg.form-control[type="email"][v-model="userNameReg"][required]
+                            input.form-control[type="email"][v-model="userNameReg"][required]
                         div.mb-3
-                            label.form-label Password
-                            input#passwordreg.form-control[type="password"][v-model="passwordReg"][required]
+                            label.form-label Пароль
+                            input.form-control[type="password"][v-model="passwordReg"][required]
+                        div.mb-3
+                            label.form-label Повторите пароль
+                            input.form-control[type="password"][v-model="passwordReg1"][required]
                         div 
                             button.btn.btn-primary[v-on:click.prevent="register()"] Регистрация
                             &nbsp;

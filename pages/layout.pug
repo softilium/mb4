@@ -12,6 +12,7 @@ head
             nav.navbar.navbar-expand-sm.navbar-toggleable-sm.navbar-light.bg-white.border-bottom.box-shadow.mb-3
                 div.container
                     a.navbar-brand[href="/"] MoneyBox
+                    span &nbsp;
                     a.navbar-text[href="/strategies"] Стратегии
                     span &nbsp;
                     a.navbar-text[href="/InvestmentAccounts"] Брокерские счета
@@ -24,7 +25,7 @@ head
                         [aria-label="Toggle navigation"]
                         span.navbar-toggler-icon
                     div.navbar-collapse.collapse.d-sm-inline-flex.justify-content-between
-                        ul.navbar-nav.flex-grow-1" &nbsp;
+                        ul.navbar-nav.flex-grow-1 &nbsp;
                         if Authenticated
                             a[href="/profile"] #{UserName}
                         else
