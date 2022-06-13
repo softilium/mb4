@@ -74,7 +74,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	sessionkey := []byte("super-secret-key")
+	sessionkey := []byte(config.C.SessionCryptKey)
 	SessionsStore = sessions.NewCookieStore(sessionkey)
 	SessionsStore.Options.HttpOnly = true
 

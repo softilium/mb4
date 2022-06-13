@@ -25,6 +25,7 @@ const App = {
             else {
                 this.showAlert = true;
                 this.alertText = await res.text();
+                //TODO Не выводится сообщение об ошибке
             }
         },
         async register() {
