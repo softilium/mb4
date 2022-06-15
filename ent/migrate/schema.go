@@ -8,6 +8,68 @@ import (
 )
 
 var (
+	// InvestAccountsColumns holds the columns for the "invest_accounts" table.
+	InvestAccountsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString},
+		{Name: "descr", Type: field.TypeString, Size: 100},
+		{Name: "user_invest_accounts", Type: field.TypeString, Nullable: true},
+	}
+	// InvestAccountsTable holds the schema information for the "invest_accounts" table.
+	InvestAccountsTable = &schema.Table{
+		Name:       "invest_accounts",
+		Columns:    InvestAccountsColumns,
+		PrimaryKey: []*schema.Column{InvestAccountsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "invest_accounts_users_InvestAccounts",
+				Columns:    []*schema.Column{InvestAccountsColumns[2]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// InvestAccountCashflowsColumns holds the columns for the "invest_account_cashflows" table.
+	InvestAccountCashflowsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString},
+		{Name: "rec_date", Type: field.TypeTime},
+		{Name: "qty", Type: field.TypeFloat64},
+		{Name: "invest_account_cashflows", Type: field.TypeString, Nullable: true},
+	}
+	// InvestAccountCashflowsTable holds the schema information for the "invest_account_cashflows" table.
+	InvestAccountCashflowsTable = &schema.Table{
+		Name:       "invest_account_cashflows",
+		Columns:    InvestAccountCashflowsColumns,
+		PrimaryKey: []*schema.Column{InvestAccountCashflowsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "invest_account_cashflows_invest_accounts_Cashflows",
+				Columns:    []*schema.Column{InvestAccountCashflowsColumns[3]},
+				RefColumns: []*schema.Column{InvestAccountsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// InvestAccountValuationsColumns holds the columns for the "invest_account_valuations" table.
+	InvestAccountValuationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString},
+		{Name: "rec_date", Type: field.TypeTime},
+		{Name: "value", Type: field.TypeFloat64},
+		{Name: "invest_account_valuations", Type: field.TypeString, Nullable: true},
+	}
+	// InvestAccountValuationsTable holds the schema information for the "invest_account_valuations" table.
+	InvestAccountValuationsTable = &schema.Table{
+		Name:       "invest_account_valuations",
+		Columns:    InvestAccountValuationsColumns,
+		PrimaryKey: []*schema.Column{InvestAccountValuationsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "invest_account_valuations_invest_accounts_Valuations",
+				Columns:    []*schema.Column{InvestAccountValuationsColumns[3]},
+				RefColumns: []*schema.Column{InvestAccountsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString},
@@ -24,9 +86,15 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		InvestAccountsTable,
+		InvestAccountCashflowsTable,
+		InvestAccountValuationsTable,
 		UsersTable,
 	}
 )
 
 func init() {
+	InvestAccountsTable.ForeignKeys[0].RefTable = UsersTable
+	InvestAccountCashflowsTable.ForeignKeys[0].RefTable = InvestAccountsTable
+	InvestAccountValuationsTable.ForeignKeys[0].RefTable = InvestAccountsTable
 }

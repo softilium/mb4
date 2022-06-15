@@ -40,10 +40,13 @@ func initServer(listenAddr string) *http.Server {
 	router.HandleFunc("/", pages.Index)
 	router.HandleFunc("/login", pages.Login)
 	router.HandleFunc("/profile", pages.Profile)
+	router.HandleFunc("/invest-accounts", pages.InvestAccounts)
 
 	router.HandleFunc("/api/login", api.ApiLogin)
 	router.HandleFunc("/api/register", api.ApiRegister)
 	router.HandleFunc("/api/logout", api.ApiLogout)
+
+	router.HandleFunc("/api/invest-accounts", api.ApiInvestAccounts)
 
 	server := &http.Server{
 		Addr:         listenAddr,

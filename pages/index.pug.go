@@ -11,6 +11,6 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	templates["index"].Execute(w, loadSessionStruct(r))
+	templates["index"].Execute(w, LoadSessionStruct(r))
 
 }

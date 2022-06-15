@@ -6,5 +6,14 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// InvestAccount is the predicate function for investaccount builders.
+type InvestAccount func(*sql.Selector)
+
+// InvestAccountCashflow is the predicate function for investaccountcashflow builders.
+type InvestAccountCashflow func(*sql.Selector)
+
+// InvestAccountValuation is the predicate function for investaccountvaluation builders.
+type InvestAccountValuation func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

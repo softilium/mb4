@@ -4,6 +4,9 @@ package ent
 
 import (
 	"github.com/rs/xid"
+	"github.com/softilium/mb4/ent/investaccount"
+	"github.com/softilium/mb4/ent/investaccountcashflow"
+	"github.com/softilium/mb4/ent/investaccountvaluation"
 	"github.com/softilium/mb4/ent/schema"
 	"github.com/softilium/mb4/ent/user"
 )
@@ -12,6 +15,43 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	investaccountFields := schema.InvestAccount{}.Fields()
+	_ = investaccountFields
+	// investaccountDescDescr is the schema descriptor for Descr field.
+	investaccountDescDescr := investaccountFields[1].Descriptor()
+	// investaccount.DescrValidator is a validator for the "Descr" field. It is called by the builders before save.
+	investaccount.DescrValidator = func() func(string) error {
+		validators := investaccountDescDescr.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+			validators[2].(func(string) error),
+		}
+		return func(_Descr string) error {
+			for _, fn := range fns {
+				if err := fn(_Descr); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// investaccountDescID is the schema descriptor for id field.
+	investaccountDescID := investaccountFields[0].Descriptor()
+	// investaccount.DefaultID holds the default value on creation for the id field.
+	investaccount.DefaultID = investaccountDescID.Default.(func() xid.ID)
+	investaccountcashflowFields := schema.InvestAccountCashflow{}.Fields()
+	_ = investaccountcashflowFields
+	// investaccountcashflowDescID is the schema descriptor for id field.
+	investaccountcashflowDescID := investaccountcashflowFields[0].Descriptor()
+	// investaccountcashflow.DefaultID holds the default value on creation for the id field.
+	investaccountcashflow.DefaultID = investaccountcashflowDescID.Default.(func() xid.ID)
+	investaccountvaluationFields := schema.InvestAccountValuation{}.Fields()
+	_ = investaccountvaluationFields
+	// investaccountvaluationDescID is the schema descriptor for id field.
+	investaccountvaluationDescID := investaccountvaluationFields[0].Descriptor()
+	// investaccountvaluation.DefaultID holds the default value on creation for the id field.
+	investaccountvaluation.DefaultID = investaccountvaluationDescID.Default.(func() xid.ID)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescUserName is the schema descriptor for UserName field.

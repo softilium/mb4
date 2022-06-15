@@ -11,6 +11,7 @@ import (
 	"github.com/rs/xid"
 	"github.com/softilium/mb4/config"
 	"github.com/softilium/mb4/db"
+	"github.com/softilium/mb4/ent"
 	"github.com/softilium/mb4/ent/user"
 )
 
@@ -20,47 +21,42 @@ var (
 )
 
 type sessionStruct struct {
+	User          *ent.User //there will be another session's fields here
 	Authenticated bool
 	UserName      string
-	UserId        string // run-time, not in the session data
 }
 
-func sessionIsAuth(s *sessions.Session) bool {
-	v, ok := s.Values["authenticated"].(bool)
-	return !ok || (ok && v)
-}
+func LoadSessionStruct(r *http.Request) sessionStruct {
 
-func loadSessionStruct(r *http.Request) sessionStruct {
+	data := sessionStruct{User: nil, Authenticated: false, UserName: ""}
 
-	data := sessionStruct{Authenticated: false, UserName: ""}
+	session, err := SessionsStore.Get(r, config.C.SessionCookieName)
+	if err != nil {
+		log.Println(err)
+		return data
+	}
 
-	session, _ := SessionsStore.Get(r, config.C.SessionCookieName)
+	userId, ok := session.Values["userId"].(string)
+	if !ok || userId == "" {
+		return data
+	}
 
-	if sessionIsAuth(session) {
+	xid, err := xid.FromString(userId)
+	if err != nil {
+		log.Println(err)
+		return data
+	}
 
-		userId, ok := session.Values["userId"].(string)
-		if !ok {
-			return data
-		}
+	users, err := db.DB.User.Query().Limit(1).Where(user.IDEQ(xid)).All(context.Background())
+	if err != nil {
+		log.Println(err)
+		return data
+	}
 
-		xid, err := xid.FromString(userId)
-		if err != nil {
-			log.Println(err)
-			return data
-		}
-
-		users, err := db.DB.User.Query().Limit(1).Where(user.IDEQ(xid)).All(context.Background())
-		if err != nil {
-			log.Println(err)
-			return data
-		}
-
-		if len(users) == 1 {
-			data.Authenticated = true
-			data.UserId = users[0].ID.String()
-			data.UserName = users[0].UserName
-		}
-
+	if len(users) == 1 {
+		data.User = users[0]
+		data.Authenticated = true
+		data.UserName = data.User.UserName
 	}
 
 	return data

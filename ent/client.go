@@ -10,10 +10,14 @@ import (
 	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/migrate"
 
+	"github.com/softilium/mb4/ent/investaccount"
+	"github.com/softilium/mb4/ent/investaccountcashflow"
+	"github.com/softilium/mb4/ent/investaccountvaluation"
 	"github.com/softilium/mb4/ent/user"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -21,6 +25,12 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// InvestAccount is the client for interacting with the InvestAccount builders.
+	InvestAccount *InvestAccountClient
+	// InvestAccountCashflow is the client for interacting with the InvestAccountCashflow builders.
+	InvestAccountCashflow *InvestAccountCashflowClient
+	// InvestAccountValuation is the client for interacting with the InvestAccountValuation builders.
+	InvestAccountValuation *InvestAccountValuationClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -36,6 +46,9 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.InvestAccount = NewInvestAccountClient(c.config)
+	c.InvestAccountCashflow = NewInvestAccountCashflowClient(c.config)
+	c.InvestAccountValuation = NewInvestAccountValuationClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -68,9 +81,12 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		User:   NewUserClient(cfg),
+		ctx:                    ctx,
+		config:                 cfg,
+		InvestAccount:          NewInvestAccountClient(cfg),
+		InvestAccountCashflow:  NewInvestAccountCashflowClient(cfg),
+		InvestAccountValuation: NewInvestAccountValuationClient(cfg),
+		User:                   NewUserClient(cfg),
 	}, nil
 }
 
@@ -88,16 +104,19 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		User:   NewUserClient(cfg),
+		ctx:                    ctx,
+		config:                 cfg,
+		InvestAccount:          NewInvestAccountClient(cfg),
+		InvestAccountCashflow:  NewInvestAccountCashflowClient(cfg),
+		InvestAccountValuation: NewInvestAccountValuationClient(cfg),
+		User:                   NewUserClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		User.
+//		InvestAccount.
 //		Query().
 //		Count(ctx)
 //
@@ -120,7 +139,360 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.InvestAccount.Use(hooks...)
+	c.InvestAccountCashflow.Use(hooks...)
+	c.InvestAccountValuation.Use(hooks...)
 	c.User.Use(hooks...)
+}
+
+// InvestAccountClient is a client for the InvestAccount schema.
+type InvestAccountClient struct {
+	config
+}
+
+// NewInvestAccountClient returns a client for the InvestAccount from the given config.
+func NewInvestAccountClient(c config) *InvestAccountClient {
+	return &InvestAccountClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `investaccount.Hooks(f(g(h())))`.
+func (c *InvestAccountClient) Use(hooks ...Hook) {
+	c.hooks.InvestAccount = append(c.hooks.InvestAccount, hooks...)
+}
+
+// Create returns a create builder for InvestAccount.
+func (c *InvestAccountClient) Create() *InvestAccountCreate {
+	mutation := newInvestAccountMutation(c.config, OpCreate)
+	return &InvestAccountCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of InvestAccount entities.
+func (c *InvestAccountClient) CreateBulk(builders ...*InvestAccountCreate) *InvestAccountCreateBulk {
+	return &InvestAccountCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for InvestAccount.
+func (c *InvestAccountClient) Update() *InvestAccountUpdate {
+	mutation := newInvestAccountMutation(c.config, OpUpdate)
+	return &InvestAccountUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *InvestAccountClient) UpdateOne(ia *InvestAccount) *InvestAccountUpdateOne {
+	mutation := newInvestAccountMutation(c.config, OpUpdateOne, withInvestAccount(ia))
+	return &InvestAccountUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *InvestAccountClient) UpdateOneID(id xid.ID) *InvestAccountUpdateOne {
+	mutation := newInvestAccountMutation(c.config, OpUpdateOne, withInvestAccountID(id))
+	return &InvestAccountUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for InvestAccount.
+func (c *InvestAccountClient) Delete() *InvestAccountDelete {
+	mutation := newInvestAccountMutation(c.config, OpDelete)
+	return &InvestAccountDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *InvestAccountClient) DeleteOne(ia *InvestAccount) *InvestAccountDeleteOne {
+	return c.DeleteOneID(ia.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *InvestAccountClient) DeleteOneID(id xid.ID) *InvestAccountDeleteOne {
+	builder := c.Delete().Where(investaccount.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &InvestAccountDeleteOne{builder}
+}
+
+// Query returns a query builder for InvestAccount.
+func (c *InvestAccountClient) Query() *InvestAccountQuery {
+	return &InvestAccountQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a InvestAccount entity by its id.
+func (c *InvestAccountClient) Get(ctx context.Context, id xid.ID) (*InvestAccount, error) {
+	return c.Query().Where(investaccount.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *InvestAccountClient) GetX(ctx context.Context, id xid.ID) *InvestAccount {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryOwner queries the Owner edge of a InvestAccount.
+func (c *InvestAccountClient) QueryOwner(ia *InvestAccount) *UserQuery {
+	query := &UserQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ia.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(investaccount.Table, investaccount.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, investaccount.OwnerTable, investaccount.OwnerColumn),
+		)
+		fromV = sqlgraph.Neighbors(ia.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCashflows queries the Cashflows edge of a InvestAccount.
+func (c *InvestAccountClient) QueryCashflows(ia *InvestAccount) *InvestAccountCashflowQuery {
+	query := &InvestAccountCashflowQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ia.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(investaccount.Table, investaccount.FieldID, id),
+			sqlgraph.To(investaccountcashflow.Table, investaccountcashflow.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, investaccount.CashflowsTable, investaccount.CashflowsColumn),
+		)
+		fromV = sqlgraph.Neighbors(ia.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryValuations queries the Valuations edge of a InvestAccount.
+func (c *InvestAccountClient) QueryValuations(ia *InvestAccount) *InvestAccountValuationQuery {
+	query := &InvestAccountValuationQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ia.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(investaccount.Table, investaccount.FieldID, id),
+			sqlgraph.To(investaccountvaluation.Table, investaccountvaluation.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, investaccount.ValuationsTable, investaccount.ValuationsColumn),
+		)
+		fromV = sqlgraph.Neighbors(ia.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *InvestAccountClient) Hooks() []Hook {
+	return c.hooks.InvestAccount
+}
+
+// InvestAccountCashflowClient is a client for the InvestAccountCashflow schema.
+type InvestAccountCashflowClient struct {
+	config
+}
+
+// NewInvestAccountCashflowClient returns a client for the InvestAccountCashflow from the given config.
+func NewInvestAccountCashflowClient(c config) *InvestAccountCashflowClient {
+	return &InvestAccountCashflowClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `investaccountcashflow.Hooks(f(g(h())))`.
+func (c *InvestAccountCashflowClient) Use(hooks ...Hook) {
+	c.hooks.InvestAccountCashflow = append(c.hooks.InvestAccountCashflow, hooks...)
+}
+
+// Create returns a create builder for InvestAccountCashflow.
+func (c *InvestAccountCashflowClient) Create() *InvestAccountCashflowCreate {
+	mutation := newInvestAccountCashflowMutation(c.config, OpCreate)
+	return &InvestAccountCashflowCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of InvestAccountCashflow entities.
+func (c *InvestAccountCashflowClient) CreateBulk(builders ...*InvestAccountCashflowCreate) *InvestAccountCashflowCreateBulk {
+	return &InvestAccountCashflowCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for InvestAccountCashflow.
+func (c *InvestAccountCashflowClient) Update() *InvestAccountCashflowUpdate {
+	mutation := newInvestAccountCashflowMutation(c.config, OpUpdate)
+	return &InvestAccountCashflowUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *InvestAccountCashflowClient) UpdateOne(iac *InvestAccountCashflow) *InvestAccountCashflowUpdateOne {
+	mutation := newInvestAccountCashflowMutation(c.config, OpUpdateOne, withInvestAccountCashflow(iac))
+	return &InvestAccountCashflowUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *InvestAccountCashflowClient) UpdateOneID(id xid.ID) *InvestAccountCashflowUpdateOne {
+	mutation := newInvestAccountCashflowMutation(c.config, OpUpdateOne, withInvestAccountCashflowID(id))
+	return &InvestAccountCashflowUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for InvestAccountCashflow.
+func (c *InvestAccountCashflowClient) Delete() *InvestAccountCashflowDelete {
+	mutation := newInvestAccountCashflowMutation(c.config, OpDelete)
+	return &InvestAccountCashflowDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *InvestAccountCashflowClient) DeleteOne(iac *InvestAccountCashflow) *InvestAccountCashflowDeleteOne {
+	return c.DeleteOneID(iac.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *InvestAccountCashflowClient) DeleteOneID(id xid.ID) *InvestAccountCashflowDeleteOne {
+	builder := c.Delete().Where(investaccountcashflow.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &InvestAccountCashflowDeleteOne{builder}
+}
+
+// Query returns a query builder for InvestAccountCashflow.
+func (c *InvestAccountCashflowClient) Query() *InvestAccountCashflowQuery {
+	return &InvestAccountCashflowQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a InvestAccountCashflow entity by its id.
+func (c *InvestAccountCashflowClient) Get(ctx context.Context, id xid.ID) (*InvestAccountCashflow, error) {
+	return c.Query().Where(investaccountcashflow.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *InvestAccountCashflowClient) GetX(ctx context.Context, id xid.ID) *InvestAccountCashflow {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryOwner queries the Owner edge of a InvestAccountCashflow.
+func (c *InvestAccountCashflowClient) QueryOwner(iac *InvestAccountCashflow) *InvestAccountQuery {
+	query := &InvestAccountQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := iac.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(investaccountcashflow.Table, investaccountcashflow.FieldID, id),
+			sqlgraph.To(investaccount.Table, investaccount.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, investaccountcashflow.OwnerTable, investaccountcashflow.OwnerColumn),
+		)
+		fromV = sqlgraph.Neighbors(iac.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *InvestAccountCashflowClient) Hooks() []Hook {
+	return c.hooks.InvestAccountCashflow
+}
+
+// InvestAccountValuationClient is a client for the InvestAccountValuation schema.
+type InvestAccountValuationClient struct {
+	config
+}
+
+// NewInvestAccountValuationClient returns a client for the InvestAccountValuation from the given config.
+func NewInvestAccountValuationClient(c config) *InvestAccountValuationClient {
+	return &InvestAccountValuationClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `investaccountvaluation.Hooks(f(g(h())))`.
+func (c *InvestAccountValuationClient) Use(hooks ...Hook) {
+	c.hooks.InvestAccountValuation = append(c.hooks.InvestAccountValuation, hooks...)
+}
+
+// Create returns a create builder for InvestAccountValuation.
+func (c *InvestAccountValuationClient) Create() *InvestAccountValuationCreate {
+	mutation := newInvestAccountValuationMutation(c.config, OpCreate)
+	return &InvestAccountValuationCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of InvestAccountValuation entities.
+func (c *InvestAccountValuationClient) CreateBulk(builders ...*InvestAccountValuationCreate) *InvestAccountValuationCreateBulk {
+	return &InvestAccountValuationCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for InvestAccountValuation.
+func (c *InvestAccountValuationClient) Update() *InvestAccountValuationUpdate {
+	mutation := newInvestAccountValuationMutation(c.config, OpUpdate)
+	return &InvestAccountValuationUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *InvestAccountValuationClient) UpdateOne(iav *InvestAccountValuation) *InvestAccountValuationUpdateOne {
+	mutation := newInvestAccountValuationMutation(c.config, OpUpdateOne, withInvestAccountValuation(iav))
+	return &InvestAccountValuationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *InvestAccountValuationClient) UpdateOneID(id xid.ID) *InvestAccountValuationUpdateOne {
+	mutation := newInvestAccountValuationMutation(c.config, OpUpdateOne, withInvestAccountValuationID(id))
+	return &InvestAccountValuationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for InvestAccountValuation.
+func (c *InvestAccountValuationClient) Delete() *InvestAccountValuationDelete {
+	mutation := newInvestAccountValuationMutation(c.config, OpDelete)
+	return &InvestAccountValuationDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *InvestAccountValuationClient) DeleteOne(iav *InvestAccountValuation) *InvestAccountValuationDeleteOne {
+	return c.DeleteOneID(iav.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *InvestAccountValuationClient) DeleteOneID(id xid.ID) *InvestAccountValuationDeleteOne {
+	builder := c.Delete().Where(investaccountvaluation.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &InvestAccountValuationDeleteOne{builder}
+}
+
+// Query returns a query builder for InvestAccountValuation.
+func (c *InvestAccountValuationClient) Query() *InvestAccountValuationQuery {
+	return &InvestAccountValuationQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a InvestAccountValuation entity by its id.
+func (c *InvestAccountValuationClient) Get(ctx context.Context, id xid.ID) (*InvestAccountValuation, error) {
+	return c.Query().Where(investaccountvaluation.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *InvestAccountValuationClient) GetX(ctx context.Context, id xid.ID) *InvestAccountValuation {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryOwner queries the Owner edge of a InvestAccountValuation.
+func (c *InvestAccountValuationClient) QueryOwner(iav *InvestAccountValuation) *InvestAccountQuery {
+	query := &InvestAccountQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := iav.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(investaccountvaluation.Table, investaccountvaluation.FieldID, id),
+			sqlgraph.To(investaccount.Table, investaccount.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, investaccountvaluation.OwnerTable, investaccountvaluation.OwnerColumn),
+		)
+		fromV = sqlgraph.Neighbors(iav.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *InvestAccountValuationClient) Hooks() []Hook {
+	return c.hooks.InvestAccountValuation
 }
 
 // UserClient is a client for the User schema.
@@ -206,6 +578,22 @@ func (c *UserClient) GetX(ctx context.Context, id xid.ID) *User {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryInvestAccounts queries the InvestAccounts edge of a User.
+func (c *UserClient) QueryInvestAccounts(u *User) *InvestAccountQuery {
+	query := &InvestAccountQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(investaccount.Table, investaccount.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.InvestAccountsTable, user.InvestAccountsColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.

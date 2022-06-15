@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/rs/xid"
 )
@@ -20,5 +21,11 @@ func (User) Fields() []ent.Field {
 		field.Int32("AuthType").Immutable().Default(Auth_Type_email).NonNegative(),
 		field.String("PasswordHash"),
 		field.Bool("Admin").Default(false),
+	}
+}
+
+func (User) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("InvestAccounts", InvestAccount.Type),
 	}
 }

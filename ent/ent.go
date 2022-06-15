@@ -8,6 +8,9 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/softilium/mb4/ent/investaccount"
+	"github.com/softilium/mb4/ent/investaccountcashflow"
+	"github.com/softilium/mb4/ent/investaccountvaluation"
 	"github.com/softilium/mb4/ent/user"
 )
 
@@ -29,7 +32,10 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		user.Table: user.ValidColumn,
+		investaccount.Table:          investaccount.ValidColumn,
+		investaccountcashflow.Table:  investaccountcashflow.ValidColumn,
+		investaccountvaluation.Table: investaccountvaluation.ValidColumn,
+		user.Table:                   user.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

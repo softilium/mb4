@@ -6,7 +6,7 @@ import (
 
 func Profile(w http.ResponseWriter, r *http.Request) {
 
-	si := loadSessionStruct(r)
+	si := LoadSessionStruct(r)
 	if !si.Authenticated {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return

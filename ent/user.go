@@ -24,6 +24,27 @@ type User struct {
 	PasswordHash string `json:"PasswordHash,omitempty"`
 	// Admin holds the value of the "Admin" field.
 	Admin bool `json:"Admin,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges UserEdges `json:"edges"`
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// InvestAccounts holds the value of the InvestAccounts edge.
+	InvestAccounts []*InvestAccount `json:"InvestAccounts,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// InvestAccountsOrErr returns the InvestAccounts value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) InvestAccountsOrErr() ([]*InvestAccount, error) {
+	if e.loadedTypes[0] {
+		return e.InvestAccounts, nil
+	}
+	return nil, &NotLoadedError{edge: "InvestAccounts"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -87,6 +108,11 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 		}
 	}
 	return nil
+}
+
+// QueryInvestAccounts queries the "InvestAccounts" edge of the User entity.
+func (u *User) QueryInvestAccounts() *InvestAccountQuery {
+	return (&UserClient{config: u.config}).QueryInvestAccounts(u)
 }
 
 // Update returns a builder for updating this User.

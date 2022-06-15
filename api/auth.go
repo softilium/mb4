@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/base64"
 	"strings"
 
 	"net/http"
@@ -13,6 +14,7 @@ import (
 	"github.com/softilium/mb4/pages"
 )
 
+// Supports both username+password form fields and Authorization header
 func ApiLogin(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
@@ -24,7 +26,27 @@ func ApiLogin(w http.ResponseWriter, r *http.Request) {
 	password := r.URL.Query().Get("password")
 	userName = strings.ToLower(strings.TrimSpace(userName))
 	if len(userName) < 3 {
-		w.WriteHeader(http.StatusBadRequest)
+
+		authraw := r.Header.Get("Authorization")
+		if authraw != "" {
+			tokens := strings.Split(authraw, " ")
+			if (len(tokens) == 2) && (tokens[0] == "Basic") {
+
+				t1dec, err := base64.StdEncoding.DecodeString(tokens[1])
+				if err == nil {
+					tokens2 := strings.Split(string(t1dec), ":")
+					if len(tokens2) == 2 {
+						userName = tokens2[0]
+						password = tokens2[1]
+					}
+				}
+			}
+		}
+
+		if len(userName) < 3 {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 	}
 
 	u, err := db.DB.User.Query().
@@ -36,6 +58,7 @@ func ApiLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(u) == 1 {
+
 		session, _ := pages.SessionsStore.Get(r, config.C.SessionCookieName)
 		session.Values["userId"] = u[0].ID.String()
 		session.Values["authenticated"] = true

@@ -19,8 +19,17 @@ const (
 	FieldPasswordHash = "password_hash"
 	// FieldAdmin holds the string denoting the admin field in the database.
 	FieldAdmin = "admin"
+	// EdgeInvestAccounts holds the string denoting the investaccounts edge name in mutations.
+	EdgeInvestAccounts = "InvestAccounts"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// InvestAccountsTable is the table that holds the InvestAccounts relation/edge.
+	InvestAccountsTable = "invest_accounts"
+	// InvestAccountsInverseTable is the table name for the InvestAccount entity.
+	// It exists in this package in order to avoid circular dependency with the "investaccount" package.
+	InvestAccountsInverseTable = "invest_accounts"
+	// InvestAccountsColumn is the table column denoting the InvestAccounts relation/edge.
+	InvestAccountsColumn = "user_invest_accounts"
 )
 
 // Columns holds all SQL columns for user fields.

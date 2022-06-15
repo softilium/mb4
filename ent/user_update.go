@@ -10,6 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/rs/xid"
+	"github.com/softilium/mb4/ent/investaccount"
 	"github.com/softilium/mb4/ent/predicate"
 	"github.com/softilium/mb4/ent/user"
 )
@@ -53,9 +55,45 @@ func (uu *UserUpdate) SetNillableAdmin(b *bool) *UserUpdate {
 	return uu
 }
 
+// AddInvestAccountIDs adds the "InvestAccounts" edge to the InvestAccount entity by IDs.
+func (uu *UserUpdate) AddInvestAccountIDs(ids ...xid.ID) *UserUpdate {
+	uu.mutation.AddInvestAccountIDs(ids...)
+	return uu
+}
+
+// AddInvestAccounts adds the "InvestAccounts" edges to the InvestAccount entity.
+func (uu *UserUpdate) AddInvestAccounts(i ...*InvestAccount) *UserUpdate {
+	ids := make([]xid.ID, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return uu.AddInvestAccountIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
+}
+
+// ClearInvestAccounts clears all "InvestAccounts" edges to the InvestAccount entity.
+func (uu *UserUpdate) ClearInvestAccounts() *UserUpdate {
+	uu.mutation.ClearInvestAccounts()
+	return uu
+}
+
+// RemoveInvestAccountIDs removes the "InvestAccounts" edge to InvestAccount entities by IDs.
+func (uu *UserUpdate) RemoveInvestAccountIDs(ids ...xid.ID) *UserUpdate {
+	uu.mutation.RemoveInvestAccountIDs(ids...)
+	return uu
+}
+
+// RemoveInvestAccounts removes "InvestAccounts" edges to InvestAccount entities.
+func (uu *UserUpdate) RemoveInvestAccounts(i ...*InvestAccount) *UserUpdate {
+	ids := make([]xid.ID, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return uu.RemoveInvestAccountIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -167,6 +205,60 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: user.FieldAdmin,
 		})
 	}
+	if uu.mutation.InvestAccountsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.InvestAccountsTable,
+			Columns: []string{user.InvestAccountsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: investaccount.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedInvestAccountsIDs(); len(nodes) > 0 && !uu.mutation.InvestAccountsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.InvestAccountsTable,
+			Columns: []string{user.InvestAccountsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: investaccount.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.InvestAccountsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.InvestAccountsTable,
+			Columns: []string{user.InvestAccountsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: investaccount.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -212,9 +304,45 @@ func (uuo *UserUpdateOne) SetNillableAdmin(b *bool) *UserUpdateOne {
 	return uuo
 }
 
+// AddInvestAccountIDs adds the "InvestAccounts" edge to the InvestAccount entity by IDs.
+func (uuo *UserUpdateOne) AddInvestAccountIDs(ids ...xid.ID) *UserUpdateOne {
+	uuo.mutation.AddInvestAccountIDs(ids...)
+	return uuo
+}
+
+// AddInvestAccounts adds the "InvestAccounts" edges to the InvestAccount entity.
+func (uuo *UserUpdateOne) AddInvestAccounts(i ...*InvestAccount) *UserUpdateOne {
+	ids := make([]xid.ID, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return uuo.AddInvestAccountIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
+}
+
+// ClearInvestAccounts clears all "InvestAccounts" edges to the InvestAccount entity.
+func (uuo *UserUpdateOne) ClearInvestAccounts() *UserUpdateOne {
+	uuo.mutation.ClearInvestAccounts()
+	return uuo
+}
+
+// RemoveInvestAccountIDs removes the "InvestAccounts" edge to InvestAccount entities by IDs.
+func (uuo *UserUpdateOne) RemoveInvestAccountIDs(ids ...xid.ID) *UserUpdateOne {
+	uuo.mutation.RemoveInvestAccountIDs(ids...)
+	return uuo
+}
+
+// RemoveInvestAccounts removes "InvestAccounts" edges to InvestAccount entities.
+func (uuo *UserUpdateOne) RemoveInvestAccounts(i ...*InvestAccount) *UserUpdateOne {
+	ids := make([]xid.ID, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return uuo.RemoveInvestAccountIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -349,6 +477,60 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Value:  value,
 			Column: user.FieldAdmin,
 		})
+	}
+	if uuo.mutation.InvestAccountsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.InvestAccountsTable,
+			Columns: []string{user.InvestAccountsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: investaccount.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedInvestAccountsIDs(); len(nodes) > 0 && !uuo.mutation.InvestAccountsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.InvestAccountsTable,
+			Columns: []string{user.InvestAccountsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: investaccount.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.InvestAccountsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.InvestAccountsTable,
+			Columns: []string{user.InvestAccountsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: investaccount.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &User{config: uuo.config}
 	_spec.Assign = _node.assignValues

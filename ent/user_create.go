@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/rs/xid"
+	"github.com/softilium/mb4/ent/investaccount"
 	"github.com/softilium/mb4/ent/user"
 )
 
@@ -72,6 +73,21 @@ func (uc *UserCreate) SetNillableID(x *xid.ID) *UserCreate {
 		uc.SetID(*x)
 	}
 	return uc
+}
+
+// AddInvestAccountIDs adds the "InvestAccounts" edge to the InvestAccount entity by IDs.
+func (uc *UserCreate) AddInvestAccountIDs(ids ...xid.ID) *UserCreate {
+	uc.mutation.AddInvestAccountIDs(ids...)
+	return uc
+}
+
+// AddInvestAccounts adds the "InvestAccounts" edges to the InvestAccount entity.
+func (uc *UserCreate) AddInvestAccounts(i ...*InvestAccount) *UserCreate {
+	ids := make([]xid.ID, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return uc.AddInvestAccountIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -250,6 +266,25 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldAdmin,
 		})
 		_node.Admin = value
+	}
+	if nodes := uc.mutation.InvestAccountsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.InvestAccountsTable,
+			Columns: []string{user.InvestAccountsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: investaccount.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

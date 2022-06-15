@@ -4,6 +4,7 @@ package user
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/predicate"
 )
@@ -428,6 +429,34 @@ func AdminEQ(v bool) predicate.User {
 func AdminNEQ(v bool) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldAdmin), v))
+	})
+}
+
+// HasInvestAccounts applies the HasEdge predicate on the "InvestAccounts" edge.
+func HasInvestAccounts() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(InvestAccountsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, InvestAccountsTable, InvestAccountsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasInvestAccountsWith applies the HasEdge predicate on the "InvestAccounts" edge with a given conditions (other predicates).
+func HasInvestAccountsWith(preds ...predicate.InvestAccount) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(InvestAccountsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, InvestAccountsTable, InvestAccountsColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
 	})
 }
 

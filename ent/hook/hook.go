@@ -9,6 +9,45 @@ import (
 	"github.com/softilium/mb4/ent"
 )
 
+// The InvestAccountFunc type is an adapter to allow the use of ordinary
+// function as InvestAccount mutator.
+type InvestAccountFunc func(context.Context, *ent.InvestAccountMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f InvestAccountFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.InvestAccountMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.InvestAccountMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The InvestAccountCashflowFunc type is an adapter to allow the use of ordinary
+// function as InvestAccountCashflow mutator.
+type InvestAccountCashflowFunc func(context.Context, *ent.InvestAccountCashflowMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f InvestAccountCashflowFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.InvestAccountCashflowMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.InvestAccountCashflowMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The InvestAccountValuationFunc type is an adapter to allow the use of ordinary
+// function as InvestAccountValuation mutator.
+type InvestAccountValuationFunc func(context.Context, *ent.InvestAccountValuationMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f InvestAccountValuationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.InvestAccountValuationMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.InvestAccountValuationMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The UserFunc type is an adapter to allow the use of ordinary
 // function as User mutator.
 type UserFunc func(context.Context, *ent.UserMutation) (ent.Value, error)

@@ -7,8 +7,12 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/rs/xid"
+	"github.com/softilium/mb4/ent/investaccount"
+	"github.com/softilium/mb4/ent/investaccountcashflow"
+	"github.com/softilium/mb4/ent/investaccountvaluation"
 	"github.com/softilium/mb4/ent/predicate"
 	"github.com/softilium/mb4/ent/user"
 
@@ -24,24 +28,1534 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeUser = "User"
+	TypeInvestAccount          = "InvestAccount"
+	TypeInvestAccountCashflow  = "InvestAccountCashflow"
+	TypeInvestAccountValuation = "InvestAccountValuation"
+	TypeUser                   = "User"
 )
 
-// UserMutation represents an operation that mutates the User nodes in the graph.
-type UserMutation struct {
+// InvestAccountMutation represents an operation that mutates the InvestAccount nodes in the graph.
+type InvestAccountMutation struct {
+	config
+	op                 Op
+	typ                string
+	id                 *xid.ID
+	_Descr             *string
+	clearedFields      map[string]struct{}
+	_Owner             *xid.ID
+	cleared_Owner      bool
+	_Cashflows         map[xid.ID]struct{}
+	removed_Cashflows  map[xid.ID]struct{}
+	cleared_Cashflows  bool
+	_Valuations        map[xid.ID]struct{}
+	removed_Valuations map[xid.ID]struct{}
+	cleared_Valuations bool
+	done               bool
+	oldValue           func(context.Context) (*InvestAccount, error)
+	predicates         []predicate.InvestAccount
+}
+
+var _ ent.Mutation = (*InvestAccountMutation)(nil)
+
+// investaccountOption allows management of the mutation configuration using functional options.
+type investaccountOption func(*InvestAccountMutation)
+
+// newInvestAccountMutation creates new mutation for the InvestAccount entity.
+func newInvestAccountMutation(c config, op Op, opts ...investaccountOption) *InvestAccountMutation {
+	m := &InvestAccountMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeInvestAccount,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withInvestAccountID sets the ID field of the mutation.
+func withInvestAccountID(id xid.ID) investaccountOption {
+	return func(m *InvestAccountMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *InvestAccount
+		)
+		m.oldValue = func(ctx context.Context) (*InvestAccount, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().InvestAccount.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withInvestAccount sets the old InvestAccount of the mutation.
+func withInvestAccount(node *InvestAccount) investaccountOption {
+	return func(m *InvestAccountMutation) {
+		m.oldValue = func(context.Context) (*InvestAccount, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m InvestAccountMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m InvestAccountMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of InvestAccount entities.
+func (m *InvestAccountMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *InvestAccountMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *InvestAccountMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().InvestAccount.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetDescr sets the "Descr" field.
+func (m *InvestAccountMutation) SetDescr(s string) {
+	m._Descr = &s
+}
+
+// Descr returns the value of the "Descr" field in the mutation.
+func (m *InvestAccountMutation) Descr() (r string, exists bool) {
+	v := m._Descr
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescr returns the old "Descr" field's value of the InvestAccount entity.
+// If the InvestAccount object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *InvestAccountMutation) OldDescr(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescr is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescr requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescr: %w", err)
+	}
+	return oldValue.Descr, nil
+}
+
+// ResetDescr resets all changes to the "Descr" field.
+func (m *InvestAccountMutation) ResetDescr() {
+	m._Descr = nil
+}
+
+// SetOwnerID sets the "Owner" edge to the User entity by id.
+func (m *InvestAccountMutation) SetOwnerID(id xid.ID) {
+	m._Owner = &id
+}
+
+// ClearOwner clears the "Owner" edge to the User entity.
+func (m *InvestAccountMutation) ClearOwner() {
+	m.cleared_Owner = true
+}
+
+// OwnerCleared reports if the "Owner" edge to the User entity was cleared.
+func (m *InvestAccountMutation) OwnerCleared() bool {
+	return m.cleared_Owner
+}
+
+// OwnerID returns the "Owner" edge ID in the mutation.
+func (m *InvestAccountMutation) OwnerID() (id xid.ID, exists bool) {
+	if m._Owner != nil {
+		return *m._Owner, true
+	}
+	return
+}
+
+// OwnerIDs returns the "Owner" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// OwnerID instead. It exists only for internal usage by the builders.
+func (m *InvestAccountMutation) OwnerIDs() (ids []xid.ID) {
+	if id := m._Owner; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetOwner resets all changes to the "Owner" edge.
+func (m *InvestAccountMutation) ResetOwner() {
+	m._Owner = nil
+	m.cleared_Owner = false
+}
+
+// AddCashflowIDs adds the "Cashflows" edge to the InvestAccountCashflow entity by ids.
+func (m *InvestAccountMutation) AddCashflowIDs(ids ...xid.ID) {
+	if m._Cashflows == nil {
+		m._Cashflows = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m._Cashflows[ids[i]] = struct{}{}
+	}
+}
+
+// ClearCashflows clears the "Cashflows" edge to the InvestAccountCashflow entity.
+func (m *InvestAccountMutation) ClearCashflows() {
+	m.cleared_Cashflows = true
+}
+
+// CashflowsCleared reports if the "Cashflows" edge to the InvestAccountCashflow entity was cleared.
+func (m *InvestAccountMutation) CashflowsCleared() bool {
+	return m.cleared_Cashflows
+}
+
+// RemoveCashflowIDs removes the "Cashflows" edge to the InvestAccountCashflow entity by IDs.
+func (m *InvestAccountMutation) RemoveCashflowIDs(ids ...xid.ID) {
+	if m.removed_Cashflows == nil {
+		m.removed_Cashflows = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m._Cashflows, ids[i])
+		m.removed_Cashflows[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCashflows returns the removed IDs of the "Cashflows" edge to the InvestAccountCashflow entity.
+func (m *InvestAccountMutation) RemovedCashflowsIDs() (ids []xid.ID) {
+	for id := range m.removed_Cashflows {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CashflowsIDs returns the "Cashflows" edge IDs in the mutation.
+func (m *InvestAccountMutation) CashflowsIDs() (ids []xid.ID) {
+	for id := range m._Cashflows {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetCashflows resets all changes to the "Cashflows" edge.
+func (m *InvestAccountMutation) ResetCashflows() {
+	m._Cashflows = nil
+	m.cleared_Cashflows = false
+	m.removed_Cashflows = nil
+}
+
+// AddValuationIDs adds the "Valuations" edge to the InvestAccountValuation entity by ids.
+func (m *InvestAccountMutation) AddValuationIDs(ids ...xid.ID) {
+	if m._Valuations == nil {
+		m._Valuations = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m._Valuations[ids[i]] = struct{}{}
+	}
+}
+
+// ClearValuations clears the "Valuations" edge to the InvestAccountValuation entity.
+func (m *InvestAccountMutation) ClearValuations() {
+	m.cleared_Valuations = true
+}
+
+// ValuationsCleared reports if the "Valuations" edge to the InvestAccountValuation entity was cleared.
+func (m *InvestAccountMutation) ValuationsCleared() bool {
+	return m.cleared_Valuations
+}
+
+// RemoveValuationIDs removes the "Valuations" edge to the InvestAccountValuation entity by IDs.
+func (m *InvestAccountMutation) RemoveValuationIDs(ids ...xid.ID) {
+	if m.removed_Valuations == nil {
+		m.removed_Valuations = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m._Valuations, ids[i])
+		m.removed_Valuations[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedValuations returns the removed IDs of the "Valuations" edge to the InvestAccountValuation entity.
+func (m *InvestAccountMutation) RemovedValuationsIDs() (ids []xid.ID) {
+	for id := range m.removed_Valuations {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ValuationsIDs returns the "Valuations" edge IDs in the mutation.
+func (m *InvestAccountMutation) ValuationsIDs() (ids []xid.ID) {
+	for id := range m._Valuations {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetValuations resets all changes to the "Valuations" edge.
+func (m *InvestAccountMutation) ResetValuations() {
+	m._Valuations = nil
+	m.cleared_Valuations = false
+	m.removed_Valuations = nil
+}
+
+// Where appends a list predicates to the InvestAccountMutation builder.
+func (m *InvestAccountMutation) Where(ps ...predicate.InvestAccount) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *InvestAccountMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (InvestAccount).
+func (m *InvestAccountMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *InvestAccountMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m._Descr != nil {
+		fields = append(fields, investaccount.FieldDescr)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *InvestAccountMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case investaccount.FieldDescr:
+		return m.Descr()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *InvestAccountMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case investaccount.FieldDescr:
+		return m.OldDescr(ctx)
+	}
+	return nil, fmt.Errorf("unknown InvestAccount field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *InvestAccountMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case investaccount.FieldDescr:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescr(v)
+		return nil
+	}
+	return fmt.Errorf("unknown InvestAccount field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *InvestAccountMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *InvestAccountMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *InvestAccountMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown InvestAccount numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *InvestAccountMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *InvestAccountMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *InvestAccountMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown InvestAccount nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *InvestAccountMutation) ResetField(name string) error {
+	switch name {
+	case investaccount.FieldDescr:
+		m.ResetDescr()
+		return nil
+	}
+	return fmt.Errorf("unknown InvestAccount field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *InvestAccountMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m._Owner != nil {
+		edges = append(edges, investaccount.EdgeOwner)
+	}
+	if m._Cashflows != nil {
+		edges = append(edges, investaccount.EdgeCashflows)
+	}
+	if m._Valuations != nil {
+		edges = append(edges, investaccount.EdgeValuations)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *InvestAccountMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case investaccount.EdgeOwner:
+		if id := m._Owner; id != nil {
+			return []ent.Value{*id}
+		}
+	case investaccount.EdgeCashflows:
+		ids := make([]ent.Value, 0, len(m._Cashflows))
+		for id := range m._Cashflows {
+			ids = append(ids, id)
+		}
+		return ids
+	case investaccount.EdgeValuations:
+		ids := make([]ent.Value, 0, len(m._Valuations))
+		for id := range m._Valuations {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *InvestAccountMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.removed_Cashflows != nil {
+		edges = append(edges, investaccount.EdgeCashflows)
+	}
+	if m.removed_Valuations != nil {
+		edges = append(edges, investaccount.EdgeValuations)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *InvestAccountMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case investaccount.EdgeCashflows:
+		ids := make([]ent.Value, 0, len(m.removed_Cashflows))
+		for id := range m.removed_Cashflows {
+			ids = append(ids, id)
+		}
+		return ids
+	case investaccount.EdgeValuations:
+		ids := make([]ent.Value, 0, len(m.removed_Valuations))
+		for id := range m.removed_Valuations {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *InvestAccountMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.cleared_Owner {
+		edges = append(edges, investaccount.EdgeOwner)
+	}
+	if m.cleared_Cashflows {
+		edges = append(edges, investaccount.EdgeCashflows)
+	}
+	if m.cleared_Valuations {
+		edges = append(edges, investaccount.EdgeValuations)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *InvestAccountMutation) EdgeCleared(name string) bool {
+	switch name {
+	case investaccount.EdgeOwner:
+		return m.cleared_Owner
+	case investaccount.EdgeCashflows:
+		return m.cleared_Cashflows
+	case investaccount.EdgeValuations:
+		return m.cleared_Valuations
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *InvestAccountMutation) ClearEdge(name string) error {
+	switch name {
+	case investaccount.EdgeOwner:
+		m.ClearOwner()
+		return nil
+	}
+	return fmt.Errorf("unknown InvestAccount unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *InvestAccountMutation) ResetEdge(name string) error {
+	switch name {
+	case investaccount.EdgeOwner:
+		m.ResetOwner()
+		return nil
+	case investaccount.EdgeCashflows:
+		m.ResetCashflows()
+		return nil
+	case investaccount.EdgeValuations:
+		m.ResetValuations()
+		return nil
+	}
+	return fmt.Errorf("unknown InvestAccount edge %s", name)
+}
+
+// InvestAccountCashflowMutation represents an operation that mutates the InvestAccountCashflow nodes in the graph.
+type InvestAccountCashflowMutation struct {
 	config
 	op            Op
 	typ           string
 	id            *xid.ID
-	_UserName     *string
-	_AuthType     *int32
-	add_AuthType  *int32
-	_PasswordHash *string
-	_Admin        *bool
+	_RecDate      *time.Time
+	_Qty          *float64
+	add_Qty       *float64
 	clearedFields map[string]struct{}
+	_Owner        *xid.ID
+	cleared_Owner bool
 	done          bool
-	oldValue      func(context.Context) (*User, error)
-	predicates    []predicate.User
+	oldValue      func(context.Context) (*InvestAccountCashflow, error)
+	predicates    []predicate.InvestAccountCashflow
+}
+
+var _ ent.Mutation = (*InvestAccountCashflowMutation)(nil)
+
+// investaccountcashflowOption allows management of the mutation configuration using functional options.
+type investaccountcashflowOption func(*InvestAccountCashflowMutation)
+
+// newInvestAccountCashflowMutation creates new mutation for the InvestAccountCashflow entity.
+func newInvestAccountCashflowMutation(c config, op Op, opts ...investaccountcashflowOption) *InvestAccountCashflowMutation {
+	m := &InvestAccountCashflowMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeInvestAccountCashflow,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withInvestAccountCashflowID sets the ID field of the mutation.
+func withInvestAccountCashflowID(id xid.ID) investaccountcashflowOption {
+	return func(m *InvestAccountCashflowMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *InvestAccountCashflow
+		)
+		m.oldValue = func(ctx context.Context) (*InvestAccountCashflow, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().InvestAccountCashflow.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withInvestAccountCashflow sets the old InvestAccountCashflow of the mutation.
+func withInvestAccountCashflow(node *InvestAccountCashflow) investaccountcashflowOption {
+	return func(m *InvestAccountCashflowMutation) {
+		m.oldValue = func(context.Context) (*InvestAccountCashflow, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m InvestAccountCashflowMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m InvestAccountCashflowMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of InvestAccountCashflow entities.
+func (m *InvestAccountCashflowMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *InvestAccountCashflowMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *InvestAccountCashflowMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().InvestAccountCashflow.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetRecDate sets the "RecDate" field.
+func (m *InvestAccountCashflowMutation) SetRecDate(t time.Time) {
+	m._RecDate = &t
+}
+
+// RecDate returns the value of the "RecDate" field in the mutation.
+func (m *InvestAccountCashflowMutation) RecDate() (r time.Time, exists bool) {
+	v := m._RecDate
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRecDate returns the old "RecDate" field's value of the InvestAccountCashflow entity.
+// If the InvestAccountCashflow object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *InvestAccountCashflowMutation) OldRecDate(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRecDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRecDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRecDate: %w", err)
+	}
+	return oldValue.RecDate, nil
+}
+
+// ResetRecDate resets all changes to the "RecDate" field.
+func (m *InvestAccountCashflowMutation) ResetRecDate() {
+	m._RecDate = nil
+}
+
+// SetQty sets the "Qty" field.
+func (m *InvestAccountCashflowMutation) SetQty(f float64) {
+	m._Qty = &f
+	m.add_Qty = nil
+}
+
+// Qty returns the value of the "Qty" field in the mutation.
+func (m *InvestAccountCashflowMutation) Qty() (r float64, exists bool) {
+	v := m._Qty
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldQty returns the old "Qty" field's value of the InvestAccountCashflow entity.
+// If the InvestAccountCashflow object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *InvestAccountCashflowMutation) OldQty(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldQty is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldQty requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldQty: %w", err)
+	}
+	return oldValue.Qty, nil
+}
+
+// AddQty adds f to the "Qty" field.
+func (m *InvestAccountCashflowMutation) AddQty(f float64) {
+	if m.add_Qty != nil {
+		*m.add_Qty += f
+	} else {
+		m.add_Qty = &f
+	}
+}
+
+// AddedQty returns the value that was added to the "Qty" field in this mutation.
+func (m *InvestAccountCashflowMutation) AddedQty() (r float64, exists bool) {
+	v := m.add_Qty
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetQty resets all changes to the "Qty" field.
+func (m *InvestAccountCashflowMutation) ResetQty() {
+	m._Qty = nil
+	m.add_Qty = nil
+}
+
+// SetOwnerID sets the "Owner" edge to the InvestAccount entity by id.
+func (m *InvestAccountCashflowMutation) SetOwnerID(id xid.ID) {
+	m._Owner = &id
+}
+
+// ClearOwner clears the "Owner" edge to the InvestAccount entity.
+func (m *InvestAccountCashflowMutation) ClearOwner() {
+	m.cleared_Owner = true
+}
+
+// OwnerCleared reports if the "Owner" edge to the InvestAccount entity was cleared.
+func (m *InvestAccountCashflowMutation) OwnerCleared() bool {
+	return m.cleared_Owner
+}
+
+// OwnerID returns the "Owner" edge ID in the mutation.
+func (m *InvestAccountCashflowMutation) OwnerID() (id xid.ID, exists bool) {
+	if m._Owner != nil {
+		return *m._Owner, true
+	}
+	return
+}
+
+// OwnerIDs returns the "Owner" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// OwnerID instead. It exists only for internal usage by the builders.
+func (m *InvestAccountCashflowMutation) OwnerIDs() (ids []xid.ID) {
+	if id := m._Owner; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetOwner resets all changes to the "Owner" edge.
+func (m *InvestAccountCashflowMutation) ResetOwner() {
+	m._Owner = nil
+	m.cleared_Owner = false
+}
+
+// Where appends a list predicates to the InvestAccountCashflowMutation builder.
+func (m *InvestAccountCashflowMutation) Where(ps ...predicate.InvestAccountCashflow) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *InvestAccountCashflowMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (InvestAccountCashflow).
+func (m *InvestAccountCashflowMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *InvestAccountCashflowMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m._RecDate != nil {
+		fields = append(fields, investaccountcashflow.FieldRecDate)
+	}
+	if m._Qty != nil {
+		fields = append(fields, investaccountcashflow.FieldQty)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *InvestAccountCashflowMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case investaccountcashflow.FieldRecDate:
+		return m.RecDate()
+	case investaccountcashflow.FieldQty:
+		return m.Qty()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *InvestAccountCashflowMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case investaccountcashflow.FieldRecDate:
+		return m.OldRecDate(ctx)
+	case investaccountcashflow.FieldQty:
+		return m.OldQty(ctx)
+	}
+	return nil, fmt.Errorf("unknown InvestAccountCashflow field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *InvestAccountCashflowMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case investaccountcashflow.FieldRecDate:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRecDate(v)
+		return nil
+	case investaccountcashflow.FieldQty:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetQty(v)
+		return nil
+	}
+	return fmt.Errorf("unknown InvestAccountCashflow field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *InvestAccountCashflowMutation) AddedFields() []string {
+	var fields []string
+	if m.add_Qty != nil {
+		fields = append(fields, investaccountcashflow.FieldQty)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *InvestAccountCashflowMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case investaccountcashflow.FieldQty:
+		return m.AddedQty()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *InvestAccountCashflowMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case investaccountcashflow.FieldQty:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddQty(v)
+		return nil
+	}
+	return fmt.Errorf("unknown InvestAccountCashflow numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *InvestAccountCashflowMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *InvestAccountCashflowMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *InvestAccountCashflowMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown InvestAccountCashflow nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *InvestAccountCashflowMutation) ResetField(name string) error {
+	switch name {
+	case investaccountcashflow.FieldRecDate:
+		m.ResetRecDate()
+		return nil
+	case investaccountcashflow.FieldQty:
+		m.ResetQty()
+		return nil
+	}
+	return fmt.Errorf("unknown InvestAccountCashflow field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *InvestAccountCashflowMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m._Owner != nil {
+		edges = append(edges, investaccountcashflow.EdgeOwner)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *InvestAccountCashflowMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case investaccountcashflow.EdgeOwner:
+		if id := m._Owner; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *InvestAccountCashflowMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *InvestAccountCashflowMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *InvestAccountCashflowMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.cleared_Owner {
+		edges = append(edges, investaccountcashflow.EdgeOwner)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *InvestAccountCashflowMutation) EdgeCleared(name string) bool {
+	switch name {
+	case investaccountcashflow.EdgeOwner:
+		return m.cleared_Owner
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *InvestAccountCashflowMutation) ClearEdge(name string) error {
+	switch name {
+	case investaccountcashflow.EdgeOwner:
+		m.ClearOwner()
+		return nil
+	}
+	return fmt.Errorf("unknown InvestAccountCashflow unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *InvestAccountCashflowMutation) ResetEdge(name string) error {
+	switch name {
+	case investaccountcashflow.EdgeOwner:
+		m.ResetOwner()
+		return nil
+	}
+	return fmt.Errorf("unknown InvestAccountCashflow edge %s", name)
+}
+
+// InvestAccountValuationMutation represents an operation that mutates the InvestAccountValuation nodes in the graph.
+type InvestAccountValuationMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *xid.ID
+	_RecDate      *time.Time
+	_Value        *float64
+	add_Value     *float64
+	clearedFields map[string]struct{}
+	_Owner        *xid.ID
+	cleared_Owner bool
+	done          bool
+	oldValue      func(context.Context) (*InvestAccountValuation, error)
+	predicates    []predicate.InvestAccountValuation
+}
+
+var _ ent.Mutation = (*InvestAccountValuationMutation)(nil)
+
+// investaccountvaluationOption allows management of the mutation configuration using functional options.
+type investaccountvaluationOption func(*InvestAccountValuationMutation)
+
+// newInvestAccountValuationMutation creates new mutation for the InvestAccountValuation entity.
+func newInvestAccountValuationMutation(c config, op Op, opts ...investaccountvaluationOption) *InvestAccountValuationMutation {
+	m := &InvestAccountValuationMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeInvestAccountValuation,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withInvestAccountValuationID sets the ID field of the mutation.
+func withInvestAccountValuationID(id xid.ID) investaccountvaluationOption {
+	return func(m *InvestAccountValuationMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *InvestAccountValuation
+		)
+		m.oldValue = func(ctx context.Context) (*InvestAccountValuation, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().InvestAccountValuation.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withInvestAccountValuation sets the old InvestAccountValuation of the mutation.
+func withInvestAccountValuation(node *InvestAccountValuation) investaccountvaluationOption {
+	return func(m *InvestAccountValuationMutation) {
+		m.oldValue = func(context.Context) (*InvestAccountValuation, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m InvestAccountValuationMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m InvestAccountValuationMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of InvestAccountValuation entities.
+func (m *InvestAccountValuationMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *InvestAccountValuationMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *InvestAccountValuationMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().InvestAccountValuation.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetRecDate sets the "RecDate" field.
+func (m *InvestAccountValuationMutation) SetRecDate(t time.Time) {
+	m._RecDate = &t
+}
+
+// RecDate returns the value of the "RecDate" field in the mutation.
+func (m *InvestAccountValuationMutation) RecDate() (r time.Time, exists bool) {
+	v := m._RecDate
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRecDate returns the old "RecDate" field's value of the InvestAccountValuation entity.
+// If the InvestAccountValuation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *InvestAccountValuationMutation) OldRecDate(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRecDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRecDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRecDate: %w", err)
+	}
+	return oldValue.RecDate, nil
+}
+
+// ResetRecDate resets all changes to the "RecDate" field.
+func (m *InvestAccountValuationMutation) ResetRecDate() {
+	m._RecDate = nil
+}
+
+// SetValue sets the "Value" field.
+func (m *InvestAccountValuationMutation) SetValue(f float64) {
+	m._Value = &f
+	m.add_Value = nil
+}
+
+// Value returns the value of the "Value" field in the mutation.
+func (m *InvestAccountValuationMutation) Value() (r float64, exists bool) {
+	v := m._Value
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldValue returns the old "Value" field's value of the InvestAccountValuation entity.
+// If the InvestAccountValuation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *InvestAccountValuationMutation) OldValue(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldValue is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldValue requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldValue: %w", err)
+	}
+	return oldValue.Value, nil
+}
+
+// AddValue adds f to the "Value" field.
+func (m *InvestAccountValuationMutation) AddValue(f float64) {
+	if m.add_Value != nil {
+		*m.add_Value += f
+	} else {
+		m.add_Value = &f
+	}
+}
+
+// AddedValue returns the value that was added to the "Value" field in this mutation.
+func (m *InvestAccountValuationMutation) AddedValue() (r float64, exists bool) {
+	v := m.add_Value
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetValue resets all changes to the "Value" field.
+func (m *InvestAccountValuationMutation) ResetValue() {
+	m._Value = nil
+	m.add_Value = nil
+}
+
+// SetOwnerID sets the "Owner" edge to the InvestAccount entity by id.
+func (m *InvestAccountValuationMutation) SetOwnerID(id xid.ID) {
+	m._Owner = &id
+}
+
+// ClearOwner clears the "Owner" edge to the InvestAccount entity.
+func (m *InvestAccountValuationMutation) ClearOwner() {
+	m.cleared_Owner = true
+}
+
+// OwnerCleared reports if the "Owner" edge to the InvestAccount entity was cleared.
+func (m *InvestAccountValuationMutation) OwnerCleared() bool {
+	return m.cleared_Owner
+}
+
+// OwnerID returns the "Owner" edge ID in the mutation.
+func (m *InvestAccountValuationMutation) OwnerID() (id xid.ID, exists bool) {
+	if m._Owner != nil {
+		return *m._Owner, true
+	}
+	return
+}
+
+// OwnerIDs returns the "Owner" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// OwnerID instead. It exists only for internal usage by the builders.
+func (m *InvestAccountValuationMutation) OwnerIDs() (ids []xid.ID) {
+	if id := m._Owner; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetOwner resets all changes to the "Owner" edge.
+func (m *InvestAccountValuationMutation) ResetOwner() {
+	m._Owner = nil
+	m.cleared_Owner = false
+}
+
+// Where appends a list predicates to the InvestAccountValuationMutation builder.
+func (m *InvestAccountValuationMutation) Where(ps ...predicate.InvestAccountValuation) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *InvestAccountValuationMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (InvestAccountValuation).
+func (m *InvestAccountValuationMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *InvestAccountValuationMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m._RecDate != nil {
+		fields = append(fields, investaccountvaluation.FieldRecDate)
+	}
+	if m._Value != nil {
+		fields = append(fields, investaccountvaluation.FieldValue)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *InvestAccountValuationMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case investaccountvaluation.FieldRecDate:
+		return m.RecDate()
+	case investaccountvaluation.FieldValue:
+		return m.Value()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *InvestAccountValuationMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case investaccountvaluation.FieldRecDate:
+		return m.OldRecDate(ctx)
+	case investaccountvaluation.FieldValue:
+		return m.OldValue(ctx)
+	}
+	return nil, fmt.Errorf("unknown InvestAccountValuation field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *InvestAccountValuationMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case investaccountvaluation.FieldRecDate:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRecDate(v)
+		return nil
+	case investaccountvaluation.FieldValue:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetValue(v)
+		return nil
+	}
+	return fmt.Errorf("unknown InvestAccountValuation field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *InvestAccountValuationMutation) AddedFields() []string {
+	var fields []string
+	if m.add_Value != nil {
+		fields = append(fields, investaccountvaluation.FieldValue)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *InvestAccountValuationMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case investaccountvaluation.FieldValue:
+		return m.AddedValue()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *InvestAccountValuationMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case investaccountvaluation.FieldValue:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddValue(v)
+		return nil
+	}
+	return fmt.Errorf("unknown InvestAccountValuation numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *InvestAccountValuationMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *InvestAccountValuationMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *InvestAccountValuationMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown InvestAccountValuation nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *InvestAccountValuationMutation) ResetField(name string) error {
+	switch name {
+	case investaccountvaluation.FieldRecDate:
+		m.ResetRecDate()
+		return nil
+	case investaccountvaluation.FieldValue:
+		m.ResetValue()
+		return nil
+	}
+	return fmt.Errorf("unknown InvestAccountValuation field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *InvestAccountValuationMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m._Owner != nil {
+		edges = append(edges, investaccountvaluation.EdgeOwner)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *InvestAccountValuationMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case investaccountvaluation.EdgeOwner:
+		if id := m._Owner; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *InvestAccountValuationMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *InvestAccountValuationMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *InvestAccountValuationMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.cleared_Owner {
+		edges = append(edges, investaccountvaluation.EdgeOwner)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *InvestAccountValuationMutation) EdgeCleared(name string) bool {
+	switch name {
+	case investaccountvaluation.EdgeOwner:
+		return m.cleared_Owner
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *InvestAccountValuationMutation) ClearEdge(name string) error {
+	switch name {
+	case investaccountvaluation.EdgeOwner:
+		m.ClearOwner()
+		return nil
+	}
+	return fmt.Errorf("unknown InvestAccountValuation unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *InvestAccountValuationMutation) ResetEdge(name string) error {
+	switch name {
+	case investaccountvaluation.EdgeOwner:
+		m.ResetOwner()
+		return nil
+	}
+	return fmt.Errorf("unknown InvestAccountValuation edge %s", name)
+}
+
+// UserMutation represents an operation that mutates the User nodes in the graph.
+type UserMutation struct {
+	config
+	op                     Op
+	typ                    string
+	id                     *xid.ID
+	_UserName              *string
+	_AuthType              *int32
+	add_AuthType           *int32
+	_PasswordHash          *string
+	_Admin                 *bool
+	clearedFields          map[string]struct{}
+	_InvestAccounts        map[xid.ID]struct{}
+	removed_InvestAccounts map[xid.ID]struct{}
+	cleared_InvestAccounts bool
+	done                   bool
+	oldValue               func(context.Context) (*User, error)
+	predicates             []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -312,6 +1826,60 @@ func (m *UserMutation) ResetAdmin() {
 	m._Admin = nil
 }
 
+// AddInvestAccountIDs adds the "InvestAccounts" edge to the InvestAccount entity by ids.
+func (m *UserMutation) AddInvestAccountIDs(ids ...xid.ID) {
+	if m._InvestAccounts == nil {
+		m._InvestAccounts = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m._InvestAccounts[ids[i]] = struct{}{}
+	}
+}
+
+// ClearInvestAccounts clears the "InvestAccounts" edge to the InvestAccount entity.
+func (m *UserMutation) ClearInvestAccounts() {
+	m.cleared_InvestAccounts = true
+}
+
+// InvestAccountsCleared reports if the "InvestAccounts" edge to the InvestAccount entity was cleared.
+func (m *UserMutation) InvestAccountsCleared() bool {
+	return m.cleared_InvestAccounts
+}
+
+// RemoveInvestAccountIDs removes the "InvestAccounts" edge to the InvestAccount entity by IDs.
+func (m *UserMutation) RemoveInvestAccountIDs(ids ...xid.ID) {
+	if m.removed_InvestAccounts == nil {
+		m.removed_InvestAccounts = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m._InvestAccounts, ids[i])
+		m.removed_InvestAccounts[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedInvestAccounts returns the removed IDs of the "InvestAccounts" edge to the InvestAccount entity.
+func (m *UserMutation) RemovedInvestAccountsIDs() (ids []xid.ID) {
+	for id := range m.removed_InvestAccounts {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// InvestAccountsIDs returns the "InvestAccounts" edge IDs in the mutation.
+func (m *UserMutation) InvestAccountsIDs() (ids []xid.ID) {
+	for id := range m._InvestAccounts {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetInvestAccounts resets all changes to the "InvestAccounts" edge.
+func (m *UserMutation) ResetInvestAccounts() {
+	m._InvestAccounts = nil
+	m.cleared_InvestAccounts = false
+	m.removed_InvestAccounts = nil
+}
+
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -496,48 +2064,84 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m._InvestAccounts != nil {
+		edges = append(edges, user.EdgeInvestAccounts)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *UserMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case user.EdgeInvestAccounts:
+		ids := make([]ent.Value, 0, len(m._InvestAccounts))
+		for id := range m._InvestAccounts {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.removed_InvestAccounts != nil {
+		edges = append(edges, user.EdgeInvestAccounts)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *UserMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case user.EdgeInvestAccounts:
+		ids := make([]ent.Value, 0, len(m.removed_InvestAccounts))
+		for id := range m.removed_InvestAccounts {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.cleared_InvestAccounts {
+		edges = append(edges, user.EdgeInvestAccounts)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *UserMutation) EdgeCleared(name string) bool {
+	switch name {
+	case user.EdgeInvestAccounts:
+		return m.cleared_InvestAccounts
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *UserMutation) ClearEdge(name string) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown User unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *UserMutation) ResetEdge(name string) error {
+	switch name {
+	case user.EdgeInvestAccounts:
+		m.ResetInvestAccounts()
+		return nil
+	}
 	return fmt.Errorf("unknown User edge %s", name)
 }
