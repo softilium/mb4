@@ -249,10 +249,6 @@ func handleWeekflow(w http.ResponseWriter, r *http.Request, sess pages.SessionSt
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 	}
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 
 	evals, err := db.DB.InvestAccountValuation.Query().WithOwner().
 		Where(investaccountvaluation.HasOwnerWith(investaccount.IDIn(xids...))).
