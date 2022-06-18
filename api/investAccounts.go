@@ -19,7 +19,8 @@ import (
 	"github.com/softilium/mb4/pages"
 )
 
-func ApiInvestAccounts(w http.ResponseWriter, r *http.Request) {
+//InvestAccounts handles the /api/investaccounts endpoint.
+func InvestAccounts(w http.ResponseWriter, r *http.Request) {
 
 	curSes := pages.LoadSessionStruct(r)
 	if !curSes.Authenticated {
@@ -227,7 +228,7 @@ func handleGet(curSes pages.SessionStruct, w http.ResponseWriter) {
 
 }
 
-func EndOfWeek(t time.Time) time.Time {
+func endOfWeek(t time.Time) time.Time {
 	return t.AddDate(0, 0, 6-int(t.Weekday()))
 }
 
@@ -295,7 +296,7 @@ func handleWeekflow(w http.ResponseWriter, r *http.Request, sess pages.SessionSt
 			if v.Edges.Owner.ID != accid {
 				continue
 			}
-			eow := EndOfWeek(v.RecDate)
+			eow := endOfWeek(v.RecDate)
 			if rec, ok := raws[eow]; !ok {
 				raws[eow] = &weekRec{eow: eow, ev: v.Value}
 			} else {
@@ -306,7 +307,7 @@ func handleWeekflow(w http.ResponseWriter, r *http.Request, sess pages.SessionSt
 			if v.Edges.Owner.ID != accid {
 				continue
 			}
-			eow := EndOfWeek(v.RecDate)
+			eow := endOfWeek(v.RecDate)
 			if rec, ok := raws[eow]; !ok {
 				raws[eow] = &weekRec{eow: eow, ev: noevMarker, cf: v.Qty}
 			} else {
@@ -318,7 +319,7 @@ func handleWeekflow(w http.ResponseWriter, r *http.Request, sess pages.SessionSt
 
 	//flat and sort records for each accs SEPARATED, fill noevs
 	alllines := make(map[xid.ID][]*weekRec)
-	all_eows := make(map[time.Time]int)
+	allEows := make(map[time.Time]int)
 	for _, accid := range xids {
 
 		lines := make([]*weekRec, 0)
@@ -326,7 +327,7 @@ func handleWeekflow(w http.ResponseWriter, r *http.Request, sess pages.SessionSt
 		if ok {
 			for _, v := range raws {
 				lines = append(lines, v)
-				all_eows[v.eow] = 1
+				allEows[v.eow] = 1
 			}
 		}
 		sort.Slice(lines, func(i, j int) bool { return lines[i].eow.Before(lines[j].eow) })
@@ -344,7 +345,7 @@ func handleWeekflow(w http.ResponseWriter, r *http.Request, sess pages.SessionSt
 	merged := make([]*weekRec, 0)
 	for _, accslice := range alllines {
 		for _, rec := range accslice {
-			var fndrec *weekRec = nil
+			var fndrec *weekRec
 			for _, mc := range merged {
 				if mc.eow == rec.eow {
 					fndrec = mc
@@ -381,7 +382,7 @@ func handleWeekflow(w http.ResponseWriter, r *http.Request, sess pages.SessionSt
 	totalcf := 0.0
 	prevProfit := 0.0
 	for i, v := range merged {
-		wnum += 1
+		wnum++
 		res[i] = &WeekLine{
 			WNum:         wnum,
 			EowT:         v.eow,

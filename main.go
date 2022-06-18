@@ -42,11 +42,11 @@ func initServer(listenAddr string) *http.Server {
 	router.HandleFunc("/profile", pages.Profile)
 	router.HandleFunc("/invest-accounts", pages.InvestAccounts)
 
-	router.HandleFunc("/api/login", api.ApiLogin)
-	router.HandleFunc("/api/register", api.ApiRegister)
-	router.HandleFunc("/api/logout", api.ApiLogout)
+	router.HandleFunc("/api/login", api.AuthLogin)
+	router.HandleFunc("/api/register", api.AuthRegister)
+	router.HandleFunc("/api/logout", api.AuthLogout)
 
-	router.HandleFunc("/api/invest-accounts", api.ApiInvestAccounts)
+	router.HandleFunc("/api/invest-accounts", api.InvestAccounts)
 
 	server := &http.Server{
 		Addr:         listenAddr,

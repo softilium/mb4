@@ -13,8 +13,8 @@ import (
 	"github.com/softilium/mb4/pages"
 )
 
-// Supports both username+password form fields and Authorization header
-func ApiLogin(w http.ResponseWriter, r *http.Request) {
+// AuthLogin supports both username+password form fields and Authorization header
+func AuthLogin(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusBadRequest)
@@ -70,7 +70,8 @@ func ApiLogin(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func ApiLogout(w http.ResponseWriter, r *http.Request) {
+//AuthLogout clears session and redirects to login page
+func AuthLogout(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusBadRequest)
@@ -85,7 +86,8 @@ func ApiLogout(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func ApiRegister(w http.ResponseWriter, r *http.Request) {
+//AuthRegister registers new user
+func AuthRegister(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusBadRequest)
