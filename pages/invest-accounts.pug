@@ -4,4 +4,55 @@ extends layout.pug
         title Инвестиционные счета
 
     block content
-        h1 Инвестиционные счета
+        script[src="/assets/lib/vue/vue.global.prod.js"]
+        script[src="/assets/lib/echarts/echarts.min.js"]
+        div#vueapp
+            h1 Инвестиционные счета
+            div.row
+                div.col-4
+                    small
+                        table.table.sm
+                            thead
+                                tr
+                                    th
+                                    th Наименование счета
+                                    th.text-end Оценка активов, руб.
+                                    th.text-end Дата последней оценки
+                            tbody
+                                tr[v-for="item in accList"]
+                                    td
+                                        input[type="checkbox"][v-model="item.selected"][v-on:change="showContent()"]
+                                    td {{ item.descr }}
+                                    td.text-end {{ printCurrency(item.value) }}
+                                    td.text-end {{ item.rec_date }}
+                div.col-8
+                    h2.text-center Абсолютный доход по выбранным счетам
+                    div[ref="totalYield"][style="height:400px;width:100%"]
+                    p
+                    small
+                        table.table.sm
+                            thead[style="position: sticky; top: 0; z-index: 1; background-color: white;"]
+                                tr
+                                    th.text-end #
+                                    th Дата
+                                    th.text-end Портфель
+                                    th.text-end Пополнений
+                                    th.text-end Пополнение нед.
+                                    th.text-end Абс.доход
+                                    th.text-end Доход нед.
+                                    th.text-end Доходность абс, %
+                                    th.text-end Доходность годовая, %
+                            tbody
+                                tr[v-for="item in weekflow"]
+                                    td.text-end {{ item.wNum}}
+                                    td.text-nowrap {{ item.eow }}
+                                    //td {{ printDate(item.eow) }}
+                                    td.text-end {{ printCurrency(item.eval) }}
+                                    td.text-end {{ printCurrency(item.totalCashflow) }}
+                                    td.text-end {{ printCurrency(item.weekCashflow) }}
+                                    td.text-end {{ printCurrency(item.totalProfit) }}
+                                    td.text-end {{ printCurrency(item.weekProfit) }}
+                                    td.text-end {{ printPercent1(item.totalYield) }}
+                                    td.text-end {{ printPercent1(item.yearYield) }}
+
+        script[src="/assets/js/invest-accounts.js"]

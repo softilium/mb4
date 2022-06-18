@@ -20,15 +20,15 @@ var (
 	SessionsStore *sessions.CookieStore
 )
 
-type sessionStruct struct {
+type SessionStruct struct {
 	User          *ent.User //there will be another session's fields here
 	Authenticated bool
 	UserName      string
 }
 
-func LoadSessionStruct(r *http.Request) sessionStruct {
+func LoadSessionStruct(r *http.Request) SessionStruct {
 
-	data := sessionStruct{User: nil, Authenticated: false, UserName: ""}
+	data := SessionStruct{User: nil, Authenticated: false, UserName: ""}
 
 	session, err := SessionsStore.Get(r, config.C.SessionCookieName)
 	if err != nil {
