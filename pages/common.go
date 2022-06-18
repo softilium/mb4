@@ -22,7 +22,7 @@ var (
 
 type SessionStruct struct {
 	User          *ent.User //there will be another session's fields here
-	Authenticated bool
+	Authenticated bool      //in pug templated we can use only fields, not funcs. We need to have fields from User here
 	UserName      string
 }
 
