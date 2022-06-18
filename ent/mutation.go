@@ -1545,8 +1545,6 @@ type UserMutation struct {
 	typ                    string
 	id                     *xid.ID
 	_UserName              *string
-	_AuthType              *int32
-	add_AuthType           *int32
 	_PasswordHash          *string
 	_Admin                 *bool
 	clearedFields          map[string]struct{}
@@ -1698,62 +1696,6 @@ func (m *UserMutation) ResetUserName() {
 	m._UserName = nil
 }
 
-// SetAuthType sets the "AuthType" field.
-func (m *UserMutation) SetAuthType(i int32) {
-	m._AuthType = &i
-	m.add_AuthType = nil
-}
-
-// AuthType returns the value of the "AuthType" field in the mutation.
-func (m *UserMutation) AuthType() (r int32, exists bool) {
-	v := m._AuthType
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldAuthType returns the old "AuthType" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldAuthType(ctx context.Context) (v int32, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldAuthType is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldAuthType requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAuthType: %w", err)
-	}
-	return oldValue.AuthType, nil
-}
-
-// AddAuthType adds i to the "AuthType" field.
-func (m *UserMutation) AddAuthType(i int32) {
-	if m.add_AuthType != nil {
-		*m.add_AuthType += i
-	} else {
-		m.add_AuthType = &i
-	}
-}
-
-// AddedAuthType returns the value that was added to the "AuthType" field in this mutation.
-func (m *UserMutation) AddedAuthType() (r int32, exists bool) {
-	v := m.add_AuthType
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetAuthType resets all changes to the "AuthType" field.
-func (m *UserMutation) ResetAuthType() {
-	m._AuthType = nil
-	m.add_AuthType = nil
-}
-
 // SetPasswordHash sets the "PasswordHash" field.
 func (m *UserMutation) SetPasswordHash(s string) {
 	m._PasswordHash = &s
@@ -1899,12 +1841,9 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 3)
 	if m._UserName != nil {
 		fields = append(fields, user.FieldUserName)
-	}
-	if m._AuthType != nil {
-		fields = append(fields, user.FieldAuthType)
 	}
 	if m._PasswordHash != nil {
 		fields = append(fields, user.FieldPasswordHash)
@@ -1922,8 +1861,6 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case user.FieldUserName:
 		return m.UserName()
-	case user.FieldAuthType:
-		return m.AuthType()
 	case user.FieldPasswordHash:
 		return m.PasswordHash()
 	case user.FieldAdmin:
@@ -1939,8 +1876,6 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 	switch name {
 	case user.FieldUserName:
 		return m.OldUserName(ctx)
-	case user.FieldAuthType:
-		return m.OldAuthType(ctx)
 	case user.FieldPasswordHash:
 		return m.OldPasswordHash(ctx)
 	case user.FieldAdmin:
@@ -1960,13 +1895,6 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUserName(v)
-		return nil
-	case user.FieldAuthType:
-		v, ok := value.(int32)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetAuthType(v)
 		return nil
 	case user.FieldPasswordHash:
 		v, ok := value.(string)
@@ -1989,21 +1917,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *UserMutation) AddedFields() []string {
-	var fields []string
-	if m.add_AuthType != nil {
-		fields = append(fields, user.FieldAuthType)
-	}
-	return fields
+	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *UserMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case user.FieldAuthType:
-		return m.AddedAuthType()
-	}
 	return nil, false
 }
 
@@ -2012,13 +1932,6 @@ func (m *UserMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *UserMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case user.FieldAuthType:
-		v, ok := value.(int32)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddAuthType(v)
-		return nil
 	}
 	return fmt.Errorf("unknown User numeric field %s", name)
 }
@@ -2048,9 +1961,6 @@ func (m *UserMutation) ResetField(name string) error {
 	switch name {
 	case user.FieldUserName:
 		m.ResetUserName()
-		return nil
-	case user.FieldAuthType:
-		m.ResetAuthType()
 		return nil
 	case user.FieldPasswordHash:
 		m.ResetPasswordHash()

@@ -9,7 +9,6 @@ import (
 
 	"github.com/softilium/mb4/config"
 	"github.com/softilium/mb4/db"
-	"github.com/softilium/mb4/ent/schema"
 	"github.com/softilium/mb4/ent/user"
 	"github.com/softilium/mb4/pages"
 )
@@ -109,7 +108,6 @@ func ApiRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	nu, err := db.DB.User.Create().
-		SetAuthType(schema.Auth_Type_email).
 		SetUserName(strings.TrimSpace(strings.ToLower(userName))).
 		SetPasswordHash(db.PasswordHash(password)).
 		Save(context.Background())

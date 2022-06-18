@@ -73,14 +73,8 @@ func init() {
 			return nil
 		}
 	}()
-	// userDescAuthType is the schema descriptor for AuthType field.
-	userDescAuthType := userFields[2].Descriptor()
-	// user.DefaultAuthType holds the default value on creation for the AuthType field.
-	user.DefaultAuthType = userDescAuthType.Default.(int32)
-	// user.AuthTypeValidator is a validator for the "AuthType" field. It is called by the builders before save.
-	user.AuthTypeValidator = userDescAuthType.Validators[0].(func(int32) error)
 	// userDescAdmin is the schema descriptor for Admin field.
-	userDescAdmin := userFields[4].Descriptor()
+	userDescAdmin := userFields[3].Descriptor()
 	// user.DefaultAdmin holds the default value on creation for the Admin field.
 	user.DefaultAdmin = userDescAdmin.Default.(bool)
 	// userDescID is the schema descriptor for id field.

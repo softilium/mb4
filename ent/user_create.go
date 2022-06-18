@@ -27,20 +27,6 @@ func (uc *UserCreate) SetUserName(s string) *UserCreate {
 	return uc
 }
 
-// SetAuthType sets the "AuthType" field.
-func (uc *UserCreate) SetAuthType(i int32) *UserCreate {
-	uc.mutation.SetAuthType(i)
-	return uc
-}
-
-// SetNillableAuthType sets the "AuthType" field if the given value is not nil.
-func (uc *UserCreate) SetNillableAuthType(i *int32) *UserCreate {
-	if i != nil {
-		uc.SetAuthType(*i)
-	}
-	return uc
-}
-
 // SetPasswordHash sets the "PasswordHash" field.
 func (uc *UserCreate) SetPasswordHash(s string) *UserCreate {
 	uc.mutation.SetPasswordHash(s)
@@ -161,10 +147,6 @@ func (uc *UserCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (uc *UserCreate) defaults() {
-	if _, ok := uc.mutation.AuthType(); !ok {
-		v := user.DefaultAuthType
-		uc.mutation.SetAuthType(v)
-	}
 	if _, ok := uc.mutation.Admin(); !ok {
 		v := user.DefaultAdmin
 		uc.mutation.SetAdmin(v)
@@ -183,14 +165,6 @@ func (uc *UserCreate) check() error {
 	if v, ok := uc.mutation.UserName(); ok {
 		if err := user.UserNameValidator(v); err != nil {
 			return &ValidationError{Name: "UserName", err: fmt.Errorf(`ent: validator failed for field "User.UserName": %w`, err)}
-		}
-	}
-	if _, ok := uc.mutation.AuthType(); !ok {
-		return &ValidationError{Name: "AuthType", err: errors.New(`ent: missing required field "User.AuthType"`)}
-	}
-	if v, ok := uc.mutation.AuthType(); ok {
-		if err := user.AuthTypeValidator(v); err != nil {
-			return &ValidationError{Name: "AuthType", err: fmt.Errorf(`ent: validator failed for field "User.AuthType": %w`, err)}
 		}
 	}
 	if _, ok := uc.mutation.PasswordHash(); !ok {
@@ -242,14 +216,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldUserName,
 		})
 		_node.UserName = value
-	}
-	if value, ok := uc.mutation.AuthType(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt32,
-			Value:  value,
-			Column: user.FieldAuthType,
-		})
-		_node.AuthType = value
 	}
 	if value, ok := uc.mutation.PasswordHash(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

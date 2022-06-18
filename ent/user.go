@@ -18,8 +18,6 @@ type User struct {
 	ID xid.ID `json:"id,omitempty"`
 	// UserName holds the value of the "UserName" field.
 	UserName string `json:"UserName,omitempty"`
-	// AuthType holds the value of the "AuthType" field.
-	AuthType int32 `json:"AuthType,omitempty"`
 	// PasswordHash holds the value of the "PasswordHash" field.
 	PasswordHash string `json:"PasswordHash,omitempty"`
 	// Admin holds the value of the "Admin" field.
@@ -54,8 +52,6 @@ func (*User) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case user.FieldAdmin:
 			values[i] = new(sql.NullBool)
-		case user.FieldAuthType:
-			values[i] = new(sql.NullInt64)
 		case user.FieldUserName, user.FieldPasswordHash:
 			values[i] = new(sql.NullString)
 		case user.FieldID:
@@ -86,12 +82,6 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field UserName", values[i])
 			} else if value.Valid {
 				u.UserName = value.String
-			}
-		case user.FieldAuthType:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field AuthType", values[i])
-			} else if value.Valid {
-				u.AuthType = int32(value.Int64)
 			}
 		case user.FieldPasswordHash:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -140,8 +130,6 @@ func (u *User) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v", u.ID))
 	builder.WriteString(", UserName=")
 	builder.WriteString(u.UserName)
-	builder.WriteString(", AuthType=")
-	builder.WriteString(fmt.Sprintf("%v", u.AuthType))
 	builder.WriteString(", PasswordHash=")
 	builder.WriteString(u.PasswordHash)
 	builder.WriteString(", Admin=")

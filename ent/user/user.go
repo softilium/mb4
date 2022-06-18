@@ -13,8 +13,6 @@ const (
 	FieldID = "id"
 	// FieldUserName holds the string denoting the username field in the database.
 	FieldUserName = "user_name"
-	// FieldAuthType holds the string denoting the authtype field in the database.
-	FieldAuthType = "auth_type"
 	// FieldPasswordHash holds the string denoting the passwordhash field in the database.
 	FieldPasswordHash = "password_hash"
 	// FieldAdmin holds the string denoting the admin field in the database.
@@ -36,7 +34,6 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldUserName,
-	FieldAuthType,
 	FieldPasswordHash,
 	FieldAdmin,
 }
@@ -54,10 +51,6 @@ func ValidColumn(column string) bool {
 var (
 	// UserNameValidator is a validator for the "UserName" field. It is called by the builders before save.
 	UserNameValidator func(string) error
-	// DefaultAuthType holds the default value on creation for the "AuthType" field.
-	DefaultAuthType int32
-	// AuthTypeValidator is a validator for the "AuthType" field. It is called by the builders before save.
-	AuthTypeValidator func(int32) error
 	// DefaultAdmin holds the default value on creation for the "Admin" field.
 	DefaultAdmin bool
 	// DefaultID holds the default value on creation for the "id" field.

@@ -99,13 +99,6 @@ func UserName(v string) predicate.User {
 	})
 }
 
-// AuthType applies equality check predicate on the "AuthType" field. It's identical to AuthTypeEQ.
-func AuthType(v int32) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldAuthType), v))
-	})
-}
-
 // PasswordHash applies equality check predicate on the "PasswordHash" field. It's identical to PasswordHashEQ.
 func PasswordHash(v string) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
@@ -228,82 +221,6 @@ func UserNameEqualFold(v string) predicate.User {
 func UserNameContainsFold(v string) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldUserName), v))
-	})
-}
-
-// AuthTypeEQ applies the EQ predicate on the "AuthType" field.
-func AuthTypeEQ(v int32) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldAuthType), v))
-	})
-}
-
-// AuthTypeNEQ applies the NEQ predicate on the "AuthType" field.
-func AuthTypeNEQ(v int32) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldAuthType), v))
-	})
-}
-
-// AuthTypeIn applies the In predicate on the "AuthType" field.
-func AuthTypeIn(vs ...int32) predicate.User {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.User(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldAuthType), v...))
-	})
-}
-
-// AuthTypeNotIn applies the NotIn predicate on the "AuthType" field.
-func AuthTypeNotIn(vs ...int32) predicate.User {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.User(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldAuthType), v...))
-	})
-}
-
-// AuthTypeGT applies the GT predicate on the "AuthType" field.
-func AuthTypeGT(v int32) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldAuthType), v))
-	})
-}
-
-// AuthTypeGTE applies the GTE predicate on the "AuthType" field.
-func AuthTypeGTE(v int32) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldAuthType), v))
-	})
-}
-
-// AuthTypeLT applies the LT predicate on the "AuthType" field.
-func AuthTypeLT(v int32) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldAuthType), v))
-	})
-}
-
-// AuthTypeLTE applies the LTE predicate on the "AuthType" field.
-func AuthTypeLTE(v int32) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldAuthType), v))
 	})
 }
 

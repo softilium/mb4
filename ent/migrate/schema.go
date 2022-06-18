@@ -74,7 +74,6 @@ var (
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString},
 		{Name: "user_name", Type: field.TypeString, Unique: true, Size: 50},
-		{Name: "auth_type", Type: field.TypeInt32, Default: 1},
 		{Name: "password_hash", Type: field.TypeString},
 		{Name: "admin", Type: field.TypeBool, Default: false},
 	}
