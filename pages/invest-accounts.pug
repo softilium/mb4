@@ -10,21 +10,21 @@ extends layout.pug
             h1 Инвестиционные счета
             div.row
                 div.col-4
-                    small
-                        table.table.sm
-                            thead
-                                tr
-                                    th
-                                    th Наименование счета
-                                    th.text-end Оценка активов, руб.
-                                    th.text-end Дата последней оценки
-                            tbody
-                                tr[v-for="item in accList"]
-                                    td
-                                        input[type="checkbox"][v-model="item.selected"][v-on:change="showContent()"]
-                                    td {{ item.descr }}
-                                    td.text-end {{ printCurrency(item.value) }}
-                                    td.text-end {{ item.rec_date }}
+                    table.table.sm
+                        thead
+                            tr
+                                th
+                                th Наименование счета
+                                th.text-end Оценка активов, руб.
+                                th.text-end Дата последней оценки
+                        tbody
+                            tr[v-for="item in accList"]
+                                td
+                                    input[type="checkbox"][v-model="item.selected"][v-on:change="showContent()"]
+                                td
+                                    a[v-bind:href="'/invest-edit-account?id=' + item.id"] {{item.descr }}
+                                td.text-end {{ printCurrency(item.value) }}
+                                td.text-end {{ item.rec_date }}
                 div.col-8
                     h3.text-center Абсолютный доход
                     div[ref="totalYield"][style="height:400px;width:100%"]
@@ -44,7 +44,7 @@ extends layout.pug
                                 th.text-end Доходность годовая, %
                         tbody
                             tr[v-for="item in weekflow"]
-                                td.text-end {{ item.wNum}}
+                                td.text-end {{ item.wNum }}
                                 td.text-nowrap {{ item.eow }}
                                 td.text-end {{ printCurrency(item.eval) }}
                                 td.text-end {{ printCurrency(item.totalCashflow) }}

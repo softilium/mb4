@@ -28,11 +28,16 @@ func InvestAccounts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	parMode := r.URL.Query().Get("mode")
+	parID := r.URL.Query().Get("id")
+
 	if r.Method == http.MethodGet {
-		if r.URL.Query().Get("mode") == "weekflow" {
-			handleWeekflow(w, r, curSes)
+		if parMode == "weekflow" {
+			handleAccsWeekflow(w, r, curSes)
+		} else if parID != "" {
+			handleAccsGetOne(w, r, curSes, parID)
 		} else {
-			handleGet(curSes, w)
+			handleAccsGetList(curSes, w)
 		}
 	}
 
@@ -42,16 +47,16 @@ func InvestAccounts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodDelete {
-		handleDelete(r, w, curSes)
+		handleAccsDelete(r, w, curSes)
 	}
 
 	if r.Method == http.MethodPost {
-		handlePost(r, w, curSes)
+		handleAccsPost(r, w, curSes)
 	}
 
 }
 
-func handlePost(r *http.Request, w http.ResponseWriter, curSes pages.SessionStruct) {
+func handleAccsPost(r *http.Request, w http.ResponseWriter, curSes pages.SessionStruct) {
 
 	// Try to decode the request body into the struct. If there is an error,
 	// respond to the client with the error message and a 400 status code.
@@ -148,7 +153,7 @@ func handlePost(r *http.Request, w http.ResponseWriter, curSes pages.SessionStru
 
 }
 
-func handleDelete(r *http.Request, w http.ResponseWriter, curSes pages.SessionStruct) {
+func handleAccsDelete(r *http.Request, w http.ResponseWriter, curSes pages.SessionStruct) {
 
 	id, err := xid.FromString(r.URL.Query().Get("id"))
 	if err != nil {
@@ -184,7 +189,7 @@ func handleDelete(r *http.Request, w http.ResponseWriter, curSes pages.SessionSt
 
 }
 
-func handleGet(curSes pages.SessionStruct, w http.ResponseWriter) {
+func handleAccsGetList(curSes pages.SessionStruct, w http.ResponseWriter) {
 	data, err := db.DB.InvestAccount.Query().
 		WithValuations(
 			func(q *ent.InvestAccountValuationQuery) {
@@ -232,7 +237,7 @@ func endOfWeek(t time.Time) time.Time {
 	return t.AddDate(0, 0, 6-int(t.Weekday()))
 }
 
-func handleWeekflow(w http.ResponseWriter, r *http.Request, sess pages.SessionStruct) {
+func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, sess pages.SessionStruct) {
 
 	var err error
 
@@ -412,6 +417,48 @@ func handleWeekflow(w http.ResponseWriter, r *http.Request, sess pages.SessionSt
 
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(res)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Println(err)
+		return
+	}
+
+}
+
+func handleAccsGetOne(w http.ResponseWriter, r *http.Request, sess pages.SessionStruct, parID string) {
+
+	xid, err := xid.FromString(parID)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	data, err := db.DB.InvestAccount.Query().
+		WithCashflows(
+			func(q *ent.InvestAccountCashflowQuery) {
+				q.Order(ent.Asc(investaccountcashflow.FieldRecDate))
+			}).
+		WithValuations(
+			func(q *ent.InvestAccountValuationQuery) {
+				q.Order(ent.Asc(investaccountvaluation.FieldRecDate))
+			}).
+		Where(investaccount.And(
+			investaccount.HasOwnerWith(user.ID(sess.User.ID))),
+			investaccount.IDEQ(xid),
+		).All(context.Background())
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if len(data) != 1 {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(data[0])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		log.Println(err)

@@ -1,0 +1,38 @@
+extends layout.pug
+
+    block title
+        title Инвестиционны счет
+
+    block content
+        script[src="/assets/lib/vue/vue.global.prod.js"]
+        h1 Инвестиционный счет
+
+        div#vueapp
+            div.row
+                div.col-3
+                    h3 Оценки портфеля
+                    table.table.table-hover.table-responsive.table-sm
+                        thead
+                            tr
+                                th.text-end Дата оценки
+                                th.text-end Руб.
+                        tbody
+                            tr[v-for="item in obj.edges.Valuations"]
+                                td.text-end {{ item.RecDate }}
+                                td.text-end {{ printCurrency(item.Value) }}
+                div.col-3
+                    h3 Ввод-вывод
+                    table.table.table-hover.table-responsive.table-sm
+                        thead
+                            tr
+                                th.text-end Дата операции
+                                th.text-end Руб.
+                        tbody
+                            tr[v-for="item in obj.edges.Cashflows"]
+                                td.text-end {{ item.RecDate }}
+                                td.text-end {{ printCurrency(item.Qty) }}
+
+        script
+            window.accid='#{AccId}'
+
+        script[src="/assets/js/invest-edit-account.js"]
