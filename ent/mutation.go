@@ -1541,19 +1541,20 @@ func (m *InvestAccountValuationMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op                     Op
-	typ                    string
-	id                     *xid.ID
-	_UserName              *string
-	_PasswordHash          *string
-	_Admin                 *bool
-	clearedFields          map[string]struct{}
-	_InvestAccounts        map[xid.ID]struct{}
-	removed_InvestAccounts map[xid.ID]struct{}
-	cleared_InvestAccounts bool
-	done                   bool
-	oldValue               func(context.Context) (*User, error)
-	predicates             []predicate.User
+	op                       Op
+	typ                      string
+	id                       *xid.ID
+	_UserName                *string
+	_PasswordHash            *string
+	_Admin                   *bool
+	_StartInvestAccountsFlow *time.Time
+	clearedFields            map[string]struct{}
+	_InvestAccounts          map[xid.ID]struct{}
+	removed_InvestAccounts   map[xid.ID]struct{}
+	cleared_InvestAccounts   bool
+	done                     bool
+	oldValue                 func(context.Context) (*User, error)
+	predicates               []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -1768,6 +1769,55 @@ func (m *UserMutation) ResetAdmin() {
 	m._Admin = nil
 }
 
+// SetStartInvestAccountsFlow sets the "StartInvestAccountsFlow" field.
+func (m *UserMutation) SetStartInvestAccountsFlow(t time.Time) {
+	m._StartInvestAccountsFlow = &t
+}
+
+// StartInvestAccountsFlow returns the value of the "StartInvestAccountsFlow" field in the mutation.
+func (m *UserMutation) StartInvestAccountsFlow() (r time.Time, exists bool) {
+	v := m._StartInvestAccountsFlow
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStartInvestAccountsFlow returns the old "StartInvestAccountsFlow" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldStartInvestAccountsFlow(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStartInvestAccountsFlow is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStartInvestAccountsFlow requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStartInvestAccountsFlow: %w", err)
+	}
+	return oldValue.StartInvestAccountsFlow, nil
+}
+
+// ClearStartInvestAccountsFlow clears the value of the "StartInvestAccountsFlow" field.
+func (m *UserMutation) ClearStartInvestAccountsFlow() {
+	m._StartInvestAccountsFlow = nil
+	m.clearedFields[user.FieldStartInvestAccountsFlow] = struct{}{}
+}
+
+// StartInvestAccountsFlowCleared returns if the "StartInvestAccountsFlow" field was cleared in this mutation.
+func (m *UserMutation) StartInvestAccountsFlowCleared() bool {
+	_, ok := m.clearedFields[user.FieldStartInvestAccountsFlow]
+	return ok
+}
+
+// ResetStartInvestAccountsFlow resets all changes to the "StartInvestAccountsFlow" field.
+func (m *UserMutation) ResetStartInvestAccountsFlow() {
+	m._StartInvestAccountsFlow = nil
+	delete(m.clearedFields, user.FieldStartInvestAccountsFlow)
+}
+
 // AddInvestAccountIDs adds the "InvestAccounts" edge to the InvestAccount entity by ids.
 func (m *UserMutation) AddInvestAccountIDs(ids ...xid.ID) {
 	if m._InvestAccounts == nil {
@@ -1841,7 +1891,7 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m._UserName != nil {
 		fields = append(fields, user.FieldUserName)
 	}
@@ -1850,6 +1900,9 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m._Admin != nil {
 		fields = append(fields, user.FieldAdmin)
+	}
+	if m._StartInvestAccountsFlow != nil {
+		fields = append(fields, user.FieldStartInvestAccountsFlow)
 	}
 	return fields
 }
@@ -1865,6 +1918,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.PasswordHash()
 	case user.FieldAdmin:
 		return m.Admin()
+	case user.FieldStartInvestAccountsFlow:
+		return m.StartInvestAccountsFlow()
 	}
 	return nil, false
 }
@@ -1880,6 +1935,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldPasswordHash(ctx)
 	case user.FieldAdmin:
 		return m.OldAdmin(ctx)
+	case user.FieldStartInvestAccountsFlow:
+		return m.OldStartInvestAccountsFlow(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -1910,6 +1967,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetAdmin(v)
 		return nil
+	case user.FieldStartInvestAccountsFlow:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStartInvestAccountsFlow(v)
+		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
 }
@@ -1939,7 +2003,11 @@ func (m *UserMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *UserMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(user.FieldStartInvestAccountsFlow) {
+		fields = append(fields, user.FieldStartInvestAccountsFlow)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1952,6 +2020,11 @@ func (m *UserMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *UserMutation) ClearField(name string) error {
+	switch name {
+	case user.FieldStartInvestAccountsFlow:
+		m.ClearStartInvestAccountsFlow()
+		return nil
+	}
 	return fmt.Errorf("unknown User nullable field %s", name)
 }
 
@@ -1967,6 +2040,9 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldAdmin:
 		m.ResetAdmin()
+		return nil
+	case user.FieldStartInvestAccountsFlow:
+		m.ResetStartInvestAccountsFlow()
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)

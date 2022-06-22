@@ -3,7 +3,9 @@ package api
 import (
 	"context"
 	"encoding/base64"
+	"log"
 	"strings"
+	"time"
 
 	"net/http"
 
@@ -13,8 +15,8 @@ import (
 	"github.com/softilium/mb4/pages"
 )
 
-// AuthLogin supports both username+password form fields and Authorization header
-func AuthLogin(w http.ResponseWriter, r *http.Request) {
+// UsersLogin supports both username+password form fields and Authorization header
+func UsersLogin(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusBadRequest)
@@ -70,8 +72,8 @@ func AuthLogin(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//AuthLogout clears session and redirects to login page
-func AuthLogout(w http.ResponseWriter, r *http.Request) {
+//UsersLogout clears session and redirects to login page
+func UsersLogout(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusBadRequest)
@@ -86,8 +88,8 @@ func AuthLogout(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//AuthRegister registers new user
-func AuthRegister(w http.ResponseWriter, r *http.Request) {
+//UsersRegister registers new user
+func UsersRegister(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusBadRequest)
@@ -124,4 +126,40 @@ func AuthRegister(w http.ResponseWriter, r *http.Request) {
 	session.Save(r, w)
 	w.WriteHeader(http.StatusOK)
 
+}
+
+// /api/auth/start-invest-accounts-flow
+func UsersStartInvestAccountsFlow(w http.ResponseWriter, r *http.Request) {
+
+	session := pages.LoadSessionStruct(r)
+	if !session.Authenticated {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+
+	}
+
+	if r.Method == http.MethodPost {
+
+		parNewdate := r.URL.Query().Get("newdate")
+		newValue, err := time.Parse("2006-01-02", parNewdate)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		_, err = db.DB.User.UpdateOneID(session.User.ID).SetStartInvestAccountsFlow(newValue).Save(context.Background())
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+	}
+
+	if r.Method == http.MethodGet {
+		if !session.User.StartInvestAccountsFlow.IsZero() {
+			res := session.User.StartInvestAccountsFlow.Format("2006-01-02")
+			w.Write([]byte(res))
+		}
+	}
 }

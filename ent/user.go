@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/rs/xid"
@@ -22,6 +23,8 @@ type User struct {
 	PasswordHash string `json:"PasswordHash,omitempty"`
 	// Admin holds the value of the "Admin" field.
 	Admin bool `json:"Admin,omitempty"`
+	// StartInvestAccountsFlow holds the value of the "StartInvestAccountsFlow" field.
+	StartInvestAccountsFlow time.Time `json:"StartInvestAccountsFlow,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges UserEdges `json:"edges"`
@@ -54,6 +57,8 @@ func (*User) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullBool)
 		case user.FieldUserName, user.FieldPasswordHash:
 			values[i] = new(sql.NullString)
+		case user.FieldStartInvestAccountsFlow:
+			values[i] = new(sql.NullTime)
 		case user.FieldID:
 			values[i] = new(xid.ID)
 		default:
@@ -95,6 +100,12 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				u.Admin = value.Bool
 			}
+		case user.FieldStartInvestAccountsFlow:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field StartInvestAccountsFlow", values[i])
+			} else if value.Valid {
+				u.StartInvestAccountsFlow = value.Time
+			}
 		}
 	}
 	return nil
@@ -134,6 +145,8 @@ func (u *User) String() string {
 	builder.WriteString(u.PasswordHash)
 	builder.WriteString(", Admin=")
 	builder.WriteString(fmt.Sprintf("%v", u.Admin))
+	builder.WriteString(", StartInvestAccountsFlow=")
+	builder.WriteString(u.StartInvestAccountsFlow.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

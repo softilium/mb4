@@ -17,6 +17,8 @@ const (
 	FieldPasswordHash = "password_hash"
 	// FieldAdmin holds the string denoting the admin field in the database.
 	FieldAdmin = "admin"
+	// FieldStartInvestAccountsFlow holds the string denoting the startinvestaccountsflow field in the database.
+	FieldStartInvestAccountsFlow = "start_invest_accounts_flow"
 	// EdgeInvestAccounts holds the string denoting the investaccounts edge name in mutations.
 	EdgeInvestAccounts = "InvestAccounts"
 	// Table holds the table name of the user in the database.
@@ -36,6 +38,7 @@ var Columns = []string{
 	FieldUserName,
 	FieldPasswordHash,
 	FieldAdmin,
+	FieldStartInvestAccountsFlow,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

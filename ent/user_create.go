@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -43,6 +44,20 @@ func (uc *UserCreate) SetAdmin(b bool) *UserCreate {
 func (uc *UserCreate) SetNillableAdmin(b *bool) *UserCreate {
 	if b != nil {
 		uc.SetAdmin(*b)
+	}
+	return uc
+}
+
+// SetStartInvestAccountsFlow sets the "StartInvestAccountsFlow" field.
+func (uc *UserCreate) SetStartInvestAccountsFlow(t time.Time) *UserCreate {
+	uc.mutation.SetStartInvestAccountsFlow(t)
+	return uc
+}
+
+// SetNillableStartInvestAccountsFlow sets the "StartInvestAccountsFlow" field if the given value is not nil.
+func (uc *UserCreate) SetNillableStartInvestAccountsFlow(t *time.Time) *UserCreate {
+	if t != nil {
+		uc.SetStartInvestAccountsFlow(*t)
 	}
 	return uc
 }
@@ -232,6 +247,14 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldAdmin,
 		})
 		_node.Admin = value
+	}
+	if value, ok := uc.mutation.StartInvestAccountsFlow(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: user.FieldStartInvestAccountsFlow,
+		})
+		_node.StartInvestAccountsFlow = value
 	}
 	if nodes := uc.mutation.InvestAccountsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

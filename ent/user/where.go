@@ -3,6 +3,8 @@
 package user
 
 import (
+	"time"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/rs/xid"
@@ -110,6 +112,13 @@ func PasswordHash(v string) predicate.User {
 func Admin(v bool) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldAdmin), v))
+	})
+}
+
+// StartInvestAccountsFlow applies equality check predicate on the "StartInvestAccountsFlow" field. It's identical to StartInvestAccountsFlowEQ.
+func StartInvestAccountsFlow(v time.Time) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldStartInvestAccountsFlow), v))
 	})
 }
 
@@ -346,6 +355,96 @@ func AdminEQ(v bool) predicate.User {
 func AdminNEQ(v bool) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldAdmin), v))
+	})
+}
+
+// StartInvestAccountsFlowEQ applies the EQ predicate on the "StartInvestAccountsFlow" field.
+func StartInvestAccountsFlowEQ(v time.Time) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldStartInvestAccountsFlow), v))
+	})
+}
+
+// StartInvestAccountsFlowNEQ applies the NEQ predicate on the "StartInvestAccountsFlow" field.
+func StartInvestAccountsFlowNEQ(v time.Time) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldStartInvestAccountsFlow), v))
+	})
+}
+
+// StartInvestAccountsFlowIn applies the In predicate on the "StartInvestAccountsFlow" field.
+func StartInvestAccountsFlowIn(vs ...time.Time) predicate.User {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.User(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldStartInvestAccountsFlow), v...))
+	})
+}
+
+// StartInvestAccountsFlowNotIn applies the NotIn predicate on the "StartInvestAccountsFlow" field.
+func StartInvestAccountsFlowNotIn(vs ...time.Time) predicate.User {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.User(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldStartInvestAccountsFlow), v...))
+	})
+}
+
+// StartInvestAccountsFlowGT applies the GT predicate on the "StartInvestAccountsFlow" field.
+func StartInvestAccountsFlowGT(v time.Time) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldStartInvestAccountsFlow), v))
+	})
+}
+
+// StartInvestAccountsFlowGTE applies the GTE predicate on the "StartInvestAccountsFlow" field.
+func StartInvestAccountsFlowGTE(v time.Time) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldStartInvestAccountsFlow), v))
+	})
+}
+
+// StartInvestAccountsFlowLT applies the LT predicate on the "StartInvestAccountsFlow" field.
+func StartInvestAccountsFlowLT(v time.Time) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldStartInvestAccountsFlow), v))
+	})
+}
+
+// StartInvestAccountsFlowLTE applies the LTE predicate on the "StartInvestAccountsFlow" field.
+func StartInvestAccountsFlowLTE(v time.Time) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldStartInvestAccountsFlow), v))
+	})
+}
+
+// StartInvestAccountsFlowIsNil applies the IsNil predicate on the "StartInvestAccountsFlow" field.
+func StartInvestAccountsFlowIsNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldStartInvestAccountsFlow)))
+	})
+}
+
+// StartInvestAccountsFlowNotNil applies the NotNil predicate on the "StartInvestAccountsFlow" field.
+func StartInvestAccountsFlowNotNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldStartInvestAccountsFlow)))
 	})
 }
 

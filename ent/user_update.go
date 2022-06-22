@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -52,6 +53,26 @@ func (uu *UserUpdate) SetNillableAdmin(b *bool) *UserUpdate {
 	if b != nil {
 		uu.SetAdmin(*b)
 	}
+	return uu
+}
+
+// SetStartInvestAccountsFlow sets the "StartInvestAccountsFlow" field.
+func (uu *UserUpdate) SetStartInvestAccountsFlow(t time.Time) *UserUpdate {
+	uu.mutation.SetStartInvestAccountsFlow(t)
+	return uu
+}
+
+// SetNillableStartInvestAccountsFlow sets the "StartInvestAccountsFlow" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableStartInvestAccountsFlow(t *time.Time) *UserUpdate {
+	if t != nil {
+		uu.SetStartInvestAccountsFlow(*t)
+	}
+	return uu
+}
+
+// ClearStartInvestAccountsFlow clears the value of the "StartInvestAccountsFlow" field.
+func (uu *UserUpdate) ClearStartInvestAccountsFlow() *UserUpdate {
+	uu.mutation.ClearStartInvestAccountsFlow()
 	return uu
 }
 
@@ -205,6 +226,19 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: user.FieldAdmin,
 		})
 	}
+	if value, ok := uu.mutation.StartInvestAccountsFlow(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: user.FieldStartInvestAccountsFlow,
+		})
+	}
+	if uu.mutation.StartInvestAccountsFlowCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: user.FieldStartInvestAccountsFlow,
+		})
+	}
 	if uu.mutation.InvestAccountsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -301,6 +335,26 @@ func (uuo *UserUpdateOne) SetNillableAdmin(b *bool) *UserUpdateOne {
 	if b != nil {
 		uuo.SetAdmin(*b)
 	}
+	return uuo
+}
+
+// SetStartInvestAccountsFlow sets the "StartInvestAccountsFlow" field.
+func (uuo *UserUpdateOne) SetStartInvestAccountsFlow(t time.Time) *UserUpdateOne {
+	uuo.mutation.SetStartInvestAccountsFlow(t)
+	return uuo
+}
+
+// SetNillableStartInvestAccountsFlow sets the "StartInvestAccountsFlow" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableStartInvestAccountsFlow(t *time.Time) *UserUpdateOne {
+	if t != nil {
+		uuo.SetStartInvestAccountsFlow(*t)
+	}
+	return uuo
+}
+
+// ClearStartInvestAccountsFlow clears the value of the "StartInvestAccountsFlow" field.
+func (uuo *UserUpdateOne) ClearStartInvestAccountsFlow() *UserUpdateOne {
+	uuo.mutation.ClearStartInvestAccountsFlow()
 	return uuo
 }
 
@@ -476,6 +530,19 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Type:   field.TypeBool,
 			Value:  value,
 			Column: user.FieldAdmin,
+		})
+	}
+	if value, ok := uuo.mutation.StartInvestAccountsFlow(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: user.FieldStartInvestAccountsFlow,
+		})
+	}
+	if uuo.mutation.StartInvestAccountsFlowCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: user.FieldStartInvestAccountsFlow,
 		})
 	}
 	if uuo.mutation.InvestAccountsCleared() {

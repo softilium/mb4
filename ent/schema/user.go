@@ -17,6 +17,7 @@ func (User) Fields() []ent.Field {
 		field.String("UserName").NotEmpty().MinLen(3).MaxLen(50).Unique(),
 		field.String("PasswordHash"),
 		field.Bool("Admin").Default(false),
+		field.Time("StartInvestAccountsFlow").Optional(),
 	}
 }
 

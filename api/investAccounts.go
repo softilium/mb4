@@ -19,7 +19,7 @@ import (
 	"github.com/softilium/mb4/pages"
 )
 
-//InvestAccounts handles the /api/investaccounts endpoint.
+//InvestAccounts handles the /api/invest-accounts.* endpoint.
 func InvestAccounts(w http.ResponseWriter, r *http.Request) {
 
 	curSes := pages.LoadSessionStruct(r)
@@ -243,6 +243,8 @@ func endOfWeek(t time.Time) time.Time {
 
 func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, sess pages.SessionStruct) {
 
+	startDate := sess.User.StartInvestAccountsFlow
+
 	var err error
 
 	ids := strings.Split(r.URL.Query().Get("ids"), ",")
@@ -370,6 +372,12 @@ func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, sess pages.Sessi
 		}
 	}
 	sort.Slice(merged, func(i, j int) bool { return merged[i].eow.Before(merged[j].eow) })
+
+	for len(merged) > 1 && merged[0].eow.Before(startDate) {
+		merged[1].cf += merged[0].cf
+		merged = merged[1:]
+	}
+	merged[0].cf = merged[0].ev
 
 	type WeekLine struct {
 		WNum          int       `json:"wNum"`

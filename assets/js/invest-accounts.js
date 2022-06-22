@@ -2,7 +2,8 @@ const App = {
     data() {
         return {
             accList: {},
-            weekflow: []
+            weekflow: [],
+            startInvestAccountsFlow: ""
         }
     },
     async mounted() {
@@ -10,21 +11,37 @@ const App = {
     },
     methods: {
         async getAccList() {
-            let response = await fetch('/api/invest-accounts', { method: 'GET' });
+            let response = await fetch("/api/users/start-invest-accounts-flow", { method: "GET" });
             if (response.ok) {
-                this.accList = await response.json();
+                const lDate = await response.text();
+                if (lDate != "")
+                    this.startInvestAccountsFlow = lDate;
+                else
+                    this.startInvestAccountsFlow = "2017-01-01";
+                response = await fetch('/api/invest-accounts', { method: 'GET' });
+                if (response.ok) this.accList = await response.json();
+                else alert("Проблема с получением списка брокерских счетов");
+            } else {
+                alert("Проблема при получении стартовой даты расчета");
             }
-            else alert("Проблема с получением списка брокерских счетов");
+        },
+        async startInvestAccountsFlowChanged() {
+            let response = await fetch(
+                `/api/users/start-invest-accounts-flow?newdate=${this.startInvestAccountsFlow}`,
+                { method: 'POST' }
+            );
+            if (response.ok) {
+                this.showContent();
+            }
+            else alert("Проблема при установке стартовой даты расчета");
         },
         async applyTotalYieldChart(domref) {
-
             var myChart = echarts.init(domref);
 
             if (this.weekflow.length < 1) {
                 myChart.clear();
                 return;
             }
-
             dates = [];
             yields = [];
             this.weekflow.forEach(function (el) {
@@ -74,7 +91,6 @@ const App = {
                 this.applyTotalYieldChart(this.$refs.totalYield);
             }
             else alert("Проблема с получением списка брокерских счетов");
-
         }
     }
 };

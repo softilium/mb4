@@ -43,12 +43,13 @@ func initServer(listenAddr string) *http.Server {
 	router.HandleFunc("/invest-accounts", pages.InvestAccounts)
 	router.HandleFunc("/invest-edit-account", pages.InvestAccount)
 
-	router.HandleFunc("/api/login", api.AuthLogin)
-	router.HandleFunc("/api/register", api.AuthRegister)
-	router.HandleFunc("/api/logout", api.AuthLogout)
+	router.HandleFunc("/api/users/login", api.UsersLogin)
+	router.HandleFunc("/api/users/register", api.UsersRegister)
+	router.HandleFunc("/api/users/logout", api.UsersLogout)
+	router.HandleFunc("/api/users/start-invest-accounts-flow", api.UsersStartInvestAccountsFlow)
 
 	router.HandleFunc("/api/invest-accounts", api.InvestAccounts)
-	
+
 	server := &http.Server{
 		Addr:         listenAddr,
 		Handler:      router,

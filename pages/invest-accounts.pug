@@ -4,12 +4,20 @@ extends layout.pug
         title Инвестиционные счета
 
     block content
-        script[src="/assets/lib/vue/vue.global.prod.js"]
+        //script[src="/assets/lib/vue/vue.global.prod.js"]
+        script[src="/assets/lib/vue/vue.global.js"]
         script[src="/assets/lib/echarts/echarts.min.js"]
         div#vueapp
             h1 Инвестиционные счета
             div.row
                 div.col-4
+                    div.form-group.row
+                        label.col-sm-6.col-form-label[for="startSimulation"] Стартовая дата расчета
+                        div.col-sm-6
+                            input.form-control.form-control-sm
+                                [type="date"]
+                                [v-model="startInvestAccountsFlow"]
+                                [v-on:change="startInvestAccountsFlowChanged()"]
                     table.table.sm
                         thead
                             tr

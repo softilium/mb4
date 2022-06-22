@@ -6,7 +6,7 @@ const App = {
     methods: {
         async logout() {
             let res = await fetch(
-                "/api/logout",
+                "/api/users/logout",
                 { method: 'POST' }
             );
             if (res.ok)

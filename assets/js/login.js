@@ -17,7 +17,7 @@ const App = {
     methods: {
         async login() {
             let res = await fetch(
-                "/api/login?username=" + this.userName + "&password=" + this.password,
+                "/api/users/login?username=" + this.userName + "&password=" + this.password,
                 { method: 'POST' }
             );
             if (res.ok)
@@ -35,7 +35,7 @@ const App = {
                 return;
             }
             let res = await fetch(
-                "/api/register?username=" + this.userNameReg + "&password=" + this.passwordReg,
+                `/api/users/register?username=${this.userNameReg}&password=${this.passwordReg}`,
                 { method: 'POST' }
             );
             if (res.ok)
