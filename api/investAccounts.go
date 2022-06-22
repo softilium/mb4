@@ -33,10 +33,13 @@ func InvestAccounts(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {
 		if parMode == "weekflow" {
+			// /api/invest-accounts?mode=weekmode
 			handleAccsWeekflow(w, r, curSes)
 		} else if parID != "" {
+			// /api/invent-acconts?id=123123
 			handleAccsGetOne(w, r, curSes, parID)
 		} else {
+			// api/invent-accounts
 			handleAccsGetList(curSes, w)
 		}
 	}
@@ -46,6 +49,7 @@ func InvestAccounts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// methods is for exchange with backoffice (for admin only)
 	if r.Method == http.MethodDelete {
 		handleAccsDelete(r, w, curSes)
 	}
@@ -204,10 +208,10 @@ func handleAccsGetList(curSes pages.SessionStruct, w http.ResponseWriter) {
 	}
 
 	type AccountListResult struct {
-		ID      string  `json:"id"`
-		Descr   string  `json:"descr"`
-		RecDate string  `json:"rec_date"`
-		Value   float64 `json:"value"`
+		ID      string    `json:"id"`
+		Descr   string    `json:"descr"`
+		RecDate time.Time `json:"rec_date"`
+		Value   float64   `json:"value"`
 	}
 
 	data2 := make([]AccountListResult, len(data))
@@ -215,7 +219,7 @@ func handleAccsGetList(curSes pages.SessionStruct, w http.ResponseWriter) {
 
 		data2[i] = AccountListResult{ID: v.ID.String(), Descr: v.Descr}
 		if len(v.Edges.Valuations) > 0 {
-			data2[i].RecDate = v.Edges.Valuations[0].RecDate.Format("02-01-2006")
+			data2[i].RecDate = v.Edges.Valuations[0].RecDate
 			data2[i].Value = v.Edges.Valuations[0].Value
 		}
 	}
@@ -369,8 +373,7 @@ func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, sess pages.Sessi
 
 	type WeekLine struct {
 		WNum          int       `json:"wNum"`
-		EowT          time.Time `json:"eowT"`
-		Eow           string    `json:"eow"`
+		Eow           time.Time `json:"eow"`
 		Eval          float64   `json:"eval"`
 		WeekCashflow  float64   `json:"weekCashflow"`
 		TotalCashflow float64   `json:"totalCashflow"`
@@ -390,8 +393,7 @@ func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, sess pages.Sessi
 		wnum++
 		res[i] = &WeekLine{
 			WNum:         wnum,
-			EowT:         v.eow,
-			Eow:          v.eow.Format("2006-01-02"),
+			Eow:          v.eow,
 			WeekCashflow: v.cf,
 			Eval:         v.ev,
 		}
@@ -406,10 +408,10 @@ func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, sess pages.Sessi
 			res[i].TotalYield = res[i].TotalProfit / res[i].TotalCashflow * 100
 		}
 
-		if res[i].TotalCashflow == 0 || (res[i].EowT.Sub(firstDate).Hours() < 24) {
+		if res[i].TotalCashflow == 0 || (res[i].Eow.Sub(firstDate).Hours() < 24) {
 			res[i].YearYield = 0
 		} else {
-			days := res[i].EowT.Sub(firstDate).Hours() / 24.0
+			days := res[i].Eow.Sub(firstDate).Hours() / 24.0
 			res[i].YearYield = res[i].TotalProfit / res[i].TotalCashflow / days * 360.0 * 100.0
 		}
 

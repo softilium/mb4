@@ -16,10 +16,16 @@ extends layout.pug
                             tr
                                 th.text-end Дата оценки
                                 th.text-end Руб.
+                                th
                         tbody
                             tr[v-for="item in obj.edges.Valuations"]
-                                td.text-end {{ item.RecDate }}
-                                td.text-end {{ printCurrency(item.Value) }}
+                                td.text-end {{ $prnDate(item.RecDate) }}
+                                td.text-end {{ $prnCurrency(item.Value) }}
+                                td
+                                    button.btn[data-bs-toggle="modal"][data-bs-target="#filterModal"]
+                                        i.bi.bi-pencil-square
+                                    button.btn
+                                        i.bi.bi-trash3
                 div.col-3
                     h3 Ввод-вывод
                     table.table.table-hover.table-responsive.table-sm
@@ -27,10 +33,16 @@ extends layout.pug
                             tr
                                 th.text-end Дата операции
                                 th.text-end Руб.
+                                th
                         tbody
                             tr[v-for="item in obj.edges.Cashflows"]
-                                td.text-end {{ item.RecDate }}
-                                td.text-end {{ printCurrency(item.Qty) }}
+                                td.text-end {{ $prnDate(item.RecDate) }}
+                                td.text-end {{ $prnCurrency(item.Qty) }}
+                                td
+                                    button.btn[data-bs-toggle="modal"][data-bs-target="#filterModal"]
+                                        i.bi.bi-pencil-square
+                                    button.btn
+                                        i.bi.bi-trash3
 
         script
             window.accid='#{AccId}'

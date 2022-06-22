@@ -23,8 +23,8 @@ extends layout.pug
                                     input[type="checkbox"][v-model="item.selected"][v-on:change="showContent()"]
                                 td
                                     a[v-bind:href="'/invest-edit-account?id=' + item.id"] {{item.descr }}
-                                td.text-end {{ printCurrency(item.value) }}
-                                td.text-end {{ item.rec_date }}
+                                td.text-end {{ $prnCurrency(item.value) }}
+                                td.text-end {{ $prnDate(item.rec_date) }}
                 div.col-8
                     h3.text-center Абсолютный доход
                     div[ref="totalYield"][style="height:400px;width:100%"]
@@ -45,13 +45,13 @@ extends layout.pug
                         tbody
                             tr[v-for="item in weekflow"]
                                 td.text-end {{ item.wNum }}
-                                td.text-nowrap {{ item.eow }}
-                                td.text-end {{ printCurrency(item.eval) }}
-                                td.text-end {{ printCurrency(item.totalCashflow) }}
-                                td.text-end {{ printCurrency(item.weekCashflow) }}
-                                td.text-end {{ printCurrency(item.totalProfit) }}
-                                td.text-end {{ printCurrency(item.weekProfit) }}
-                                td.text-end {{ printPercent1(item.totalYield) }}
-                                td.text-end {{ printPercent1(item.yearYield) }}
+                                td.text-nowrap {{ $prnDate(item.eow) }}
+                                td.text-end {{ $prnCurrency(item.eval) }}
+                                td.text-end {{ $prnCurrency(item.totalCashflow) }}
+                                td.text-end {{ $prnCurrency(item.weekCashflow) }}
+                                td.text-end {{ $prnCurrency(item.totalProfit) }}
+                                td.text-end {{ $prnCurrency(item.weekProfit) }}
+                                td.text-end {{ $prnPercent1(item.totalYield) }}
+                                td.text-end {{ $prnPercent1(item.yearYield) }}
 
         script[src="/assets/js/invest-accounts.js"]
