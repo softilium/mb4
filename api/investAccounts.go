@@ -241,10 +241,6 @@ func handleAccsGetList(curSes pages.SessionStruct, w http.ResponseWriter) {
 
 }
 
-func endOfWeek(t time.Time) time.Time {
-	return t.AddDate(0, 0, 6-int(t.Weekday()))
-}
-
 func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, sess pages.SessionStruct) {
 
 	startDate := sess.User.StartInvestAccountsFlow
@@ -462,4 +458,8 @@ func handleErr(err error, w http.ResponseWriter) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		panic(err)
 	}
+}
+
+func endOfWeek(t time.Time) time.Time {
+	return t.AddDate(0, 0, 6-int(t.Weekday()))
 }
