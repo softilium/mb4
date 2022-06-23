@@ -58,6 +58,10 @@ func InvestAccounts(w http.ResponseWriter, r *http.Request) {
 		handleAccsPost(r, w, session)
 	}
 
+	if r.Method == http.MethodPut {
+		handleAccsPut(r, w, session)
+	}
+
 }
 
 func InvestAccountValuations(w http.ResponseWriter, r *http.Request) {
@@ -101,6 +105,27 @@ func InvestAccountValuations(w http.ResponseWriter, r *http.Request) {
 		err := db.DB.InvestAccountValuation.UpdateOneID(id).SetRecDate(par.RecDate).SetValue(par.Value).Exec(context.Background())
 		handleErr(err, w)
 
+	}
+
+}
+
+func handleAccsPut(r *http.Request, w http.ResponseWriter, session pages.SessionStruct) {
+
+	id, err := xid.FromString(r.URL.Query().Get("id"))
+	handleErr(err, w)
+
+	updater := db.DB.InvestAccount.UpdateOneID(id)
+	updCnt := 0
+
+	newDescr := r.URL.Query().Get("newdescr")
+	if newDescr != "" {
+		updater = updater.SetDescr(newDescr)
+		updCnt++
+	}
+
+	if updCnt > 0 {
+		err = updater.Exec(context.Background())
+		handleErr(err, w)
 	}
 
 }
@@ -176,11 +201,7 @@ func handleAccsPost(r *http.Request, w http.ResponseWriter, curSes pages.Session
 func handleAccsDelete(r *http.Request, w http.ResponseWriter, session pages.SessionStruct) {
 
 	id, err := xid.FromString(r.URL.Query().Get("id"))
-	if err != nil {
-		log.Println("Unable to get id parameter")
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	handleErr(err, w)
 
 	tx, err := db.DB.Tx(context.Background())
 	defer tx.Rollback()
