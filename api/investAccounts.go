@@ -76,18 +76,13 @@ func InvestAccountValuations(w http.ResponseWriter, r *http.Request) {
 	id, err := xid.FromString(r.URL.Query().Get("id"))
 	handleErr(err, w)
 
-	allUserAccounts, err := db.DB.InvestAccount.Query().Where(investaccount.HasOwnerWith(user.IDEQ(session.User.ID))).All(context.Background())
+	accXids, err := session.GetInvestAccountXids()
 	handleErr(err, w)
-
-	xids := make([]xid.ID, len(allUserAccounts))
-	for i, v := range allUserAccounts {
-		xids[i] = v.ID
-	}
 
 	if r.Method == http.MethodDelete {
 
 		cnt, err := db.DB.InvestAccountValuation.Delete().Where(investaccountvaluation.And(
-			investaccountvaluation.ID(id), investaccountvaluation.HasOwnerWith(investaccount.IDIn(xids...)))).
+			investaccountvaluation.ID(id), investaccountvaluation.HasOwnerWith(investaccount.IDIn(accXids...)))).
 			Exec(context.Background())
 		handleErr(err, w)
 
@@ -178,7 +173,7 @@ func handleAccsPost(r *http.Request, w http.ResponseWriter, curSes pages.Session
 
 }
 
-func handleAccsDelete(r *http.Request, w http.ResponseWriter, curSes pages.SessionStruct) {
+func handleAccsDelete(r *http.Request, w http.ResponseWriter, session pages.SessionStruct) {
 
 	id, err := xid.FromString(r.URL.Query().Get("id"))
 	if err != nil {
@@ -187,21 +182,29 @@ func handleAccsDelete(r *http.Request, w http.ResponseWriter, curSes pages.Sessi
 		return
 	}
 
-	_, err = db.DB.InvestAccountValuation.Delete().
-		Where(investaccountvaluation.HasOwnerWith(investaccount.IDEQ(id))).
-		Exec(context.Background())
+	tx, err := db.DB.Tx(context.Background())
+	defer tx.Rollback()
 	handleErr(err, w)
 
-	_, err = db.DB.InvestAccountCashflow.Delete().
-		Where(investaccountcashflow.HasOwnerWith(investaccount.IDEQ(id))).
+	cnt, err := tx.InvestAccount.Delete().
+		Where(investaccount.And(investaccount.ID(id), investaccount.HasOwnerWith(user.IDEQ(session.User.ID)))).
 		Exec(context.Background())
 	handleErr(err, w)
+	if cnt == 1 {
+		_, err = tx.InvestAccountValuation.Delete().
+			Where(investaccountvaluation.HasOwnerWith(investaccount.IDEQ(id))).
+			Exec(context.Background())
+		handleErr(err, w)
 
-	_, err = db.DB.InvestAccount.Delete().
-		Where(investaccount.And(investaccount.ID(id), investaccount.HasOwnerWith(user.IDEQ(curSes.User.ID)))).
-		Exec(context.Background())
-	w.WriteHeader(http.StatusOK)
-	handleErr(err, w)
+		_, err = tx.InvestAccountCashflow.Delete().
+			Where(investaccountcashflow.HasOwnerWith(investaccount.IDEQ(id))).
+			Exec(context.Background())
+		handleErr(err, w)
+
+		tx.Commit()
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+	}
 
 }
 
@@ -241,11 +244,14 @@ func handleAccsGetList(curSes pages.SessionStruct, w http.ResponseWriter) {
 
 }
 
-func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, sess pages.SessionStruct) {
+func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, session pages.SessionStruct) {
 
-	startDate := sess.User.StartInvestAccountsFlow
+	startDate := session.User.StartInvestAccountsFlow
 
 	var err error
+
+	accsMap, err := session.GetInvestAccountXidsMap()
+	handleErr(err, w)
 
 	ids := strings.Split(r.URL.Query().Get("ids"), ",")
 	if len(ids) == 0 {
@@ -254,10 +260,13 @@ func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, sess pages.Sessi
 		return
 	}
 
-	xids := make([]xid.ID, len(ids))
-	for i, v := range ids {
-		xids[i], err = xid.FromString(v)
+	xids := make([]xid.ID, 0)
+	for _, v := range ids {
+		newXid, err := xid.FromString(v)
 		handleErr(err, w)
+		if _, hasValue := accsMap[newXid]; hasValue {
+			xids = append(xids, newXid)
+		}
 	}
 
 	evals, err := db.DB.InvestAccountValuation.Query().WithOwner().
@@ -423,10 +432,18 @@ func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, sess pages.Sessi
 
 }
 
-func handleAccsGetOne(w http.ResponseWriter, r *http.Request, sess pages.SessionStruct, parID string) {
+func handleAccsGetOne(w http.ResponseWriter, r *http.Request, session pages.SessionStruct, parID string) {
 
 	xid, err := xid.FromString(parID)
 	handleErr(err, w)
+
+	accsMap, err := session.GetInvestAccountXidsMap()
+	handleErr(err, w)
+
+	if _, has := accsMap[xid]; !has {
+		http.Error(w, "Not found", http.StatusNotFound)
+		return
+	}
 
 	data, err := db.DB.InvestAccount.Query().
 		WithCashflows(
@@ -437,10 +454,7 @@ func handleAccsGetOne(w http.ResponseWriter, r *http.Request, sess pages.Session
 			func(q *ent.InvestAccountValuationQuery) {
 				q.Order(ent.Asc(investaccountvaluation.FieldRecDate))
 			}).
-		Where(investaccount.And(
-			investaccount.HasOwnerWith(user.ID(sess.User.ID))),
-			investaccount.IDEQ(xid),
-		).All(context.Background())
+		Where(investaccount.IDEQ(xid)).All(context.Background())
 	handleErr(err, w)
 	if len(data) != 1 {
 		http.Error(w, err.Error(), http.StatusNotFound)

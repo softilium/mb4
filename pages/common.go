@@ -12,6 +12,7 @@ import (
 	"github.com/softilium/mb4/config"
 	"github.com/softilium/mb4/db"
 	"github.com/softilium/mb4/ent"
+	"github.com/softilium/mb4/ent/investaccount"
 	"github.com/softilium/mb4/ent/user"
 )
 
@@ -24,6 +25,37 @@ type SessionStruct struct {
 	User          *ent.User //there will be another session's fields here
 	Authenticated bool      //in pug templated we can use only fields, not funcs. We need to have fields from User here
 	UserName      string
+}
+
+func (session *SessionStruct) GetInvestAccountXids() ([]xid.ID, error) {
+
+	allUserAccounts, err := db.DB.InvestAccount.Query().Where(investaccount.HasOwnerWith(user.IDEQ(session.User.ID))).All(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
+	xids := make([]xid.ID, len(allUserAccounts))
+	for i, v := range allUserAccounts {
+		xids[i] = v.ID
+	}
+
+	return xids, nil
+
+}
+
+func (session *SessionStruct) GetInvestAccountXidsMap() (map[xid.ID]bool, error) {
+
+	list, err := session.GetInvestAccountXids()
+	res := make(map[xid.ID]bool)
+	if err != nil {
+		return res, err
+	}
+	for _, v := range list {
+		res[v] = true
+	}
+
+	return res, nil
+
 }
 
 func LoadSessionStruct(r *http.Request) SessionStruct {

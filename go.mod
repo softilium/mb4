@@ -21,7 +21,7 @@ require (
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/sessions v1.2.1
-	github.com/hashicorp/hcl/v2 v2.12.0 // indirect
+	github.com/hashicorp/hcl/v2 v2.13.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/rs/xid v1.4.0
 	github.com/zclconf/go-cty v1.10.0 // indirect
