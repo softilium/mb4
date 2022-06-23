@@ -22,8 +22,8 @@ import (
 //InvestAccounts handles the /api/invest-accounts.* endpoint.
 func InvestAccounts(w http.ResponseWriter, r *http.Request) {
 
-	curSes := pages.LoadSessionStruct(r)
-	if !curSes.Authenticated {
+	session := pages.LoadSessionStruct(r)
+	if !session.Authenticated {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -34,28 +34,78 @@ func InvestAccounts(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		if parMode == "weekflow" {
 			// /api/invest-accounts?mode=weekmode
-			handleAccsWeekflow(w, r, curSes)
+			handleAccsWeekflow(w, r, session)
 		} else if parID != "" {
 			// /api/invent-acconts?id=123123
-			handleAccsGetOne(w, r, curSes, parID)
+			handleAccsGetOne(w, r, session, parID)
 		} else {
 			// api/invent-accounts
-			handleAccsGetList(curSes, w)
+			handleAccsGetList(session, w)
 		}
 	}
 
-	if !curSes.User.Admin {
+	if !session.User.Admin {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	// methods is for exchange with backoffice (for admin only)
 	if r.Method == http.MethodDelete {
-		handleAccsDelete(r, w, curSes)
+		handleAccsDelete(r, w, session)
 	}
 
 	if r.Method == http.MethodPost {
-		handleAccsPost(r, w, curSes)
+		handleAccsPost(r, w, session)
+	}
+
+}
+
+func InvestAccountValuations(w http.ResponseWriter, r *http.Request) {
+
+	session := pages.LoadSessionStruct(r)
+	if !session.Authenticated {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	if r.Method != http.MethodDelete && r.Method != http.MethodPut {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	id, err := xid.FromString(r.URL.Query().Get("id"))
+	handleErr(err, w)
+
+	allUserAccounts, err := db.DB.InvestAccount.Query().Where(investaccount.HasOwnerWith(user.IDEQ(session.User.ID))).All(context.Background())
+	handleErr(err, w)
+
+	xids := make([]xid.ID, len(allUserAccounts))
+	for i, v := range allUserAccounts {
+		xids[i] = v.ID
+	}
+
+	if r.Method == http.MethodDelete {
+
+		cnt, err := db.DB.InvestAccountValuation.Delete().Where(investaccountvaluation.And(
+			investaccountvaluation.ID(id), investaccountvaluation.HasOwnerWith(investaccount.IDIn(xids...)))).
+			Exec(context.Background())
+		handleErr(err, w)
+
+		if cnt == 0 {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+	}
+
+	if r.Method == http.MethodPut {
+
+		par := ent.InvestAccountValuation{}
+		err = json.NewDecoder(r.Body).Decode(&par)
+		handleErr(err, w)
+
+		err := db.DB.InvestAccountValuation.UpdateOneID(id).SetRecDate(par.RecDate).SetValue(par.Value).Exec(context.Background())
+		handleErr(err, w)
+
 	}
 
 }
@@ -68,11 +118,7 @@ func handleAccsPost(r *http.Request, w http.ResponseWriter, curSes pages.Session
 	var p []*ent.InvestAccount
 
 	err := json.NewDecoder(r.Body).Decode(&p)
-	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	handleErr(err, w)
 
 	for _, pone := range p {
 		existings, err := db.DB.InvestAccount.Query().
@@ -80,37 +126,22 @@ func handleAccsPost(r *http.Request, w http.ResponseWriter, curSes pages.Session
 				investaccount.DescrEQ(pone.Descr),
 				investaccount.HasOwnerWith(user.IDEQ(curSes.User.ID)))).
 			All(context.Background())
-		if err != nil {
-			log.Println(err.Error())
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		handleErr(err, w)
+
 		for _, existing := range existings {
 
 			_, err = db.DB.InvestAccountValuation.Delete().
 				Where(investaccountvaluation.HasOwnerWith(investaccount.IDEQ(existing.ID))).
 				Exec(context.Background())
-			if err != nil {
-				log.Println(err.Error())
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
+			handleErr(err, w)
 
 			_, err = db.DB.InvestAccountCashflow.Delete().
 				Where(investaccountcashflow.HasOwnerWith(investaccount.IDEQ(existing.ID))).
 				Exec(context.Background())
-			if err != nil {
-				log.Println(err.Error())
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
+			handleErr(err, w)
 
 			err = db.DB.InvestAccount.DeleteOneID(existing.ID).Exec(context.Background())
-			if err != nil {
-				log.Println(err.Error())
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
+			handleErr(err, w)
 		}
 
 	}
@@ -121,11 +152,7 @@ func handleAccsPost(r *http.Request, w http.ResponseWriter, curSes pages.Session
 			SetDescr(v.Descr).
 			SetOwnerID(curSes.User.ID).
 			Save(context.Background())
-		if err != nil {
-			log.Println(err.Error())
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		handleErr(err, w)
 
 		for _, vv := range v.Edges.Valuations {
 			_, err = db.DB.InvestAccountValuation.Create().
@@ -133,10 +160,7 @@ func handleAccsPost(r *http.Request, w http.ResponseWriter, curSes pages.Session
 				SetRecDate(vv.RecDate).
 				SetValue(vv.Value).
 				Save(context.Background())
-			if err != nil {
-				log.Println(err.Error())
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-			}
+			handleErr(err, w)
 
 		}
 
@@ -146,10 +170,7 @@ func handleAccsPost(r *http.Request, w http.ResponseWriter, curSes pages.Session
 				SetRecDate(vv.RecDate).
 				SetQty(vv.Qty).
 				Save(context.Background())
-			if err != nil {
-				log.Println(err.Error())
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-			}
+			handleErr(err, w)
 
 		}
 
@@ -169,27 +190,18 @@ func handleAccsDelete(r *http.Request, w http.ResponseWriter, curSes pages.Sessi
 	_, err = db.DB.InvestAccountValuation.Delete().
 		Where(investaccountvaluation.HasOwnerWith(investaccount.IDEQ(id))).
 		Exec(context.Background())
-	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	handleErr(err, w)
 
 	_, err = db.DB.InvestAccountCashflow.Delete().
 		Where(investaccountcashflow.HasOwnerWith(investaccount.IDEQ(id))).
 		Exec(context.Background())
-	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	handleErr(err, w)
 
 	_, err = db.DB.InvestAccount.Delete().
 		Where(investaccount.And(investaccount.ID(id), investaccount.HasOwnerWith(user.IDEQ(curSes.User.ID)))).
 		Exec(context.Background())
 	w.WriteHeader(http.StatusOK)
-	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	handleErr(err, w)
 
 }
 
@@ -201,11 +213,7 @@ func handleAccsGetList(curSes pages.SessionStruct, w http.ResponseWriter) {
 			}).
 		Where(investaccount.HasOwnerWith(user.IDEQ(curSes.User.ID))).
 		All(context.Background())
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	handleErr(err, w)
 
 	type AccountListResult struct {
 		ID      string    `json:"id"`
@@ -229,11 +237,7 @@ func handleAccsGetList(curSes pages.SessionStruct, w http.ResponseWriter) {
 
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(data2)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		log.Println(err)
-		return
-	}
+	handleErr(err, w)
 
 }
 
@@ -256,20 +260,14 @@ func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, sess pages.Sessi
 	xids := make([]xid.ID, len(ids))
 	for i, v := range ids {
 		xids[i], err = xid.FromString(v)
-		if err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-		}
+		handleErr(err, w)
 	}
 
 	evals, err := db.DB.InvestAccountValuation.Query().WithOwner().
 		Where(investaccountvaluation.HasOwnerWith(investaccount.IDIn(xids...))).
 		Order(ent.Asc(investaccountvaluation.FieldRecDate)).
 		All(context.Background())
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	handleErr(err, w)
 	if len(evals) == 0 {
 		log.Println("No evaluations found")
 		return
@@ -279,10 +277,7 @@ func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, sess pages.Sessi
 		Where(investaccountcashflow.HasOwnerWith(investaccount.IDIn(xids...))).
 		Order(ent.Asc(investaccountcashflow.FieldRecDate)).
 		All(context.Background())
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	handleErr(err, w)
 
 	// calc first date to diff for wn
 	firstDate := time.Date(evals[0].RecDate.Year(), evals[0].RecDate.Month(), evals[0].RecDate.Day(), 0, 0, 0, 0, time.UTC)
@@ -427,22 +422,14 @@ func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, sess pages.Sessi
 
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(res)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		log.Println(err)
-		return
-	}
+	handleErr(err, w)
 
 }
 
 func handleAccsGetOne(w http.ResponseWriter, r *http.Request, sess pages.SessionStruct, parID string) {
 
 	xid, err := xid.FromString(parID)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	handleErr(err, w)
 
 	data, err := db.DB.InvestAccount.Query().
 		WithCashflows(
@@ -457,11 +444,7 @@ func handleAccsGetOne(w http.ResponseWriter, r *http.Request, sess pages.Session
 			investaccount.HasOwnerWith(user.ID(sess.User.ID))),
 			investaccount.IDEQ(xid),
 		).All(context.Background())
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	handleErr(err, w)
 	if len(data) != 1 {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -469,10 +452,14 @@ func handleAccsGetOne(w http.ResponseWriter, r *http.Request, sess pages.Session
 
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(data[0])
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		log.Println(err)
-		return
-	}
+	handleErr(err, w)
 
+}
+
+func handleErr(err error, w http.ResponseWriter) {
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		panic(err)
+	}
 }
