@@ -251,6 +251,7 @@ func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, sess pages.Sessi
 	if len(ids) == 0 {
 		log.Println("No ids provided")
 		http.Error(w, "No ids provided", http.StatusBadRequest)
+		return
 	}
 
 	xids := make([]xid.ID, len(ids))
