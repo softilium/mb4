@@ -25,15 +25,36 @@ extends layout.pug
                                 th.text-end Дата оценки
                                 th.text-end Руб.
                                 th
+                                    button.btn[data-bs-toggle="modal"][data-bs-target="#valModal"][v-on:click="setNewSelectedVal()"]
+                                        i.bi.bi-file-earmark-plus
+
                         tbody
                             tr[v-for="item in obj.edges.Valuations"]
                                 td.text-end {{ $prnDate(item.RecDate) }}
                                 td.text-end {{ $prnCurrency(item.Value) }}
                                 td
-                                    button.btn[data-bs-toggle="modal"][data-bs-target="#filterModal"]
+                                    button.btn[data-bs-toggle="modal"][data-bs-target="#valModal"][v-on:click="setSelectedVal(item)"]
                                         i.bi.bi-pencil-square
                                     button.btn
                                         i.bi.bi-trash3[v-on:click="deleteValuation(item.id)"]
+                    // Line editor for table Valuations
+                    div.modal[id="valModal"][tabindex="-1"][aria-labelledby="valModalLabel"][aria-hidden="true"]
+                        div.modal-dialog
+                            div.modal-content
+                                div.modal-header
+                                    h5.modal-title[id="valModalLabel"] Редактор оценки
+                                    button.btn-close[type="button"][data-bs-dismiss="modal"][aria-label="Close"]
+                                div.modal-body
+                                    div.mb-3.row
+                                        label.col-sm-3.col-form-label Дата оценки
+                                        div.col-sm-9
+                                            input.form-control.form-control-sm[type="date"][v-model="selectedVal.RecDate"]
+                                    div.mb-3.row
+                                        label.col-sm-3.col-form-label Оценка, руб.
+                                        div.col-sm-9
+                                            input.form-control.form-control-sm[type="number"][v-model="selectedVal.Value"]
+                                div.modal-footer
+                                    button.btn.btn-primary[type="button"][v-on:click="saveSelectedVal()"][data-bs-dismiss="modal"] Сохранить и закрыть
                 div.col-3
                     h3 Ввод-вывод
                     table.table.table-hover.table-responsive.table-sm

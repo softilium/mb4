@@ -1,13 +1,47 @@
 const App = {
     data() {
         return {
-            obj: {}
+            // stubs for initial rendering
+            obj: {
+                edges: {
+                    Valuations: []
+                }
+            },
+            selectedVal: {
+                id: null,
+                RecDate: null,
+                Value: null
+            }
         }
     },
     async mounted() {
         await this.getList();
     },
     methods: {
+        async setNewSelectedVal() {
+            this.selectedVal.id = null;
+            this.selectedVal.Value = 0;
+            this.selectedVal.RecDate = '2022-01-01';
+        },
+        async setSelectedVal(item) {
+            this.selectedVal.id = item.id;
+            this.selectedVal.Value = item.Value;
+            this.selectedVal.RecDate = item.RecDate.split('T')[0]; // strip time from date
+        },
+        async saveSelectedVal() {
+            let res = null;
+            this.selectedVal.RecDate += "T03:00:00+03:00"; // restore full time from date
+            if (this.selectedVal.id == null) {
+                res = await fetch(`/api/invest-account-valuations?id=${this.selectedVal.id}&owner=${window.accid}`,
+                    { method: 'POST', body: JSON.stringify(this.selectedVal) }
+                );
+            } else {
+                res = await fetch(`/api/invest-account-valuations?id=${this.selectedVal.id}`,
+                    { method: 'PUT', body: JSON.stringify(this.selectedVal) }
+                );
+            }
+            if (res.ok) this.getList(); else alert("Ошибка при сохранении");
+        },
         async getList() {
             let response = await fetch(`/api/invest-accounts?id=${window.accid}`, { method: 'GET' });
             if (response.ok) {
@@ -33,7 +67,6 @@ const App = {
             );
             if (!response.ok) alert("Проблема с установкой наименования брокерского счета");
         }
-
     }
 };
 
