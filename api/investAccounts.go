@@ -316,7 +316,9 @@ func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, session pages.Se
 	}
 
 	evals, err := db.DB.InvestAccountValuation.Query().WithOwner().
-		Where(investaccountvaluation.HasOwnerWith(investaccount.IDIn(xids...))).
+		Where(investaccountvaluation.And(
+			investaccountvaluation.HasOwnerWith(investaccount.IDIn(xids...)),
+			investaccountvaluation.RecDateGTE(startDate.Add(-time.Hour*24*7)))).
 		Order(ent.Asc(investaccountvaluation.FieldRecDate)).
 		All(context.Background())
 	handleErr(err, w)
@@ -326,18 +328,12 @@ func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, session pages.Se
 	}
 
 	cf, err := db.DB.InvestAccountCashflow.Query().WithOwner().
-		Where(investaccountcashflow.HasOwnerWith(investaccount.IDIn(xids...))).
+		Where(investaccountcashflow.And(
+			investaccountcashflow.HasOwnerWith(investaccount.IDIn(xids...)),
+			investaccountcashflow.RecDateGTE(startDate.Add(-time.Hour*24*7)))).
 		Order(ent.Asc(investaccountcashflow.FieldRecDate)).
 		All(context.Background())
 	handleErr(err, w)
-
-	// calc first date to diff for wn
-	firstDate := time.Date(evals[0].RecDate.Year(), evals[0].RecDate.Month(), evals[0].RecDate.Day(), 0, 0, 0, 0, time.UTC)
-	for _, v := range evals {
-		if v.RecDate.Before(firstDate) {
-			firstDate = v.RecDate
-		}
-	}
 
 	// raw items tree by acc, eow
 	type weekRec struct {
@@ -346,6 +342,7 @@ func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, session pages.Se
 		cf  float64
 	}
 	allraws := make(map[xid.ID]map[time.Time]*weekRec)
+	alleows := make(map[time.Time]bool)
 	noevMarker := -9999999.0
 	for _, accid := range xids {
 		allraws[accid] = make(map[time.Time]*weekRec)
@@ -355,6 +352,7 @@ func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, session pages.Se
 				continue
 			}
 			eow := endOfWeek(v.RecDate)
+			alleows[eow] = true
 			if rec, ok := raws[eow]; !ok {
 				raws[eow] = &weekRec{eow: eow, ev: v.Value}
 			} else {
@@ -366,6 +364,7 @@ func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, session pages.Se
 				continue
 			}
 			eow := endOfWeek(v.RecDate)
+			alleows[eow] = true
 			if rec, ok := raws[eow]; !ok {
 				raws[eow] = &weekRec{eow: eow, ev: noevMarker, cf: v.Qty}
 			} else {
@@ -375,17 +374,22 @@ func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, session pages.Se
 		}
 	}
 
+	// add missing weeks to allraws
+	for eow := range alleows {
+		for _, accid := range xids {
+			if _, ok := allraws[accid][eow]; !ok {
+				allraws[accid][eow] = &weekRec{eow: eow, ev: noevMarker}
+			}
+		}
+	}
+
 	//flat and sort records for each accs SEPARATED, fill noevs
 	alllines := make(map[xid.ID][]*weekRec)
-	allEows := make(map[time.Time]int)
 	for _, accid := range xids {
-
 		lines := make([]*weekRec, 0)
-		raws, ok := allraws[accid]
-		if ok {
+		if raws, ok := allraws[accid]; ok {
 			for _, v := range raws {
 				lines = append(lines, v)
-				allEows[v.eow] = 1
 			}
 		}
 		sort.Slice(lines, func(i, j int) bool { return lines[i].eow.Before(lines[j].eow) })
@@ -403,25 +407,24 @@ func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, session pages.Se
 	merged := make([]*weekRec, 0)
 	for _, accslice := range alllines {
 		for _, rec := range accslice {
-			var fndrec *weekRec
+			found := false
 			for _, mc := range merged {
-				if mc.eow == rec.eow {
-					fndrec = mc
+				if mc.eow.Equal(rec.eow) {
+					found = true
+					mc.ev += rec.ev
+					mc.cf += rec.cf
 					break
 				}
 			}
-			if fndrec == nil {
+			if !found {
 				merged = append(merged, rec)
-			} else {
-				fndrec.ev += rec.ev
-				fndrec.cf += rec.cf
 			}
 		}
 	}
 	sort.Slice(merged, func(i, j int) bool { return merged[i].eow.Before(merged[j].eow) })
 
+	// trim merged for startDate
 	for len(merged) > 1 && merged[0].eow.Before(startDate) {
-		merged[1].cf += merged[0].cf
 		merged = merged[1:]
 	}
 	merged[0].cf = merged[0].ev
@@ -463,10 +466,10 @@ func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, session pages.Se
 			res[i].TotalYield = res[i].TotalProfit / res[i].TotalCashflow * 100
 		}
 
-		if res[i].TotalCashflow == 0 || (res[i].Eow.Sub(firstDate).Hours() < 24) {
+		if res[i].TotalCashflow == 0 || (res[i].Eow.Sub(merged[0].eow).Hours() < 24) {
 			res[i].YearYield = 0
 		} else {
-			days := res[i].Eow.Sub(firstDate).Hours() / 24.0
+			days := res[i].Eow.Sub(merged[0].eow).Hours() / 24.0
 			res[i].YearYield = res[i].TotalProfit / res[i].TotalCashflow / days * 360.0 * 100.0
 		}
 
