@@ -24,9 +24,14 @@ type config struct {
 
 // hooks per client, for fast access.
 type hooks struct {
+	DivPayout              []ent.Hook
+	Emitent                []ent.Hook
+	Industry               []ent.Hook
 	InvestAccount          []ent.Hook
 	InvestAccountCashflow  []ent.Hook
 	InvestAccountValuation []ent.Hook
+	Quote                  []ent.Hook
+	Ticker                 []ent.Hook
 	User                   []ent.Hook
 }
 

@@ -10,9 +10,14 @@ import (
 	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/migrate"
 
+	"github.com/softilium/mb4/ent/divpayout"
+	"github.com/softilium/mb4/ent/emitent"
+	"github.com/softilium/mb4/ent/industry"
 	"github.com/softilium/mb4/ent/investaccount"
 	"github.com/softilium/mb4/ent/investaccountcashflow"
 	"github.com/softilium/mb4/ent/investaccountvaluation"
+	"github.com/softilium/mb4/ent/quote"
+	"github.com/softilium/mb4/ent/ticker"
 	"github.com/softilium/mb4/ent/user"
 
 	"entgo.io/ent/dialect"
@@ -25,12 +30,22 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// DivPayout is the client for interacting with the DivPayout builders.
+	DivPayout *DivPayoutClient
+	// Emitent is the client for interacting with the Emitent builders.
+	Emitent *EmitentClient
+	// Industry is the client for interacting with the Industry builders.
+	Industry *IndustryClient
 	// InvestAccount is the client for interacting with the InvestAccount builders.
 	InvestAccount *InvestAccountClient
 	// InvestAccountCashflow is the client for interacting with the InvestAccountCashflow builders.
 	InvestAccountCashflow *InvestAccountCashflowClient
 	// InvestAccountValuation is the client for interacting with the InvestAccountValuation builders.
 	InvestAccountValuation *InvestAccountValuationClient
+	// Quote is the client for interacting with the Quote builders.
+	Quote *QuoteClient
+	// Ticker is the client for interacting with the Ticker builders.
+	Ticker *TickerClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -46,9 +61,14 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.DivPayout = NewDivPayoutClient(c.config)
+	c.Emitent = NewEmitentClient(c.config)
+	c.Industry = NewIndustryClient(c.config)
 	c.InvestAccount = NewInvestAccountClient(c.config)
 	c.InvestAccountCashflow = NewInvestAccountCashflowClient(c.config)
 	c.InvestAccountValuation = NewInvestAccountValuationClient(c.config)
+	c.Quote = NewQuoteClient(c.config)
+	c.Ticker = NewTickerClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -83,9 +103,14 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:                    ctx,
 		config:                 cfg,
+		DivPayout:              NewDivPayoutClient(cfg),
+		Emitent:                NewEmitentClient(cfg),
+		Industry:               NewIndustryClient(cfg),
 		InvestAccount:          NewInvestAccountClient(cfg),
 		InvestAccountCashflow:  NewInvestAccountCashflowClient(cfg),
 		InvestAccountValuation: NewInvestAccountValuationClient(cfg),
+		Quote:                  NewQuoteClient(cfg),
+		Ticker:                 NewTickerClient(cfg),
 		User:                   NewUserClient(cfg),
 	}, nil
 }
@@ -106,9 +131,14 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:                    ctx,
 		config:                 cfg,
+		DivPayout:              NewDivPayoutClient(cfg),
+		Emitent:                NewEmitentClient(cfg),
+		Industry:               NewIndustryClient(cfg),
 		InvestAccount:          NewInvestAccountClient(cfg),
 		InvestAccountCashflow:  NewInvestAccountCashflowClient(cfg),
 		InvestAccountValuation: NewInvestAccountValuationClient(cfg),
+		Quote:                  NewQuoteClient(cfg),
+		Ticker:                 NewTickerClient(cfg),
 		User:                   NewUserClient(cfg),
 	}, nil
 }
@@ -116,7 +146,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		InvestAccount.
+//		DivPayout.
 //		Query().
 //		Count(ctx)
 //
@@ -139,10 +169,349 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.DivPayout.Use(hooks...)
+	c.Emitent.Use(hooks...)
+	c.Industry.Use(hooks...)
 	c.InvestAccount.Use(hooks...)
 	c.InvestAccountCashflow.Use(hooks...)
 	c.InvestAccountValuation.Use(hooks...)
+	c.Quote.Use(hooks...)
+	c.Ticker.Use(hooks...)
 	c.User.Use(hooks...)
+}
+
+// DivPayoutClient is a client for the DivPayout schema.
+type DivPayoutClient struct {
+	config
+}
+
+// NewDivPayoutClient returns a client for the DivPayout from the given config.
+func NewDivPayoutClient(c config) *DivPayoutClient {
+	return &DivPayoutClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `divpayout.Hooks(f(g(h())))`.
+func (c *DivPayoutClient) Use(hooks ...Hook) {
+	c.hooks.DivPayout = append(c.hooks.DivPayout, hooks...)
+}
+
+// Create returns a create builder for DivPayout.
+func (c *DivPayoutClient) Create() *DivPayoutCreate {
+	mutation := newDivPayoutMutation(c.config, OpCreate)
+	return &DivPayoutCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of DivPayout entities.
+func (c *DivPayoutClient) CreateBulk(builders ...*DivPayoutCreate) *DivPayoutCreateBulk {
+	return &DivPayoutCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for DivPayout.
+func (c *DivPayoutClient) Update() *DivPayoutUpdate {
+	mutation := newDivPayoutMutation(c.config, OpUpdate)
+	return &DivPayoutUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *DivPayoutClient) UpdateOne(dp *DivPayout) *DivPayoutUpdateOne {
+	mutation := newDivPayoutMutation(c.config, OpUpdateOne, withDivPayout(dp))
+	return &DivPayoutUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *DivPayoutClient) UpdateOneID(id int) *DivPayoutUpdateOne {
+	mutation := newDivPayoutMutation(c.config, OpUpdateOne, withDivPayoutID(id))
+	return &DivPayoutUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for DivPayout.
+func (c *DivPayoutClient) Delete() *DivPayoutDelete {
+	mutation := newDivPayoutMutation(c.config, OpDelete)
+	return &DivPayoutDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *DivPayoutClient) DeleteOne(dp *DivPayout) *DivPayoutDeleteOne {
+	return c.DeleteOneID(dp.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *DivPayoutClient) DeleteOneID(id int) *DivPayoutDeleteOne {
+	builder := c.Delete().Where(divpayout.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &DivPayoutDeleteOne{builder}
+}
+
+// Query returns a query builder for DivPayout.
+func (c *DivPayoutClient) Query() *DivPayoutQuery {
+	return &DivPayoutQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a DivPayout entity by its id.
+func (c *DivPayoutClient) Get(ctx context.Context, id int) (*DivPayout, error) {
+	return c.Query().Where(divpayout.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *DivPayoutClient) GetX(ctx context.Context, id int) *DivPayout {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryTickers queries the Tickers edge of a DivPayout.
+func (c *DivPayoutClient) QueryTickers(dp *DivPayout) *TickerQuery {
+	query := &TickerQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := dp.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(divpayout.Table, divpayout.FieldID, id),
+			sqlgraph.To(ticker.Table, ticker.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, divpayout.TickersTable, divpayout.TickersColumn),
+		)
+		fromV = sqlgraph.Neighbors(dp.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *DivPayoutClient) Hooks() []Hook {
+	return c.hooks.DivPayout
+}
+
+// EmitentClient is a client for the Emitent schema.
+type EmitentClient struct {
+	config
+}
+
+// NewEmitentClient returns a client for the Emitent from the given config.
+func NewEmitentClient(c config) *EmitentClient {
+	return &EmitentClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `emitent.Hooks(f(g(h())))`.
+func (c *EmitentClient) Use(hooks ...Hook) {
+	c.hooks.Emitent = append(c.hooks.Emitent, hooks...)
+}
+
+// Create returns a create builder for Emitent.
+func (c *EmitentClient) Create() *EmitentCreate {
+	mutation := newEmitentMutation(c.config, OpCreate)
+	return &EmitentCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Emitent entities.
+func (c *EmitentClient) CreateBulk(builders ...*EmitentCreate) *EmitentCreateBulk {
+	return &EmitentCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Emitent.
+func (c *EmitentClient) Update() *EmitentUpdate {
+	mutation := newEmitentMutation(c.config, OpUpdate)
+	return &EmitentUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EmitentClient) UpdateOne(e *Emitent) *EmitentUpdateOne {
+	mutation := newEmitentMutation(c.config, OpUpdateOne, withEmitent(e))
+	return &EmitentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EmitentClient) UpdateOneID(id int) *EmitentUpdateOne {
+	mutation := newEmitentMutation(c.config, OpUpdateOne, withEmitentID(id))
+	return &EmitentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Emitent.
+func (c *EmitentClient) Delete() *EmitentDelete {
+	mutation := newEmitentMutation(c.config, OpDelete)
+	return &EmitentDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *EmitentClient) DeleteOne(e *Emitent) *EmitentDeleteOne {
+	return c.DeleteOneID(e.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *EmitentClient) DeleteOneID(id int) *EmitentDeleteOne {
+	builder := c.Delete().Where(emitent.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EmitentDeleteOne{builder}
+}
+
+// Query returns a query builder for Emitent.
+func (c *EmitentClient) Query() *EmitentQuery {
+	return &EmitentQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Emitent entity by its id.
+func (c *EmitentClient) Get(ctx context.Context, id int) (*Emitent, error) {
+	return c.Query().Where(emitent.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EmitentClient) GetX(ctx context.Context, id int) *Emitent {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryIndustry queries the Industry edge of a Emitent.
+func (c *EmitentClient) QueryIndustry(e *Emitent) *IndustryQuery {
+	query := &IndustryQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(emitent.Table, emitent.FieldID, id),
+			sqlgraph.To(industry.Table, industry.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, emitent.IndustryTable, emitent.IndustryColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTickers queries the Tickers edge of a Emitent.
+func (c *EmitentClient) QueryTickers(e *Emitent) *TickerQuery {
+	query := &TickerQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(emitent.Table, emitent.FieldID, id),
+			sqlgraph.To(ticker.Table, ticker.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, emitent.TickersTable, emitent.TickersColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *EmitentClient) Hooks() []Hook {
+	return c.hooks.Emitent
+}
+
+// IndustryClient is a client for the Industry schema.
+type IndustryClient struct {
+	config
+}
+
+// NewIndustryClient returns a client for the Industry from the given config.
+func NewIndustryClient(c config) *IndustryClient {
+	return &IndustryClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `industry.Hooks(f(g(h())))`.
+func (c *IndustryClient) Use(hooks ...Hook) {
+	c.hooks.Industry = append(c.hooks.Industry, hooks...)
+}
+
+// Create returns a create builder for Industry.
+func (c *IndustryClient) Create() *IndustryCreate {
+	mutation := newIndustryMutation(c.config, OpCreate)
+	return &IndustryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Industry entities.
+func (c *IndustryClient) CreateBulk(builders ...*IndustryCreate) *IndustryCreateBulk {
+	return &IndustryCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Industry.
+func (c *IndustryClient) Update() *IndustryUpdate {
+	mutation := newIndustryMutation(c.config, OpUpdate)
+	return &IndustryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *IndustryClient) UpdateOne(i *Industry) *IndustryUpdateOne {
+	mutation := newIndustryMutation(c.config, OpUpdateOne, withIndustry(i))
+	return &IndustryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *IndustryClient) UpdateOneID(id string) *IndustryUpdateOne {
+	mutation := newIndustryMutation(c.config, OpUpdateOne, withIndustryID(id))
+	return &IndustryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Industry.
+func (c *IndustryClient) Delete() *IndustryDelete {
+	mutation := newIndustryMutation(c.config, OpDelete)
+	return &IndustryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *IndustryClient) DeleteOne(i *Industry) *IndustryDeleteOne {
+	return c.DeleteOneID(i.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *IndustryClient) DeleteOneID(id string) *IndustryDeleteOne {
+	builder := c.Delete().Where(industry.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &IndustryDeleteOne{builder}
+}
+
+// Query returns a query builder for Industry.
+func (c *IndustryClient) Query() *IndustryQuery {
+	return &IndustryQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Industry entity by its id.
+func (c *IndustryClient) Get(ctx context.Context, id string) (*Industry, error) {
+	return c.Query().Where(industry.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *IndustryClient) GetX(ctx context.Context, id string) *Industry {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryEmitents queries the Emitents edge of a Industry.
+func (c *IndustryClient) QueryEmitents(i *Industry) *EmitentQuery {
+	query := &EmitentQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := i.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(industry.Table, industry.FieldID, id),
+			sqlgraph.To(emitent.Table, emitent.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, industry.EmitentsTable, industry.EmitentsColumn),
+		)
+		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *IndustryClient) Hooks() []Hook {
+	return c.hooks.Industry
 }
 
 // InvestAccountClient is a client for the InvestAccount schema.
@@ -493,6 +862,250 @@ func (c *InvestAccountValuationClient) QueryOwner(iav *InvestAccountValuation) *
 // Hooks returns the client hooks.
 func (c *InvestAccountValuationClient) Hooks() []Hook {
 	return c.hooks.InvestAccountValuation
+}
+
+// QuoteClient is a client for the Quote schema.
+type QuoteClient struct {
+	config
+}
+
+// NewQuoteClient returns a client for the Quote from the given config.
+func NewQuoteClient(c config) *QuoteClient {
+	return &QuoteClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `quote.Hooks(f(g(h())))`.
+func (c *QuoteClient) Use(hooks ...Hook) {
+	c.hooks.Quote = append(c.hooks.Quote, hooks...)
+}
+
+// Create returns a create builder for Quote.
+func (c *QuoteClient) Create() *QuoteCreate {
+	mutation := newQuoteMutation(c.config, OpCreate)
+	return &QuoteCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Quote entities.
+func (c *QuoteClient) CreateBulk(builders ...*QuoteCreate) *QuoteCreateBulk {
+	return &QuoteCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Quote.
+func (c *QuoteClient) Update() *QuoteUpdate {
+	mutation := newQuoteMutation(c.config, OpUpdate)
+	return &QuoteUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *QuoteClient) UpdateOne(q *Quote) *QuoteUpdateOne {
+	mutation := newQuoteMutation(c.config, OpUpdateOne, withQuote(q))
+	return &QuoteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *QuoteClient) UpdateOneID(id int) *QuoteUpdateOne {
+	mutation := newQuoteMutation(c.config, OpUpdateOne, withQuoteID(id))
+	return &QuoteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Quote.
+func (c *QuoteClient) Delete() *QuoteDelete {
+	mutation := newQuoteMutation(c.config, OpDelete)
+	return &QuoteDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *QuoteClient) DeleteOne(q *Quote) *QuoteDeleteOne {
+	return c.DeleteOneID(q.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *QuoteClient) DeleteOneID(id int) *QuoteDeleteOne {
+	builder := c.Delete().Where(quote.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &QuoteDeleteOne{builder}
+}
+
+// Query returns a query builder for Quote.
+func (c *QuoteClient) Query() *QuoteQuery {
+	return &QuoteQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Quote entity by its id.
+func (c *QuoteClient) Get(ctx context.Context, id int) (*Quote, error) {
+	return c.Query().Where(quote.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *QuoteClient) GetX(ctx context.Context, id int) *Quote {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryTicker queries the Ticker edge of a Quote.
+func (c *QuoteClient) QueryTicker(q *Quote) *TickerQuery {
+	query := &TickerQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := q.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(quote.Table, quote.FieldID, id),
+			sqlgraph.To(ticker.Table, ticker.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, quote.TickerTable, quote.TickerColumn),
+		)
+		fromV = sqlgraph.Neighbors(q.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *QuoteClient) Hooks() []Hook {
+	return c.hooks.Quote
+}
+
+// TickerClient is a client for the Ticker schema.
+type TickerClient struct {
+	config
+}
+
+// NewTickerClient returns a client for the Ticker from the given config.
+func NewTickerClient(c config) *TickerClient {
+	return &TickerClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `ticker.Hooks(f(g(h())))`.
+func (c *TickerClient) Use(hooks ...Hook) {
+	c.hooks.Ticker = append(c.hooks.Ticker, hooks...)
+}
+
+// Create returns a create builder for Ticker.
+func (c *TickerClient) Create() *TickerCreate {
+	mutation := newTickerMutation(c.config, OpCreate)
+	return &TickerCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Ticker entities.
+func (c *TickerClient) CreateBulk(builders ...*TickerCreate) *TickerCreateBulk {
+	return &TickerCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Ticker.
+func (c *TickerClient) Update() *TickerUpdate {
+	mutation := newTickerMutation(c.config, OpUpdate)
+	return &TickerUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TickerClient) UpdateOne(t *Ticker) *TickerUpdateOne {
+	mutation := newTickerMutation(c.config, OpUpdateOne, withTicker(t))
+	return &TickerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TickerClient) UpdateOneID(id string) *TickerUpdateOne {
+	mutation := newTickerMutation(c.config, OpUpdateOne, withTickerID(id))
+	return &TickerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Ticker.
+func (c *TickerClient) Delete() *TickerDelete {
+	mutation := newTickerMutation(c.config, OpDelete)
+	return &TickerDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *TickerClient) DeleteOne(t *Ticker) *TickerDeleteOne {
+	return c.DeleteOneID(t.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *TickerClient) DeleteOneID(id string) *TickerDeleteOne {
+	builder := c.Delete().Where(ticker.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TickerDeleteOne{builder}
+}
+
+// Query returns a query builder for Ticker.
+func (c *TickerClient) Query() *TickerQuery {
+	return &TickerQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Ticker entity by its id.
+func (c *TickerClient) Get(ctx context.Context, id string) (*Ticker, error) {
+	return c.Query().Where(ticker.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TickerClient) GetX(ctx context.Context, id string) *Ticker {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryEmitent queries the Emitent edge of a Ticker.
+func (c *TickerClient) QueryEmitent(t *Ticker) *EmitentQuery {
+	query := &EmitentQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(ticker.Table, ticker.FieldID, id),
+			sqlgraph.To(emitent.Table, emitent.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ticker.EmitentTable, ticker.EmitentColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryQuotes queries the Quotes edge of a Ticker.
+func (c *TickerClient) QueryQuotes(t *Ticker) *QuoteQuery {
+	query := &QuoteQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(ticker.Table, ticker.FieldID, id),
+			sqlgraph.To(quote.Table, quote.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ticker.QuotesTable, ticker.QuotesColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDivPayouts queries the DivPayouts edge of a Ticker.
+func (c *TickerClient) QueryDivPayouts(t *Ticker) *DivPayoutQuery {
+	query := &DivPayoutQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(ticker.Table, ticker.FieldID, id),
+			sqlgraph.To(divpayout.Table, divpayout.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ticker.DivPayoutsTable, ticker.DivPayoutsColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *TickerClient) Hooks() []Hook {
+	return c.hooks.Ticker
 }
 
 // UserClient is a client for the User schema.

@@ -9,6 +9,45 @@ import (
 	"github.com/softilium/mb4/ent"
 )
 
+// The DivPayoutFunc type is an adapter to allow the use of ordinary
+// function as DivPayout mutator.
+type DivPayoutFunc func(context.Context, *ent.DivPayoutMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DivPayoutFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.DivPayoutMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DivPayoutMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The EmitentFunc type is an adapter to allow the use of ordinary
+// function as Emitent mutator.
+type EmitentFunc func(context.Context, *ent.EmitentMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f EmitentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.EmitentMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EmitentMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The IndustryFunc type is an adapter to allow the use of ordinary
+// function as Industry mutator.
+type IndustryFunc func(context.Context, *ent.IndustryMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f IndustryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.IndustryMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.IndustryMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The InvestAccountFunc type is an adapter to allow the use of ordinary
 // function as InvestAccount mutator.
 type InvestAccountFunc func(context.Context, *ent.InvestAccountMutation) (ent.Value, error)
@@ -44,6 +83,32 @@ func (f InvestAccountValuationFunc) Mutate(ctx context.Context, m ent.Mutation) 
 	mv, ok := m.(*ent.InvestAccountValuationMutation)
 	if !ok {
 		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.InvestAccountValuationMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The QuoteFunc type is an adapter to allow the use of ordinary
+// function as Quote mutator.
+type QuoteFunc func(context.Context, *ent.QuoteMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f QuoteFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.QuoteMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.QuoteMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The TickerFunc type is an adapter to allow the use of ordinary
+// function as Ticker mutator.
+type TickerFunc func(context.Context, *ent.TickerMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TickerFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.TickerMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TickerMutation", m)
 	}
 	return f(ctx, mv)
 }

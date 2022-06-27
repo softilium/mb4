@@ -8,6 +8,61 @@ import (
 )
 
 var (
+	// DivPayoutsColumns holds the columns for the "div_payouts" table.
+	DivPayoutsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "for_year", Type: field.TypeInt},
+		{Name: "for_quarter", Type: field.TypeInt},
+		{Name: "close_date", Type: field.TypeTime},
+		{Name: "status", Type: field.TypeInt},
+		{Name: "dps", Type: field.TypeFloat64},
+		{Name: "ticker_div_payouts", Type: field.TypeString, Nullable: true, Size: 20},
+	}
+	// DivPayoutsTable holds the schema information for the "div_payouts" table.
+	DivPayoutsTable = &schema.Table{
+		Name:       "div_payouts",
+		Columns:    DivPayoutsColumns,
+		PrimaryKey: []*schema.Column{DivPayoutsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "div_payouts_tickers_DivPayouts",
+				Columns:    []*schema.Column{DivPayoutsColumns[6]},
+				RefColumns: []*schema.Column{TickersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// EmitentsColumns holds the columns for the "emitents" table.
+	EmitentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "descr", Type: field.TypeString, Unique: true, Size: 100},
+		{Name: "industry_emitents", Type: field.TypeString, Nullable: true, Size: 20},
+	}
+	// EmitentsTable holds the schema information for the "emitents" table.
+	EmitentsTable = &schema.Table{
+		Name:       "emitents",
+		Columns:    EmitentsColumns,
+		PrimaryKey: []*schema.Column{EmitentsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "emitents_industries_Emitents",
+				Columns:    []*schema.Column{EmitentsColumns[2]},
+				RefColumns: []*schema.Column{IndustriesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// IndustriesColumns holds the columns for the "industries" table.
+	IndustriesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true, Size: 20},
+		{Name: "descr", Type: field.TypeString, Unique: true, Size: 100},
+	}
+	// IndustriesTable holds the schema information for the "industries" table.
+	IndustriesTable = &schema.Table{
+		Name:       "industries",
+		Columns:    IndustriesColumns,
+		PrimaryKey: []*schema.Column{IndustriesColumns[0]},
+	}
 	// InvestAccountsColumns holds the columns for the "invest_accounts" table.
 	InvestAccountsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString},
@@ -70,6 +125,57 @@ var (
 			},
 		},
 	}
+	// QuotesColumns holds the columns for the "quotes" table.
+	QuotesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "d", Type: field.TypeTime},
+		{Name: "o", Type: field.TypeFloat64},
+		{Name: "c", Type: field.TypeFloat64},
+		{Name: "h", Type: field.TypeFloat64},
+		{Name: "l", Type: field.TypeFloat64},
+		{Name: "v", Type: field.TypeFloat64},
+		{Name: "cap", Type: field.TypeFloat64},
+		{Name: "div_sum_5y", Type: field.TypeFloat64},
+		{Name: "div_yield_5y", Type: field.TypeFloat64},
+		{Name: "lot_size", Type: field.TypeInt},
+		{Name: "list_level", Type: field.TypeInt},
+		{Name: "ticker_quotes", Type: field.TypeString, Nullable: true, Size: 20},
+	}
+	// QuotesTable holds the schema information for the "quotes" table.
+	QuotesTable = &schema.Table{
+		Name:       "quotes",
+		Columns:    QuotesColumns,
+		PrimaryKey: []*schema.Column{QuotesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "quotes_tickers_Quotes",
+				Columns:    []*schema.Column{QuotesColumns[12]},
+				RefColumns: []*schema.Column{TickersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// TickersColumns holds the columns for the "tickers" table.
+	TickersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true, Size: 20},
+		{Name: "descr", Type: field.TypeString, Unique: true, Size: 50},
+		{Name: "kind", Type: field.TypeInt32, Default: 100},
+		{Name: "emitent_tickers", Type: field.TypeInt, Nullable: true},
+	}
+	// TickersTable holds the schema information for the "tickers" table.
+	TickersTable = &schema.Table{
+		Name:       "tickers",
+		Columns:    TickersColumns,
+		PrimaryKey: []*schema.Column{TickersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "tickers_emitents_Tickers",
+				Columns:    []*schema.Column{TickersColumns[3]},
+				RefColumns: []*schema.Column{EmitentsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString},
@@ -86,15 +192,24 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		DivPayoutsTable,
+		EmitentsTable,
+		IndustriesTable,
 		InvestAccountsTable,
 		InvestAccountCashflowsTable,
 		InvestAccountValuationsTable,
+		QuotesTable,
+		TickersTable,
 		UsersTable,
 	}
 )
 
 func init() {
+	DivPayoutsTable.ForeignKeys[0].RefTable = TickersTable
+	EmitentsTable.ForeignKeys[0].RefTable = IndustriesTable
 	InvestAccountsTable.ForeignKeys[0].RefTable = UsersTable
 	InvestAccountCashflowsTable.ForeignKeys[0].RefTable = InvestAccountsTable
 	InvestAccountValuationsTable.ForeignKeys[0].RefTable = InvestAccountsTable
+	QuotesTable.ForeignKeys[0].RefTable = TickersTable
+	TickersTable.ForeignKeys[0].RefTable = EmitentsTable
 }
