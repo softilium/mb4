@@ -47,18 +47,21 @@ func initServer(listenAddr string) *http.Server {
 	router.HandleFunc("/api/users/register", api.UsersRegister)
 	router.HandleFunc("/api/users/logout", api.UsersLogout)
 	router.HandleFunc("/api/users/start-invest-accounts-flow", api.UsersStartInvestAccountsFlow)
-
 	router.HandleFunc("/api/invest-accounts", api.InvestAccounts)
 	router.HandleFunc("/api/invest-account-valuations", api.InvestAccountValuations)
-
 	router.HandleFunc("/api/industries", api.Industries)
+	router.HandleFunc("/api/emitents", api.Emitents)
+	router.HandleFunc("/api/tickers", api.Tickers)
+	router.HandleFunc("/api/quotes", api.Quotes)
 
 	server := &http.Server{
-		Addr:         listenAddr,
-		Handler:      router,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  15 * time.Second,
+		Addr:    listenAddr,
+		Handler: router,
+	}
+	if config.C.Debug {
+		server.ReadTimeout = 5 * time.Second
+		server.WriteTimeout = 10 * time.Second
+		server.IdleTimeout = 15 * time.Second
 	}
 
 	server.Handler = gh.RecoveryHandler()(server.Handler)

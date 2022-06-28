@@ -24,6 +24,6 @@ func (InvestAccountValuation) Fields() []ent.Field {
 // Edges of the InvestAccountValuation.
 func (InvestAccountValuation) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("Owner", InvestAccount.Type).Ref("Valuations").Unique(),
+		edge.From("Owner", InvestAccount.Type).Ref("Valuations").Required().Unique(),
 	}
 }

@@ -49,14 +49,6 @@ func (iac *InvestAccountCreate) SetOwnerID(id xid.ID) *InvestAccountCreate {
 	return iac
 }
 
-// SetNillableOwnerID sets the "Owner" edge to the User entity by ID if the given value is not nil.
-func (iac *InvestAccountCreate) SetNillableOwnerID(id *xid.ID) *InvestAccountCreate {
-	if id != nil {
-		iac = iac.SetOwnerID(*id)
-	}
-	return iac
-}
-
 // SetOwner sets the "Owner" edge to the User entity.
 func (iac *InvestAccountCreate) SetOwner(u *User) *InvestAccountCreate {
 	return iac.SetOwnerID(u.ID)
@@ -178,6 +170,9 @@ func (iac *InvestAccountCreate) check() error {
 		if err := investaccount.DescrValidator(v); err != nil {
 			return &ValidationError{Name: "Descr", err: fmt.Errorf(`ent: validator failed for field "InvestAccount.Descr": %w`, err)}
 		}
+	}
+	if _, ok := iac.mutation.OwnerID(); !ok {
+		return &ValidationError{Name: "Owner", err: errors.New(`ent: missing required edge "InvestAccount.Owner"`)}
 	}
 	return nil
 }

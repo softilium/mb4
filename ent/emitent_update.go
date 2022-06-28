@@ -41,14 +41,6 @@ func (eu *EmitentUpdate) SetIndustryID(id string) *EmitentUpdate {
 	return eu
 }
 
-// SetNillableIndustryID sets the "Industry" edge to the Industry entity by ID if the given value is not nil.
-func (eu *EmitentUpdate) SetNillableIndustryID(id *string) *EmitentUpdate {
-	if id != nil {
-		eu = eu.SetIndustryID(*id)
-	}
-	return eu
-}
-
 // SetIndustry sets the "Industry" edge to the Industry entity.
 func (eu *EmitentUpdate) SetIndustry(i *Industry) *EmitentUpdate {
 	return eu.SetIndustryID(i.ID)
@@ -168,6 +160,9 @@ func (eu *EmitentUpdate) check() error {
 			return &ValidationError{Name: "Descr", err: fmt.Errorf(`ent: validator failed for field "Emitent.Descr": %w`, err)}
 		}
 	}
+	if _, ok := eu.mutation.IndustryID(); eu.mutation.IndustryCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Emitent.Industry"`)
+	}
 	return nil
 }
 
@@ -177,7 +172,7 @@ func (eu *EmitentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   emitent.Table,
 			Columns: emitent.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeString,
 				Column: emitent.FieldID,
 			},
 		},
@@ -316,14 +311,6 @@ func (euo *EmitentUpdateOne) SetIndustryID(id string) *EmitentUpdateOne {
 	return euo
 }
 
-// SetNillableIndustryID sets the "Industry" edge to the Industry entity by ID if the given value is not nil.
-func (euo *EmitentUpdateOne) SetNillableIndustryID(id *string) *EmitentUpdateOne {
-	if id != nil {
-		euo = euo.SetIndustryID(*id)
-	}
-	return euo
-}
-
 // SetIndustry sets the "Industry" edge to the Industry entity.
 func (euo *EmitentUpdateOne) SetIndustry(i *Industry) *EmitentUpdateOne {
 	return euo.SetIndustryID(i.ID)
@@ -450,6 +437,9 @@ func (euo *EmitentUpdateOne) check() error {
 			return &ValidationError{Name: "Descr", err: fmt.Errorf(`ent: validator failed for field "Emitent.Descr": %w`, err)}
 		}
 	}
+	if _, ok := euo.mutation.IndustryID(); euo.mutation.IndustryCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Emitent.Industry"`)
+	}
 	return nil
 }
 
@@ -459,7 +449,7 @@ func (euo *EmitentUpdateOne) sqlSave(ctx context.Context) (_node *Emitent, err e
 			Table:   emitent.Table,
 			Columns: emitent.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeString,
 				Column: emitent.FieldID,
 			},
 		},

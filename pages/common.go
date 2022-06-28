@@ -22,14 +22,25 @@ var (
 )
 
 type SessionStruct struct {
-	User          *ent.User //there will be another session's fields here
+	user          *ent.User //there will be another session's fields here
 	Authenticated bool      //in pug templated we can use only fields, not funcs. We need to have fields from User here
+	UserID        xid.ID    //this is the same as user.ID
+	UserIDStr     string
 	UserName      string
+	UserIsAdmin   bool
+}
+
+func (session *SessionStruct) GetUser() *ent.User {
+
+	if session.user == nil {
+		panic("session.user is nil")
+	}
+	return session.user
 }
 
 func (session *SessionStruct) GetInvestAccountXids() ([]xid.ID, error) {
 
-	allUserAccounts, err := db.DB.InvestAccount.Query().Where(investaccount.HasOwnerWith(user.IDEQ(session.User.ID))).All(context.Background())
+	allUserAccounts, err := db.DB.InvestAccount.Query().Where(investaccount.HasOwnerWith(user.IDEQ(session.UserID))).All(context.Background())
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +71,7 @@ func (session *SessionStruct) GetInvestAccountXidsMap() (map[xid.ID]bool, error)
 
 func LoadSessionStruct(r *http.Request) SessionStruct {
 
-	data := SessionStruct{User: nil, Authenticated: false, UserName: ""}
+	data := SessionStruct{user: nil, Authenticated: false, UserName: "", UserIsAdmin: false}
 
 	session, err := SessionsStore.Get(r, config.C.SessionCookieName)
 	if err != nil {
@@ -86,9 +97,12 @@ func LoadSessionStruct(r *http.Request) SessionStruct {
 	}
 
 	if len(users) == 1 {
-		data.User = users[0]
+		data.user = users[0]
 		data.Authenticated = true
-		data.UserName = data.User.UserName
+		data.UserName = data.user.UserName
+		data.UserIsAdmin = data.user.Admin
+		data.UserID = data.user.ID
+		data.UserIDStr = data.user.ID.String()
 	}
 
 	return data

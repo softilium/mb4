@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/divpayout"
 	"github.com/softilium/mb4/ent/emitent"
 	"github.com/softilium/mb4/ent/quote"
@@ -49,13 +50,13 @@ func (tc *TickerCreate) SetID(s string) *TickerCreate {
 }
 
 // SetEmitentID sets the "Emitent" edge to the Emitent entity by ID.
-func (tc *TickerCreate) SetEmitentID(id int) *TickerCreate {
+func (tc *TickerCreate) SetEmitentID(id xid.ID) *TickerCreate {
 	tc.mutation.SetEmitentID(id)
 	return tc
 }
 
 // SetNillableEmitentID sets the "Emitent" edge to the Emitent entity by ID if the given value is not nil.
-func (tc *TickerCreate) SetNillableEmitentID(id *int) *TickerCreate {
+func (tc *TickerCreate) SetNillableEmitentID(id *xid.ID) *TickerCreate {
 	if id != nil {
 		tc = tc.SetEmitentID(*id)
 	}
@@ -68,14 +69,14 @@ func (tc *TickerCreate) SetEmitent(e *Emitent) *TickerCreate {
 }
 
 // AddQuoteIDs adds the "Quotes" edge to the Quote entity by IDs.
-func (tc *TickerCreate) AddQuoteIDs(ids ...int) *TickerCreate {
+func (tc *TickerCreate) AddQuoteIDs(ids ...xid.ID) *TickerCreate {
 	tc.mutation.AddQuoteIDs(ids...)
 	return tc
 }
 
 // AddQuotes adds the "Quotes" edges to the Quote entity.
 func (tc *TickerCreate) AddQuotes(q ...*Quote) *TickerCreate {
-	ids := make([]int, len(q))
+	ids := make([]xid.ID, len(q))
 	for i := range q {
 		ids[i] = q[i].ID
 	}
@@ -253,7 +254,7 @@ func (tc *TickerCreate) createSpec() (*Ticker, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: emitent.FieldID,
 				},
 			},
@@ -273,7 +274,7 @@ func (tc *TickerCreate) createSpec() (*Ticker, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: quote.FieldID,
 				},
 			},

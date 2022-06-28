@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/divpayout"
 	"github.com/softilium/mb4/ent/emitent"
 	"github.com/softilium/mb4/ent/predicate"
@@ -58,13 +59,13 @@ func (tu *TickerUpdate) AddKind(i int32) *TickerUpdate {
 }
 
 // SetEmitentID sets the "Emitent" edge to the Emitent entity by ID.
-func (tu *TickerUpdate) SetEmitentID(id int) *TickerUpdate {
+func (tu *TickerUpdate) SetEmitentID(id xid.ID) *TickerUpdate {
 	tu.mutation.SetEmitentID(id)
 	return tu
 }
 
 // SetNillableEmitentID sets the "Emitent" edge to the Emitent entity by ID if the given value is not nil.
-func (tu *TickerUpdate) SetNillableEmitentID(id *int) *TickerUpdate {
+func (tu *TickerUpdate) SetNillableEmitentID(id *xid.ID) *TickerUpdate {
 	if id != nil {
 		tu = tu.SetEmitentID(*id)
 	}
@@ -77,14 +78,14 @@ func (tu *TickerUpdate) SetEmitent(e *Emitent) *TickerUpdate {
 }
 
 // AddQuoteIDs adds the "Quotes" edge to the Quote entity by IDs.
-func (tu *TickerUpdate) AddQuoteIDs(ids ...int) *TickerUpdate {
+func (tu *TickerUpdate) AddQuoteIDs(ids ...xid.ID) *TickerUpdate {
 	tu.mutation.AddQuoteIDs(ids...)
 	return tu
 }
 
 // AddQuotes adds the "Quotes" edges to the Quote entity.
 func (tu *TickerUpdate) AddQuotes(q ...*Quote) *TickerUpdate {
-	ids := make([]int, len(q))
+	ids := make([]xid.ID, len(q))
 	for i := range q {
 		ids[i] = q[i].ID
 	}
@@ -124,14 +125,14 @@ func (tu *TickerUpdate) ClearQuotes() *TickerUpdate {
 }
 
 // RemoveQuoteIDs removes the "Quotes" edge to Quote entities by IDs.
-func (tu *TickerUpdate) RemoveQuoteIDs(ids ...int) *TickerUpdate {
+func (tu *TickerUpdate) RemoveQuoteIDs(ids ...xid.ID) *TickerUpdate {
 	tu.mutation.RemoveQuoteIDs(ids...)
 	return tu
 }
 
 // RemoveQuotes removes "Quotes" edges to Quote entities.
 func (tu *TickerUpdate) RemoveQuotes(q ...*Quote) *TickerUpdate {
-	ids := make([]int, len(q))
+	ids := make([]xid.ID, len(q))
 	for i := range q {
 		ids[i] = q[i].ID
 	}
@@ -277,7 +278,7 @@ func (tu *TickerUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: emitent.FieldID,
 				},
 			},
@@ -293,7 +294,7 @@ func (tu *TickerUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: emitent.FieldID,
 				},
 			},
@@ -312,7 +313,7 @@ func (tu *TickerUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: quote.FieldID,
 				},
 			},
@@ -328,7 +329,7 @@ func (tu *TickerUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: quote.FieldID,
 				},
 			},
@@ -347,7 +348,7 @@ func (tu *TickerUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: quote.FieldID,
 				},
 			},
@@ -458,13 +459,13 @@ func (tuo *TickerUpdateOne) AddKind(i int32) *TickerUpdateOne {
 }
 
 // SetEmitentID sets the "Emitent" edge to the Emitent entity by ID.
-func (tuo *TickerUpdateOne) SetEmitentID(id int) *TickerUpdateOne {
+func (tuo *TickerUpdateOne) SetEmitentID(id xid.ID) *TickerUpdateOne {
 	tuo.mutation.SetEmitentID(id)
 	return tuo
 }
 
 // SetNillableEmitentID sets the "Emitent" edge to the Emitent entity by ID if the given value is not nil.
-func (tuo *TickerUpdateOne) SetNillableEmitentID(id *int) *TickerUpdateOne {
+func (tuo *TickerUpdateOne) SetNillableEmitentID(id *xid.ID) *TickerUpdateOne {
 	if id != nil {
 		tuo = tuo.SetEmitentID(*id)
 	}
@@ -477,14 +478,14 @@ func (tuo *TickerUpdateOne) SetEmitent(e *Emitent) *TickerUpdateOne {
 }
 
 // AddQuoteIDs adds the "Quotes" edge to the Quote entity by IDs.
-func (tuo *TickerUpdateOne) AddQuoteIDs(ids ...int) *TickerUpdateOne {
+func (tuo *TickerUpdateOne) AddQuoteIDs(ids ...xid.ID) *TickerUpdateOne {
 	tuo.mutation.AddQuoteIDs(ids...)
 	return tuo
 }
 
 // AddQuotes adds the "Quotes" edges to the Quote entity.
 func (tuo *TickerUpdateOne) AddQuotes(q ...*Quote) *TickerUpdateOne {
-	ids := make([]int, len(q))
+	ids := make([]xid.ID, len(q))
 	for i := range q {
 		ids[i] = q[i].ID
 	}
@@ -524,14 +525,14 @@ func (tuo *TickerUpdateOne) ClearQuotes() *TickerUpdateOne {
 }
 
 // RemoveQuoteIDs removes the "Quotes" edge to Quote entities by IDs.
-func (tuo *TickerUpdateOne) RemoveQuoteIDs(ids ...int) *TickerUpdateOne {
+func (tuo *TickerUpdateOne) RemoveQuoteIDs(ids ...xid.ID) *TickerUpdateOne {
 	tuo.mutation.RemoveQuoteIDs(ids...)
 	return tuo
 }
 
 // RemoveQuotes removes "Quotes" edges to Quote entities.
 func (tuo *TickerUpdateOne) RemoveQuotes(q ...*Quote) *TickerUpdateOne {
-	ids := make([]int, len(q))
+	ids := make([]xid.ID, len(q))
 	for i := range q {
 		ids[i] = q[i].ID
 	}
@@ -701,7 +702,7 @@ func (tuo *TickerUpdateOne) sqlSave(ctx context.Context) (_node *Ticker, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: emitent.FieldID,
 				},
 			},
@@ -717,7 +718,7 @@ func (tuo *TickerUpdateOne) sqlSave(ctx context.Context) (_node *Ticker, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: emitent.FieldID,
 				},
 			},
@@ -736,7 +737,7 @@ func (tuo *TickerUpdateOne) sqlSave(ctx context.Context) (_node *Ticker, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: quote.FieldID,
 				},
 			},
@@ -752,7 +753,7 @@ func (tuo *TickerUpdateOne) sqlSave(ctx context.Context) (_node *Ticker, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: quote.FieldID,
 				},
 			},
@@ -771,7 +772,7 @@ func (tuo *TickerUpdateOne) sqlSave(ctx context.Context) (_node *Ticker, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: quote.FieldID,
 				},
 			},

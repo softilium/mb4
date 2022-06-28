@@ -137,13 +137,13 @@ func UsersStartInvestAccountsFlow(w http.ResponseWriter, r *http.Request) {
 		newValue, err := time.Parse("2006-01-02", parNewdate)
 		handleErr(err, w)
 
-		_, err = db.DB.User.UpdateOneID(session.User.ID).SetStartInvestAccountsFlow(newValue).Save(context.Background())
+		_, err = db.DB.User.UpdateOneID(session.UserID).SetStartInvestAccountsFlow(newValue).Save(context.Background())
 		handleErr(err, w)
 	}
 
 	if r.Method == http.MethodGet {
-		if !session.User.StartInvestAccountsFlow.IsZero() {
-			res := session.User.StartInvestAccountsFlow.Format("2006-01-02")
+		if !session.GetUser().StartInvestAccountsFlow.IsZero() {
+			res := session.GetUser().StartInvestAccountsFlow.Format("2006-01-02")
 			w.Write([]byte(res))
 		}
 	}

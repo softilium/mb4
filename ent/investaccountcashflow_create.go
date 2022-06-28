@@ -54,14 +54,6 @@ func (iacc *InvestAccountCashflowCreate) SetOwnerID(id xid.ID) *InvestAccountCas
 	return iacc
 }
 
-// SetNillableOwnerID sets the "Owner" edge to the InvestAccount entity by ID if the given value is not nil.
-func (iacc *InvestAccountCashflowCreate) SetNillableOwnerID(id *xid.ID) *InvestAccountCashflowCreate {
-	if id != nil {
-		iacc = iacc.SetOwnerID(*id)
-	}
-	return iacc
-}
-
 // SetOwner sets the "Owner" edge to the InvestAccount entity.
 func (iacc *InvestAccountCashflowCreate) SetOwner(i *InvestAccount) *InvestAccountCashflowCreate {
 	return iacc.SetOwnerID(i.ID)
@@ -151,6 +143,9 @@ func (iacc *InvestAccountCashflowCreate) check() error {
 	}
 	if _, ok := iacc.mutation.Qty(); !ok {
 		return &ValidationError{Name: "Qty", err: errors.New(`ent: missing required field "InvestAccountCashflow.Qty"`)}
+	}
+	if _, ok := iacc.mutation.OwnerID(); !ok {
+		return &ValidationError{Name: "Owner", err: errors.New(`ent: missing required edge "InvestAccountCashflow.Owner"`)}
 	}
 	return nil
 }

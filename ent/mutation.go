@@ -780,7 +780,7 @@ type EmitentMutation struct {
 	config
 	op               Op
 	typ              string
-	id               *int
+	id               *xid.ID
 	_Descr           *string
 	clearedFields    map[string]struct{}
 	_Industry        *string
@@ -813,7 +813,7 @@ func newEmitentMutation(c config, op Op, opts ...emitentOption) *EmitentMutation
 }
 
 // withEmitentID sets the ID field of the mutation.
-func withEmitentID(id int) emitentOption {
+func withEmitentID(id xid.ID) emitentOption {
 	return func(m *EmitentMutation) {
 		var (
 			err   error
@@ -863,9 +863,15 @@ func (m EmitentMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Emitent entities.
+func (m *EmitentMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *EmitentMutation) ID() (id int, exists bool) {
+func (m *EmitentMutation) ID() (id xid.ID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -876,12 +882,12 @@ func (m *EmitentMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *EmitentMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *EmitentMutation) IDs(ctx context.Context) ([]xid.ID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []int{id}, nil
+			return []xid.ID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -1246,8 +1252,8 @@ type IndustryMutation struct {
 	id               *string
 	_Descr           *string
 	clearedFields    map[string]struct{}
-	_Emitents        map[int]struct{}
-	removed_Emitents map[int]struct{}
+	_Emitents        map[xid.ID]struct{}
+	removed_Emitents map[xid.ID]struct{}
 	cleared_Emitents bool
 	done             bool
 	oldValue         func(context.Context) (*Industry, error)
@@ -1395,9 +1401,9 @@ func (m *IndustryMutation) ResetDescr() {
 }
 
 // AddEmitentIDs adds the "Emitents" edge to the Emitent entity by ids.
-func (m *IndustryMutation) AddEmitentIDs(ids ...int) {
+func (m *IndustryMutation) AddEmitentIDs(ids ...xid.ID) {
 	if m._Emitents == nil {
-		m._Emitents = make(map[int]struct{})
+		m._Emitents = make(map[xid.ID]struct{})
 	}
 	for i := range ids {
 		m._Emitents[ids[i]] = struct{}{}
@@ -1415,9 +1421,9 @@ func (m *IndustryMutation) EmitentsCleared() bool {
 }
 
 // RemoveEmitentIDs removes the "Emitents" edge to the Emitent entity by IDs.
-func (m *IndustryMutation) RemoveEmitentIDs(ids ...int) {
+func (m *IndustryMutation) RemoveEmitentIDs(ids ...xid.ID) {
 	if m.removed_Emitents == nil {
-		m.removed_Emitents = make(map[int]struct{})
+		m.removed_Emitents = make(map[xid.ID]struct{})
 	}
 	for i := range ids {
 		delete(m._Emitents, ids[i])
@@ -1426,7 +1432,7 @@ func (m *IndustryMutation) RemoveEmitentIDs(ids ...int) {
 }
 
 // RemovedEmitents returns the removed IDs of the "Emitents" edge to the Emitent entity.
-func (m *IndustryMutation) RemovedEmitentsIDs() (ids []int) {
+func (m *IndustryMutation) RemovedEmitentsIDs() (ids []xid.ID) {
 	for id := range m.removed_Emitents {
 		ids = append(ids, id)
 	}
@@ -1434,7 +1440,7 @@ func (m *IndustryMutation) RemovedEmitentsIDs() (ids []int) {
 }
 
 // EmitentsIDs returns the "Emitents" edge IDs in the mutation.
-func (m *IndustryMutation) EmitentsIDs() (ids []int) {
+func (m *IndustryMutation) EmitentsIDs() (ids []xid.ID) {
 	for id := range m._Emitents {
 		ids = append(ids, id)
 	}
@@ -3157,7 +3163,7 @@ type QuoteMutation struct {
 	config
 	op              Op
 	typ             string
-	id              *int
+	id              *xid.ID
 	_D              *time.Time
 	_O              *float64
 	add_O           *float64
@@ -3207,7 +3213,7 @@ func newQuoteMutation(c config, op Op, opts ...quoteOption) *QuoteMutation {
 }
 
 // withQuoteID sets the ID field of the mutation.
-func withQuoteID(id int) quoteOption {
+func withQuoteID(id xid.ID) quoteOption {
 	return func(m *QuoteMutation) {
 		var (
 			err   error
@@ -3257,9 +3263,15 @@ func (m QuoteMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Quote entities.
+func (m *QuoteMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *QuoteMutation) ID() (id int, exists bool) {
+func (m *QuoteMutation) ID() (id xid.ID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -3270,12 +3282,12 @@ func (m *QuoteMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *QuoteMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *QuoteMutation) IDs(ctx context.Context) ([]xid.ID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []int{id}, nil
+			return []xid.ID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -4415,10 +4427,10 @@ type TickerMutation struct {
 	_Kind              *int32
 	add_Kind           *int32
 	clearedFields      map[string]struct{}
-	_Emitent           *int
+	_Emitent           *xid.ID
 	cleared_Emitent    bool
-	_Quotes            map[int]struct{}
-	removed_Quotes     map[int]struct{}
+	_Quotes            map[xid.ID]struct{}
+	removed_Quotes     map[xid.ID]struct{}
 	cleared_Quotes     bool
 	_DivPayouts        map[int]struct{}
 	removed_DivPayouts map[int]struct{}
@@ -4625,7 +4637,7 @@ func (m *TickerMutation) ResetKind() {
 }
 
 // SetEmitentID sets the "Emitent" edge to the Emitent entity by id.
-func (m *TickerMutation) SetEmitentID(id int) {
+func (m *TickerMutation) SetEmitentID(id xid.ID) {
 	m._Emitent = &id
 }
 
@@ -4640,7 +4652,7 @@ func (m *TickerMutation) EmitentCleared() bool {
 }
 
 // EmitentID returns the "Emitent" edge ID in the mutation.
-func (m *TickerMutation) EmitentID() (id int, exists bool) {
+func (m *TickerMutation) EmitentID() (id xid.ID, exists bool) {
 	if m._Emitent != nil {
 		return *m._Emitent, true
 	}
@@ -4650,7 +4662,7 @@ func (m *TickerMutation) EmitentID() (id int, exists bool) {
 // EmitentIDs returns the "Emitent" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // EmitentID instead. It exists only for internal usage by the builders.
-func (m *TickerMutation) EmitentIDs() (ids []int) {
+func (m *TickerMutation) EmitentIDs() (ids []xid.ID) {
 	if id := m._Emitent; id != nil {
 		ids = append(ids, *id)
 	}
@@ -4664,9 +4676,9 @@ func (m *TickerMutation) ResetEmitent() {
 }
 
 // AddQuoteIDs adds the "Quotes" edge to the Quote entity by ids.
-func (m *TickerMutation) AddQuoteIDs(ids ...int) {
+func (m *TickerMutation) AddQuoteIDs(ids ...xid.ID) {
 	if m._Quotes == nil {
-		m._Quotes = make(map[int]struct{})
+		m._Quotes = make(map[xid.ID]struct{})
 	}
 	for i := range ids {
 		m._Quotes[ids[i]] = struct{}{}
@@ -4684,9 +4696,9 @@ func (m *TickerMutation) QuotesCleared() bool {
 }
 
 // RemoveQuoteIDs removes the "Quotes" edge to the Quote entity by IDs.
-func (m *TickerMutation) RemoveQuoteIDs(ids ...int) {
+func (m *TickerMutation) RemoveQuoteIDs(ids ...xid.ID) {
 	if m.removed_Quotes == nil {
-		m.removed_Quotes = make(map[int]struct{})
+		m.removed_Quotes = make(map[xid.ID]struct{})
 	}
 	for i := range ids {
 		delete(m._Quotes, ids[i])
@@ -4695,7 +4707,7 @@ func (m *TickerMutation) RemoveQuoteIDs(ids ...int) {
 }
 
 // RemovedQuotes returns the removed IDs of the "Quotes" edge to the Quote entity.
-func (m *TickerMutation) RemovedQuotesIDs() (ids []int) {
+func (m *TickerMutation) RemovedQuotesIDs() (ids []xid.ID) {
 	for id := range m.removed_Quotes {
 		ids = append(ids, id)
 	}
@@ -4703,7 +4715,7 @@ func (m *TickerMutation) RemovedQuotesIDs() (ids []int) {
 }
 
 // QuotesIDs returns the "Quotes" edge IDs in the mutation.
-func (m *TickerMutation) QuotesIDs() (ids []int) {
+func (m *TickerMutation) QuotesIDs() (ids []xid.ID) {
 	for id := range m._Quotes {
 		ids = append(ids, id)
 	}

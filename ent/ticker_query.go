@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/divpayout"
 	"github.com/softilium/mb4/ent/emitent"
 	"github.com/softilium/mb4/ent/predicate"
@@ -458,8 +459,8 @@ func (tq *TickerQuery) sqlAll(ctx context.Context) ([]*Ticker, error) {
 	}
 
 	if query := tq.withEmitent; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*Ticker)
+		ids := make([]xid.ID, 0, len(nodes))
+		nodeids := make(map[xid.ID][]*Ticker)
 		for i := range nodes {
 			if nodes[i].emitent_tickers == nil {
 				continue

@@ -2,6 +2,10 @@
 
 package quote
 
+import (
+	"github.com/rs/xid"
+)
+
 const (
 	// Label holds the string label denoting the quote type in the database.
 	Label = "quote"
@@ -82,6 +86,6 @@ func ValidColumn(column string) bool {
 var (
 	// LotSizeValidator is a validator for the "LotSize" field. It is called by the builders before save.
 	LotSizeValidator func(int) error
-	// ListLevelValidator is a validator for the "ListLevel" field. It is called by the builders before save.
-	ListLevelValidator func(int) error
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() xid.ID
 )

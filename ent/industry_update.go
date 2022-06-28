@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/emitent"
 	"github.com/softilium/mb4/ent/industry"
 	"github.com/softilium/mb4/ent/predicate"
@@ -35,14 +36,14 @@ func (iu *IndustryUpdate) SetDescr(s string) *IndustryUpdate {
 }
 
 // AddEmitentIDs adds the "Emitents" edge to the Emitent entity by IDs.
-func (iu *IndustryUpdate) AddEmitentIDs(ids ...int) *IndustryUpdate {
+func (iu *IndustryUpdate) AddEmitentIDs(ids ...xid.ID) *IndustryUpdate {
 	iu.mutation.AddEmitentIDs(ids...)
 	return iu
 }
 
 // AddEmitents adds the "Emitents" edges to the Emitent entity.
 func (iu *IndustryUpdate) AddEmitents(e ...*Emitent) *IndustryUpdate {
-	ids := make([]int, len(e))
+	ids := make([]xid.ID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
@@ -61,14 +62,14 @@ func (iu *IndustryUpdate) ClearEmitents() *IndustryUpdate {
 }
 
 // RemoveEmitentIDs removes the "Emitents" edge to Emitent entities by IDs.
-func (iu *IndustryUpdate) RemoveEmitentIDs(ids ...int) *IndustryUpdate {
+func (iu *IndustryUpdate) RemoveEmitentIDs(ids ...xid.ID) *IndustryUpdate {
 	iu.mutation.RemoveEmitentIDs(ids...)
 	return iu
 }
 
 // RemoveEmitents removes "Emitents" edges to Emitent entities.
 func (iu *IndustryUpdate) RemoveEmitents(e ...*Emitent) *IndustryUpdate {
-	ids := make([]int, len(e))
+	ids := make([]xid.ID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
@@ -179,7 +180,7 @@ func (iu *IndustryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: emitent.FieldID,
 				},
 			},
@@ -195,7 +196,7 @@ func (iu *IndustryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: emitent.FieldID,
 				},
 			},
@@ -214,7 +215,7 @@ func (iu *IndustryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: emitent.FieldID,
 				},
 			},
@@ -250,14 +251,14 @@ func (iuo *IndustryUpdateOne) SetDescr(s string) *IndustryUpdateOne {
 }
 
 // AddEmitentIDs adds the "Emitents" edge to the Emitent entity by IDs.
-func (iuo *IndustryUpdateOne) AddEmitentIDs(ids ...int) *IndustryUpdateOne {
+func (iuo *IndustryUpdateOne) AddEmitentIDs(ids ...xid.ID) *IndustryUpdateOne {
 	iuo.mutation.AddEmitentIDs(ids...)
 	return iuo
 }
 
 // AddEmitents adds the "Emitents" edges to the Emitent entity.
 func (iuo *IndustryUpdateOne) AddEmitents(e ...*Emitent) *IndustryUpdateOne {
-	ids := make([]int, len(e))
+	ids := make([]xid.ID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
@@ -276,14 +277,14 @@ func (iuo *IndustryUpdateOne) ClearEmitents() *IndustryUpdateOne {
 }
 
 // RemoveEmitentIDs removes the "Emitents" edge to Emitent entities by IDs.
-func (iuo *IndustryUpdateOne) RemoveEmitentIDs(ids ...int) *IndustryUpdateOne {
+func (iuo *IndustryUpdateOne) RemoveEmitentIDs(ids ...xid.ID) *IndustryUpdateOne {
 	iuo.mutation.RemoveEmitentIDs(ids...)
 	return iuo
 }
 
 // RemoveEmitents removes "Emitents" edges to Emitent entities.
 func (iuo *IndustryUpdateOne) RemoveEmitents(e ...*Emitent) *IndustryUpdateOne {
-	ids := make([]int, len(e))
+	ids := make([]xid.ID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
@@ -418,7 +419,7 @@ func (iuo *IndustryUpdateOne) sqlSave(ctx context.Context) (_node *Industry, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: emitent.FieldID,
 				},
 			},
@@ -434,7 +435,7 @@ func (iuo *IndustryUpdateOne) sqlSave(ctx context.Context) (_node *Industry, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: emitent.FieldID,
 				},
 			},
@@ -453,7 +454,7 @@ func (iuo *IndustryUpdateOne) sqlSave(ctx context.Context) (_node *Industry, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: emitent.FieldID,
 				},
 			},

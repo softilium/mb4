@@ -5,32 +5,33 @@ package emitent
 import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.Emitent {
+func ID(id xid.ID) predicate.Emitent {
 	return predicate.Emitent(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.Emitent {
+func IDEQ(id xid.ID) predicate.Emitent {
 	return predicate.Emitent(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.Emitent {
+func IDNEQ(id xid.ID) predicate.Emitent {
 	return predicate.Emitent(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldID), id))
 	})
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.Emitent {
+func IDIn(ids ...xid.ID) predicate.Emitent {
 	return predicate.Emitent(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -47,7 +48,7 @@ func IDIn(ids ...int) predicate.Emitent {
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.Emitent {
+func IDNotIn(ids ...xid.ID) predicate.Emitent {
 	return predicate.Emitent(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -64,28 +65,28 @@ func IDNotIn(ids ...int) predicate.Emitent {
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.Emitent {
+func IDGT(id xid.ID) predicate.Emitent {
 	return predicate.Emitent(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldID), id))
 	})
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.Emitent {
+func IDGTE(id xid.ID) predicate.Emitent {
 	return predicate.Emitent(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldID), id))
 	})
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.Emitent {
+func IDLT(id xid.ID) predicate.Emitent {
 	return predicate.Emitent(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldID), id))
 	})
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.Emitent {
+func IDLTE(id xid.ID) predicate.Emitent {
 	return predicate.Emitent(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldID), id))
 	})

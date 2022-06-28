@@ -37,7 +37,7 @@ func init() {
 	emitentFields := schema.Emitent{}.Fields()
 	_ = emitentFields
 	// emitentDescDescr is the schema descriptor for Descr field.
-	emitentDescDescr := emitentFields[0].Descriptor()
+	emitentDescDescr := emitentFields[1].Descriptor()
 	// emitent.DescrValidator is a validator for the "Descr" field. It is called by the builders before save.
 	emitent.DescrValidator = func() func(string) error {
 		validators := emitentDescDescr.Validators
@@ -55,6 +55,10 @@ func init() {
 			return nil
 		}
 	}()
+	// emitentDescID is the schema descriptor for id field.
+	emitentDescID := emitentFields[0].Descriptor()
+	// emitent.DefaultID holds the default value on creation for the id field.
+	emitent.DefaultID = emitentDescID.Default.(func() xid.ID)
 	industryFields := schema.Industry{}.Fields()
 	_ = industryFields
 	// industryDescDescr is the schema descriptor for Descr field.
@@ -135,13 +139,13 @@ func init() {
 	quoteFields := schema.Quote{}.Fields()
 	_ = quoteFields
 	// quoteDescLotSize is the schema descriptor for LotSize field.
-	quoteDescLotSize := quoteFields[9].Descriptor()
+	quoteDescLotSize := quoteFields[10].Descriptor()
 	// quote.LotSizeValidator is a validator for the "LotSize" field. It is called by the builders before save.
 	quote.LotSizeValidator = quoteDescLotSize.Validators[0].(func(int) error)
-	// quoteDescListLevel is the schema descriptor for ListLevel field.
-	quoteDescListLevel := quoteFields[10].Descriptor()
-	// quote.ListLevelValidator is a validator for the "ListLevel" field. It is called by the builders before save.
-	quote.ListLevelValidator = quoteDescListLevel.Validators[0].(func(int) error)
+	// quoteDescID is the schema descriptor for id field.
+	quoteDescID := quoteFields[0].Descriptor()
+	// quote.DefaultID holds the default value on creation for the id field.
+	quote.DefaultID = quoteDescID.Default.(func() xid.ID)
 	tickerFields := schema.Ticker{}.Fields()
 	_ = tickerFields
 	// tickerDescDescr is the schema descriptor for Descr field.

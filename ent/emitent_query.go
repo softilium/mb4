@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/emitent"
 	"github.com/softilium/mb4/ent/industry"
 	"github.com/softilium/mb4/ent/predicate"
@@ -135,8 +136,8 @@ func (eq *EmitentQuery) FirstX(ctx context.Context) *Emitent {
 
 // FirstID returns the first Emitent ID from the query.
 // Returns a *NotFoundError when no Emitent ID was found.
-func (eq *EmitentQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (eq *EmitentQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
+	var ids []xid.ID
 	if ids, err = eq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -148,7 +149,7 @@ func (eq *EmitentQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (eq *EmitentQuery) FirstIDX(ctx context.Context) int {
+func (eq *EmitentQuery) FirstIDX(ctx context.Context) xid.ID {
 	id, err := eq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -186,8 +187,8 @@ func (eq *EmitentQuery) OnlyX(ctx context.Context) *Emitent {
 // OnlyID is like Only, but returns the only Emitent ID in the query.
 // Returns a *NotSingularError when more than one Emitent ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (eq *EmitentQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (eq *EmitentQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
+	var ids []xid.ID
 	if ids, err = eq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -203,7 +204,7 @@ func (eq *EmitentQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (eq *EmitentQuery) OnlyIDX(ctx context.Context) int {
+func (eq *EmitentQuery) OnlyIDX(ctx context.Context) xid.ID {
 	id, err := eq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -229,8 +230,8 @@ func (eq *EmitentQuery) AllX(ctx context.Context) []*Emitent {
 }
 
 // IDs executes the query and returns a list of Emitent IDs.
-func (eq *EmitentQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (eq *EmitentQuery) IDs(ctx context.Context) ([]xid.ID, error) {
+	var ids []xid.ID
 	if err := eq.Select(emitent.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -238,7 +239,7 @@ func (eq *EmitentQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (eq *EmitentQuery) IDsX(ctx context.Context) []int {
+func (eq *EmitentQuery) IDsX(ctx context.Context) []xid.ID {
 	ids, err := eq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -451,7 +452,7 @@ func (eq *EmitentQuery) sqlAll(ctx context.Context) ([]*Emitent, error) {
 
 	if query := eq.withTickers; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*Emitent)
+		nodeids := make(map[xid.ID]*Emitent)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -504,7 +505,7 @@ func (eq *EmitentQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   emitent.Table,
 			Columns: emitent.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeString,
 				Column: emitent.FieldID,
 			},
 		},

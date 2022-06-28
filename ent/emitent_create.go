@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/emitent"
 	"github.com/softilium/mb4/ent/industry"
 	"github.com/softilium/mb4/ent/ticker"
@@ -27,17 +28,23 @@ func (ec *EmitentCreate) SetDescr(s string) *EmitentCreate {
 	return ec
 }
 
-// SetIndustryID sets the "Industry" edge to the Industry entity by ID.
-func (ec *EmitentCreate) SetIndustryID(id string) *EmitentCreate {
-	ec.mutation.SetIndustryID(id)
+// SetID sets the "id" field.
+func (ec *EmitentCreate) SetID(x xid.ID) *EmitentCreate {
+	ec.mutation.SetID(x)
 	return ec
 }
 
-// SetNillableIndustryID sets the "Industry" edge to the Industry entity by ID if the given value is not nil.
-func (ec *EmitentCreate) SetNillableIndustryID(id *string) *EmitentCreate {
-	if id != nil {
-		ec = ec.SetIndustryID(*id)
+// SetNillableID sets the "id" field if the given value is not nil.
+func (ec *EmitentCreate) SetNillableID(x *xid.ID) *EmitentCreate {
+	if x != nil {
+		ec.SetID(*x)
 	}
+	return ec
+}
+
+// SetIndustryID sets the "Industry" edge to the Industry entity by ID.
+func (ec *EmitentCreate) SetIndustryID(id string) *EmitentCreate {
+	ec.mutation.SetIndustryID(id)
 	return ec
 }
 
@@ -72,6 +79,7 @@ func (ec *EmitentCreate) Save(ctx context.Context) (*Emitent, error) {
 		err  error
 		node *Emitent
 	)
+	ec.defaults()
 	if len(ec.hooks) == 0 {
 		if err = ec.check(); err != nil {
 			return nil, err
@@ -129,6 +137,14 @@ func (ec *EmitentCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (ec *EmitentCreate) defaults() {
+	if _, ok := ec.mutation.ID(); !ok {
+		v := emitent.DefaultID()
+		ec.mutation.SetID(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (ec *EmitentCreate) check() error {
 	if _, ok := ec.mutation.Descr(); !ok {
@@ -138,6 +154,9 @@ func (ec *EmitentCreate) check() error {
 		if err := emitent.DescrValidator(v); err != nil {
 			return &ValidationError{Name: "Descr", err: fmt.Errorf(`ent: validator failed for field "Emitent.Descr": %w`, err)}
 		}
+	}
+	if _, ok := ec.mutation.IndustryID(); !ok {
+		return &ValidationError{Name: "Industry", err: errors.New(`ent: missing required edge "Emitent.Industry"`)}
 	}
 	return nil
 }
@@ -150,8 +169,13 @@ func (ec *EmitentCreate) sqlSave(ctx context.Context) (*Emitent, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != nil {
+		if id, ok := _spec.ID.Value.(*xid.ID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
+		}
+	}
 	return _node, nil
 }
 
@@ -161,11 +185,15 @@ func (ec *EmitentCreate) createSpec() (*Emitent, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: emitent.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeString,
 				Column: emitent.FieldID,
 			},
 		}
 	)
+	if id, ok := ec.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = &id
+	}
 	if value, ok := ec.mutation.Descr(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -230,6 +258,7 @@ func (ecb *EmitentCreateBulk) Save(ctx context.Context) ([]*Emitent, error) {
 	for i := range ecb.builders {
 		func(i int, root context.Context) {
 			builder := ecb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*EmitentMutation)
 				if !ok {
@@ -257,10 +286,6 @@ func (ecb *EmitentCreateBulk) Save(ctx context.Context) ([]*Emitent, error) {
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

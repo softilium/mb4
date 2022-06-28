@@ -32,6 +32,6 @@ func (DivPayout) Fields() []ent.Field {
 // Edges of the DivPayout.
 func (DivPayout) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("Tickers", Ticker.Type).Ref("DivPayouts").Unique(),
+		edge.From("Tickers", Ticker.Type).Ref("DivPayouts").Required().Unique(),
 	}
 }

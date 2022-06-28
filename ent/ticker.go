@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/emitent"
 	"github.com/softilium/mb4/ent/ticker"
 )
@@ -23,7 +24,7 @@ type Ticker struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TickerQuery when eager-loading is set.
 	Edges           TickerEdges `json:"edges"`
-	emitent_tickers *int
+	emitent_tickers *xid.ID
 }
 
 // TickerEdges holds the relations/edges for other nodes in the graph.
@@ -81,7 +82,7 @@ func (*Ticker) scanValues(columns []string) ([]interface{}, error) {
 		case ticker.FieldID, ticker.FieldDescr:
 			values[i] = new(sql.NullString)
 		case ticker.ForeignKeys[0]: // emitent_tickers
-			values[i] = new(sql.NullInt64)
+			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Ticker", columns[i])
 		}
@@ -116,11 +117,11 @@ func (t *Ticker) assignValues(columns []string, values []interface{}) error {
 				t.Kind = int32(value.Int64)
 			}
 		case ticker.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field emitent_tickers", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field emitent_tickers", values[i])
 			} else if value.Valid {
-				t.emitent_tickers = new(int)
-				*t.emitent_tickers = int(value.Int64)
+				t.emitent_tickers = new(xid.ID)
+				*t.emitent_tickers = *value.S.(*xid.ID)
 			}
 		}
 	}

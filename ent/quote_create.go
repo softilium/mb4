@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/quote"
 	"github.com/softilium/mb4/ent/ticker"
 )
@@ -87,17 +88,23 @@ func (qc *QuoteCreate) SetListLevel(i int) *QuoteCreate {
 	return qc
 }
 
-// SetTickerID sets the "Ticker" edge to the Ticker entity by ID.
-func (qc *QuoteCreate) SetTickerID(id string) *QuoteCreate {
-	qc.mutation.SetTickerID(id)
+// SetID sets the "id" field.
+func (qc *QuoteCreate) SetID(x xid.ID) *QuoteCreate {
+	qc.mutation.SetID(x)
 	return qc
 }
 
-// SetNillableTickerID sets the "Ticker" edge to the Ticker entity by ID if the given value is not nil.
-func (qc *QuoteCreate) SetNillableTickerID(id *string) *QuoteCreate {
-	if id != nil {
-		qc = qc.SetTickerID(*id)
+// SetNillableID sets the "id" field if the given value is not nil.
+func (qc *QuoteCreate) SetNillableID(x *xid.ID) *QuoteCreate {
+	if x != nil {
+		qc.SetID(*x)
 	}
+	return qc
+}
+
+// SetTickerID sets the "Ticker" edge to the Ticker entity by ID.
+func (qc *QuoteCreate) SetTickerID(id string) *QuoteCreate {
+	qc.mutation.SetTickerID(id)
 	return qc
 }
 
@@ -117,6 +124,7 @@ func (qc *QuoteCreate) Save(ctx context.Context) (*Quote, error) {
 		err  error
 		node *Quote
 	)
+	qc.defaults()
 	if len(qc.hooks) == 0 {
 		if err = qc.check(); err != nil {
 			return nil, err
@@ -174,6 +182,14 @@ func (qc *QuoteCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (qc *QuoteCreate) defaults() {
+	if _, ok := qc.mutation.ID(); !ok {
+		v := quote.DefaultID()
+		qc.mutation.SetID(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (qc *QuoteCreate) check() error {
 	if _, ok := qc.mutation.D(); !ok {
@@ -214,10 +230,8 @@ func (qc *QuoteCreate) check() error {
 	if _, ok := qc.mutation.ListLevel(); !ok {
 		return &ValidationError{Name: "ListLevel", err: errors.New(`ent: missing required field "Quote.ListLevel"`)}
 	}
-	if v, ok := qc.mutation.ListLevel(); ok {
-		if err := quote.ListLevelValidator(v); err != nil {
-			return &ValidationError{Name: "ListLevel", err: fmt.Errorf(`ent: validator failed for field "Quote.ListLevel": %w`, err)}
-		}
+	if _, ok := qc.mutation.TickerID(); !ok {
+		return &ValidationError{Name: "Ticker", err: errors.New(`ent: missing required edge "Quote.Ticker"`)}
 	}
 	return nil
 }
@@ -230,8 +244,13 @@ func (qc *QuoteCreate) sqlSave(ctx context.Context) (*Quote, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != nil {
+		if id, ok := _spec.ID.Value.(*xid.ID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
+		}
+	}
 	return _node, nil
 }
 
@@ -241,11 +260,15 @@ func (qc *QuoteCreate) createSpec() (*Quote, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: quote.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeString,
 				Column: quote.FieldID,
 			},
 		}
 	)
+	if id, ok := qc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = &id
+	}
 	if value, ok := qc.mutation.D(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -371,6 +394,7 @@ func (qcb *QuoteCreateBulk) Save(ctx context.Context) ([]*Quote, error) {
 	for i := range qcb.builders {
 		func(i int, root context.Context) {
 			builder := qcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*QuoteMutation)
 				if !ok {
@@ -398,10 +422,6 @@ func (qcb *QuoteCreateBulk) Save(ctx context.Context) ([]*Quote, error) {
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

@@ -43,14 +43,6 @@ func (iau *InvestAccountUpdate) SetOwnerID(id xid.ID) *InvestAccountUpdate {
 	return iau
 }
 
-// SetNillableOwnerID sets the "Owner" edge to the User entity by ID if the given value is not nil.
-func (iau *InvestAccountUpdate) SetNillableOwnerID(id *xid.ID) *InvestAccountUpdate {
-	if id != nil {
-		iau = iau.SetOwnerID(*id)
-	}
-	return iau
-}
-
 // SetOwner sets the "Owner" edge to the User entity.
 func (iau *InvestAccountUpdate) SetOwner(u *User) *InvestAccountUpdate {
 	return iau.SetOwnerID(u.ID)
@@ -205,6 +197,9 @@ func (iau *InvestAccountUpdate) check() error {
 		if err := investaccount.DescrValidator(v); err != nil {
 			return &ValidationError{Name: "Descr", err: fmt.Errorf(`ent: validator failed for field "InvestAccount.Descr": %w`, err)}
 		}
+	}
+	if _, ok := iau.mutation.OwnerID(); iau.mutation.OwnerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "InvestAccount.Owner"`)
 	}
 	return nil
 }
@@ -408,14 +403,6 @@ func (iauo *InvestAccountUpdateOne) SetOwnerID(id xid.ID) *InvestAccountUpdateOn
 	return iauo
 }
 
-// SetNillableOwnerID sets the "Owner" edge to the User entity by ID if the given value is not nil.
-func (iauo *InvestAccountUpdateOne) SetNillableOwnerID(id *xid.ID) *InvestAccountUpdateOne {
-	if id != nil {
-		iauo = iauo.SetOwnerID(*id)
-	}
-	return iauo
-}
-
 // SetOwner sets the "Owner" edge to the User entity.
 func (iauo *InvestAccountUpdateOne) SetOwner(u *User) *InvestAccountUpdateOne {
 	return iauo.SetOwnerID(u.ID)
@@ -577,6 +564,9 @@ func (iauo *InvestAccountUpdateOne) check() error {
 		if err := investaccount.DescrValidator(v); err != nil {
 			return &ValidationError{Name: "Descr", err: fmt.Errorf(`ent: validator failed for field "InvestAccount.Descr": %w`, err)}
 		}
+	}
+	if _, ok := iauo.mutation.OwnerID(); iauo.mutation.OwnerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "InvestAccount.Owner"`)
 	}
 	return nil
 }

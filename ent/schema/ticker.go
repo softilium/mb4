@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -32,8 +33,8 @@ func (Ticker) Fields() []ent.Field {
 // Edges of the Ticker.
 func (Ticker) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("Emitent", Emitent.Type).Ref("Tickers").Unique(),
-		edge.To("Quotes", Quote.Type),
-		edge.To("DivPayouts", DivPayout.Type),
+		edge.From("Emitent", Emitent.Type).Ref("Tickers").Required().Unique(),
+		edge.To("Quotes", Quote.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
+		edge.To("DivPayouts", DivPayout.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
 	}
 }

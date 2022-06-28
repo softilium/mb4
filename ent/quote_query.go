@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/predicate"
 	"github.com/softilium/mb4/ent/quote"
 	"github.com/softilium/mb4/ent/ticker"
@@ -110,8 +111,8 @@ func (qq *QuoteQuery) FirstX(ctx context.Context) *Quote {
 
 // FirstID returns the first Quote ID from the query.
 // Returns a *NotFoundError when no Quote ID was found.
-func (qq *QuoteQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (qq *QuoteQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
+	var ids []xid.ID
 	if ids, err = qq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -123,7 +124,7 @@ func (qq *QuoteQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (qq *QuoteQuery) FirstIDX(ctx context.Context) int {
+func (qq *QuoteQuery) FirstIDX(ctx context.Context) xid.ID {
 	id, err := qq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -161,8 +162,8 @@ func (qq *QuoteQuery) OnlyX(ctx context.Context) *Quote {
 // OnlyID is like Only, but returns the only Quote ID in the query.
 // Returns a *NotSingularError when more than one Quote ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (qq *QuoteQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (qq *QuoteQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
+	var ids []xid.ID
 	if ids, err = qq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -178,7 +179,7 @@ func (qq *QuoteQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (qq *QuoteQuery) OnlyIDX(ctx context.Context) int {
+func (qq *QuoteQuery) OnlyIDX(ctx context.Context) xid.ID {
 	id, err := qq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -204,8 +205,8 @@ func (qq *QuoteQuery) AllX(ctx context.Context) []*Quote {
 }
 
 // IDs executes the query and returns a list of Quote IDs.
-func (qq *QuoteQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (qq *QuoteQuery) IDs(ctx context.Context) ([]xid.ID, error) {
+	var ids []xid.ID
 	if err := qq.Select(quote.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -213,7 +214,7 @@ func (qq *QuoteQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (qq *QuoteQuery) IDsX(ctx context.Context) []int {
+func (qq *QuoteQuery) IDsX(ctx context.Context) []xid.ID {
 	ids, err := qq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -437,7 +438,7 @@ func (qq *QuoteQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   quote.Table,
 			Columns: quote.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeString,
 				Column: quote.FieldID,
 			},
 		},

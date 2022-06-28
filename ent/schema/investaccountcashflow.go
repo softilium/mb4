@@ -24,6 +24,6 @@ func (InvestAccountCashflow) Fields() []ent.Field {
 // Edges of the InvestAccountCashflow.
 func (InvestAccountCashflow) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("Owner", InvestAccount.Type).Ref("Cashflows").Unique(),
+		edge.From("Owner", InvestAccount.Type).Ref("Cashflows").Required().Unique(),
 	}
 }

@@ -44,7 +44,7 @@ func InvestAccounts(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if !session.User.Admin {
+	if !session.UserIsAdmin {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -155,7 +155,7 @@ func handleAccsPut(r *http.Request, w http.ResponseWriter, session pages.Session
 
 }
 
-func handleAccsPost(r *http.Request, w http.ResponseWriter, curSes pages.SessionStruct) {
+func handleAccsPost(r *http.Request, w http.ResponseWriter, session pages.SessionStruct) {
 
 	// Try to decode the request body into the struct. If there is an error,
 	// respond to the client with the error message and a 400 status code.
@@ -169,7 +169,7 @@ func handleAccsPost(r *http.Request, w http.ResponseWriter, curSes pages.Session
 		existings, err := db.DB.InvestAccount.Query().
 			Where(investaccount.And(
 				investaccount.DescrEQ(pone.Descr),
-				investaccount.HasOwnerWith(user.IDEQ(curSes.User.ID)))).
+				investaccount.HasOwnerWith(user.IDEQ(session.UserID)))).
 			All(context.Background())
 		handleErr(err, w)
 
@@ -195,7 +195,7 @@ func handleAccsPost(r *http.Request, w http.ResponseWriter, curSes pages.Session
 
 		ins, err := db.DB.InvestAccount.Create().
 			SetDescr(v.Descr).
-			SetOwnerID(curSes.User.ID).
+			SetOwnerID(session.UserID).
 			Save(context.Background())
 		handleErr(err, w)
 
@@ -228,39 +228,23 @@ func handleAccsDelete(r *http.Request, w http.ResponseWriter, session pages.Sess
 	id, err := xid.FromString(r.URL.Query().Get("id"))
 	handleErr(err, w)
 
-	tx, err := db.DB.Tx(context.Background())
-	defer tx.Rollback()
-	handleErr(err, w)
-
-	cnt, err := tx.InvestAccount.Delete().
-		Where(investaccount.And(investaccount.ID(id), investaccount.HasOwnerWith(user.IDEQ(session.User.ID)))).
+	cnt, err := db.DB.InvestAccount.Delete().
+		Where(investaccount.And(investaccount.ID(id), investaccount.HasOwnerWith(user.IDEQ(session.UserID)))).
 		Exec(context.Background())
 	handleErr(err, w)
-	if cnt == 1 {
-		_, err = tx.InvestAccountValuation.Delete().
-			Where(investaccountvaluation.HasOwnerWith(investaccount.IDEQ(id))).
-			Exec(context.Background())
-		handleErr(err, w)
-
-		_, err = tx.InvestAccountCashflow.Delete().
-			Where(investaccountcashflow.HasOwnerWith(investaccount.IDEQ(id))).
-			Exec(context.Background())
-		handleErr(err, w)
-
-		tx.Commit()
-	} else {
+	if cnt == 0 {
 		w.WriteHeader(http.StatusNotFound)
 	}
 
 }
 
-func handleAccsGetList(curSes pages.SessionStruct, w http.ResponseWriter) {
+func handleAccsGetList(session pages.SessionStruct, w http.ResponseWriter) {
 	data, err := db.DB.InvestAccount.Query().
 		WithValuations(
 			func(q *ent.InvestAccountValuationQuery) {
 				q.Order(ent.Desc(investaccountvaluation.FieldRecDate))
 			}).
-		Where(investaccount.HasOwnerWith(user.IDEQ(curSes.User.ID))).
+		Where(investaccount.HasOwnerWith(user.IDEQ(session.UserID))).
 		All(context.Background())
 	handleErr(err, w)
 
@@ -292,7 +276,7 @@ func handleAccsGetList(curSes pages.SessionStruct, w http.ResponseWriter) {
 
 func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, session pages.SessionStruct) {
 
-	startDate := session.User.StartInvestAccountsFlow
+	startDate := session.GetUser().StartInvestAccountsFlow
 
 	var err error
 

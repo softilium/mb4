@@ -57,14 +57,6 @@ func (dpc *DivPayoutCreate) SetTickersID(id string) *DivPayoutCreate {
 	return dpc
 }
 
-// SetNillableTickersID sets the "Tickers" edge to the Ticker entity by ID if the given value is not nil.
-func (dpc *DivPayoutCreate) SetNillableTickersID(id *string) *DivPayoutCreate {
-	if id != nil {
-		dpc = dpc.SetTickersID(*id)
-	}
-	return dpc
-}
-
 // SetTickers sets the "Tickers" edge to the Ticker entity.
 func (dpc *DivPayoutCreate) SetTickers(t *Ticker) *DivPayoutCreate {
 	return dpc.SetTickersID(t.ID)
@@ -169,6 +161,9 @@ func (dpc *DivPayoutCreate) check() error {
 	}
 	if _, ok := dpc.mutation.DPS(); !ok {
 		return &ValidationError{Name: "DPS", err: errors.New(`ent: missing required field "DivPayout.DPS"`)}
+	}
+	if _, ok := dpc.mutation.TickersID(); !ok {
+		return &ValidationError{Name: "Tickers", err: errors.New(`ent: missing required edge "DivPayout.Tickers"`)}
 	}
 	return nil
 }

@@ -2,6 +2,10 @@
 
 package emitent
 
+import (
+	"github.com/rs/xid"
+)
+
 const (
 	// Label holds the string label denoting the emitent type in the database.
 	Label = "emitent"
@@ -61,4 +65,6 @@ func ValidColumn(column string) bool {
 var (
 	// DescrValidator is a validator for the "Descr" field. It is called by the builders before save.
 	DescrValidator func(string) error
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() xid.ID
 )

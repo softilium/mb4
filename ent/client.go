@@ -326,7 +326,7 @@ func (c *EmitentClient) UpdateOne(e *Emitent) *EmitentUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *EmitentClient) UpdateOneID(id int) *EmitentUpdateOne {
+func (c *EmitentClient) UpdateOneID(id xid.ID) *EmitentUpdateOne {
 	mutation := newEmitentMutation(c.config, OpUpdateOne, withEmitentID(id))
 	return &EmitentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -343,7 +343,7 @@ func (c *EmitentClient) DeleteOne(e *Emitent) *EmitentDeleteOne {
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *EmitentClient) DeleteOneID(id int) *EmitentDeleteOne {
+func (c *EmitentClient) DeleteOneID(id xid.ID) *EmitentDeleteOne {
 	builder := c.Delete().Where(emitent.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -358,12 +358,12 @@ func (c *EmitentClient) Query() *EmitentQuery {
 }
 
 // Get returns a Emitent entity by its id.
-func (c *EmitentClient) Get(ctx context.Context, id int) (*Emitent, error) {
+func (c *EmitentClient) Get(ctx context.Context, id xid.ID) (*Emitent, error) {
 	return c.Query().Where(emitent.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *EmitentClient) GetX(ctx context.Context, id int) *Emitent {
+func (c *EmitentClient) GetX(ctx context.Context, id xid.ID) *Emitent {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -904,7 +904,7 @@ func (c *QuoteClient) UpdateOne(q *Quote) *QuoteUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *QuoteClient) UpdateOneID(id int) *QuoteUpdateOne {
+func (c *QuoteClient) UpdateOneID(id xid.ID) *QuoteUpdateOne {
 	mutation := newQuoteMutation(c.config, OpUpdateOne, withQuoteID(id))
 	return &QuoteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -921,7 +921,7 @@ func (c *QuoteClient) DeleteOne(q *Quote) *QuoteDeleteOne {
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *QuoteClient) DeleteOneID(id int) *QuoteDeleteOne {
+func (c *QuoteClient) DeleteOneID(id xid.ID) *QuoteDeleteOne {
 	builder := c.Delete().Where(quote.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -936,12 +936,12 @@ func (c *QuoteClient) Query() *QuoteQuery {
 }
 
 // Get returns a Quote entity by its id.
-func (c *QuoteClient) Get(ctx context.Context, id int) (*Quote, error) {
+func (c *QuoteClient) Get(ctx context.Context, id xid.ID) (*Quote, error) {
 	return c.Query().Where(quote.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *QuoteClient) GetX(ctx context.Context, id int) *Quote {
+func (c *QuoteClient) GetX(ctx context.Context, id xid.ID) *Quote {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

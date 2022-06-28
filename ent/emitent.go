@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/emitent"
 	"github.com/softilium/mb4/ent/industry"
 )
@@ -15,7 +16,7 @@ import (
 type Emitent struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID xid.ID `json:"id,omitempty"`
 	// Descr holds the value of the "Descr" field.
 	Descr string `json:"Descr,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -63,10 +64,10 @@ func (*Emitent) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case emitent.FieldID:
-			values[i] = new(sql.NullInt64)
 		case emitent.FieldDescr:
 			values[i] = new(sql.NullString)
+		case emitent.FieldID:
+			values[i] = new(xid.ID)
 		case emitent.ForeignKeys[0]: // industry_emitents
 			values[i] = new(sql.NullString)
 		default:
@@ -85,11 +86,11 @@ func (e *Emitent) assignValues(columns []string, values []interface{}) error {
 	for i := range columns {
 		switch columns[i] {
 		case emitent.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*xid.ID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				e.ID = *value
 			}
-			e.ID = int(value.Int64)
 		case emitent.FieldDescr:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field Descr", values[i])

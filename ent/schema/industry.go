@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -22,6 +23,6 @@ func (Industry) Fields() []ent.Field {
 // Edges of the Industry.
 func (Industry) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("Emitents", Emitent.Type),
+		edge.To("Emitents", Emitent.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
 	}
 }

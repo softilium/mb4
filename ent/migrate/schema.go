@@ -16,7 +16,7 @@ var (
 		{Name: "close_date", Type: field.TypeTime},
 		{Name: "status", Type: field.TypeInt},
 		{Name: "dps", Type: field.TypeFloat64},
-		{Name: "ticker_div_payouts", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "ticker_div_payouts", Type: field.TypeString, Size: 20},
 	}
 	// DivPayoutsTable holds the schema information for the "div_payouts" table.
 	DivPayoutsTable = &schema.Table{
@@ -28,15 +28,15 @@ var (
 				Symbol:     "div_payouts_tickers_DivPayouts",
 				Columns:    []*schema.Column{DivPayoutsColumns[6]},
 				RefColumns: []*schema.Column{TickersColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.Cascade,
 			},
 		},
 	}
 	// EmitentsColumns holds the columns for the "emitents" table.
 	EmitentsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeString},
 		{Name: "descr", Type: field.TypeString, Unique: true, Size: 100},
-		{Name: "industry_emitents", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "industry_emitents", Type: field.TypeString, Size: 20},
 	}
 	// EmitentsTable holds the schema information for the "emitents" table.
 	EmitentsTable = &schema.Table{
@@ -48,7 +48,7 @@ var (
 				Symbol:     "emitents_industries_Emitents",
 				Columns:    []*schema.Column{EmitentsColumns[2]},
 				RefColumns: []*schema.Column{IndustriesColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.Cascade,
 			},
 		},
 	}
@@ -67,7 +67,7 @@ var (
 	InvestAccountsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString},
 		{Name: "descr", Type: field.TypeString, Size: 100},
-		{Name: "user_invest_accounts", Type: field.TypeString, Nullable: true},
+		{Name: "user_invest_accounts", Type: field.TypeString},
 	}
 	// InvestAccountsTable holds the schema information for the "invest_accounts" table.
 	InvestAccountsTable = &schema.Table{
@@ -79,7 +79,7 @@ var (
 				Symbol:     "invest_accounts_users_InvestAccounts",
 				Columns:    []*schema.Column{InvestAccountsColumns[2]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.Cascade,
 			},
 		},
 	}
@@ -88,7 +88,7 @@ var (
 		{Name: "id", Type: field.TypeString},
 		{Name: "rec_date", Type: field.TypeTime},
 		{Name: "qty", Type: field.TypeFloat64},
-		{Name: "invest_account_cashflows", Type: field.TypeString, Nullable: true},
+		{Name: "invest_account_cashflows", Type: field.TypeString},
 	}
 	// InvestAccountCashflowsTable holds the schema information for the "invest_account_cashflows" table.
 	InvestAccountCashflowsTable = &schema.Table{
@@ -100,7 +100,7 @@ var (
 				Symbol:     "invest_account_cashflows_invest_accounts_Cashflows",
 				Columns:    []*schema.Column{InvestAccountCashflowsColumns[3]},
 				RefColumns: []*schema.Column{InvestAccountsColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.Cascade,
 			},
 		},
 	}
@@ -109,7 +109,7 @@ var (
 		{Name: "id", Type: field.TypeString},
 		{Name: "rec_date", Type: field.TypeTime},
 		{Name: "value", Type: field.TypeFloat64},
-		{Name: "invest_account_valuations", Type: field.TypeString, Nullable: true},
+		{Name: "invest_account_valuations", Type: field.TypeString},
 	}
 	// InvestAccountValuationsTable holds the schema information for the "invest_account_valuations" table.
 	InvestAccountValuationsTable = &schema.Table{
@@ -121,13 +121,13 @@ var (
 				Symbol:     "invest_account_valuations_invest_accounts_Valuations",
 				Columns:    []*schema.Column{InvestAccountValuationsColumns[3]},
 				RefColumns: []*schema.Column{InvestAccountsColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.Cascade,
 			},
 		},
 	}
 	// QuotesColumns holds the columns for the "quotes" table.
 	QuotesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeString},
 		{Name: "d", Type: field.TypeTime},
 		{Name: "o", Type: field.TypeFloat64},
 		{Name: "c", Type: field.TypeFloat64},
@@ -139,7 +139,7 @@ var (
 		{Name: "div_yield_5y", Type: field.TypeFloat64},
 		{Name: "lot_size", Type: field.TypeInt},
 		{Name: "list_level", Type: field.TypeInt},
-		{Name: "ticker_quotes", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "ticker_quotes", Type: field.TypeString, Size: 20},
 	}
 	// QuotesTable holds the schema information for the "quotes" table.
 	QuotesTable = &schema.Table{
@@ -151,7 +151,14 @@ var (
 				Symbol:     "quotes_tickers_Quotes",
 				Columns:    []*schema.Column{QuotesColumns[12]},
 				RefColumns: []*schema.Column{TickersColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "quote_d_ticker_quotes",
+				Unique:  true,
+				Columns: []*schema.Column{QuotesColumns[1], QuotesColumns[12]},
 			},
 		},
 	}
@@ -160,7 +167,7 @@ var (
 		{Name: "id", Type: field.TypeString, Unique: true, Size: 20},
 		{Name: "descr", Type: field.TypeString, Unique: true, Size: 50},
 		{Name: "kind", Type: field.TypeInt32, Default: 100},
-		{Name: "emitent_tickers", Type: field.TypeInt, Nullable: true},
+		{Name: "emitent_tickers", Type: field.TypeString, Nullable: true},
 	}
 	// TickersTable holds the schema information for the "tickers" table.
 	TickersTable = &schema.Table{
@@ -172,7 +179,7 @@ var (
 				Symbol:     "tickers_emitents_Tickers",
 				Columns:    []*schema.Column{TickersColumns[3]},
 				RefColumns: []*schema.Column{EmitentsColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.Cascade,
 			},
 		},
 	}

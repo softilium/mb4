@@ -55,14 +55,6 @@ func (iacu *InvestAccountCashflowUpdate) SetOwnerID(id xid.ID) *InvestAccountCas
 	return iacu
 }
 
-// SetNillableOwnerID sets the "Owner" edge to the InvestAccount entity by ID if the given value is not nil.
-func (iacu *InvestAccountCashflowUpdate) SetNillableOwnerID(id *xid.ID) *InvestAccountCashflowUpdate {
-	if id != nil {
-		iacu = iacu.SetOwnerID(*id)
-	}
-	return iacu
-}
-
 // SetOwner sets the "Owner" edge to the InvestAccount entity.
 func (iacu *InvestAccountCashflowUpdate) SetOwner(i *InvestAccount) *InvestAccountCashflowUpdate {
 	return iacu.SetOwnerID(i.ID)
@@ -86,12 +78,18 @@ func (iacu *InvestAccountCashflowUpdate) Save(ctx context.Context) (int, error) 
 		affected int
 	)
 	if len(iacu.hooks) == 0 {
+		if err = iacu.check(); err != nil {
+			return 0, err
+		}
 		affected, err = iacu.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*InvestAccountCashflowMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = iacu.check(); err != nil {
+				return 0, err
 			}
 			iacu.mutation = mutation
 			affected, err = iacu.sqlSave(ctx)
@@ -131,6 +129,14 @@ func (iacu *InvestAccountCashflowUpdate) ExecX(ctx context.Context) {
 	if err := iacu.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (iacu *InvestAccountCashflowUpdate) check() error {
+	if _, ok := iacu.mutation.OwnerID(); iacu.mutation.OwnerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "InvestAccountCashflow.Owner"`)
+	}
+	return nil
 }
 
 func (iacu *InvestAccountCashflowUpdate) sqlSave(ctx context.Context) (n int, err error) {
@@ -251,14 +257,6 @@ func (iacuo *InvestAccountCashflowUpdateOne) SetOwnerID(id xid.ID) *InvestAccoun
 	return iacuo
 }
 
-// SetNillableOwnerID sets the "Owner" edge to the InvestAccount entity by ID if the given value is not nil.
-func (iacuo *InvestAccountCashflowUpdateOne) SetNillableOwnerID(id *xid.ID) *InvestAccountCashflowUpdateOne {
-	if id != nil {
-		iacuo = iacuo.SetOwnerID(*id)
-	}
-	return iacuo
-}
-
 // SetOwner sets the "Owner" edge to the InvestAccount entity.
 func (iacuo *InvestAccountCashflowUpdateOne) SetOwner(i *InvestAccount) *InvestAccountCashflowUpdateOne {
 	return iacuo.SetOwnerID(i.ID)
@@ -289,12 +287,18 @@ func (iacuo *InvestAccountCashflowUpdateOne) Save(ctx context.Context) (*InvestA
 		node *InvestAccountCashflow
 	)
 	if len(iacuo.hooks) == 0 {
+		if err = iacuo.check(); err != nil {
+			return nil, err
+		}
 		node, err = iacuo.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*InvestAccountCashflowMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = iacuo.check(); err != nil {
+				return nil, err
 			}
 			iacuo.mutation = mutation
 			node, err = iacuo.sqlSave(ctx)
@@ -334,6 +338,14 @@ func (iacuo *InvestAccountCashflowUpdateOne) ExecX(ctx context.Context) {
 	if err := iacuo.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (iacuo *InvestAccountCashflowUpdateOne) check() error {
+	if _, ok := iacuo.mutation.OwnerID(); iacuo.mutation.OwnerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "InvestAccountCashflow.Owner"`)
+	}
+	return nil
 }
 
 func (iacuo *InvestAccountCashflowUpdateOne) sqlSave(ctx context.Context) (_node *InvestAccountCashflow, err error) {

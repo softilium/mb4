@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/quote"
 	"github.com/softilium/mb4/ent/ticker"
 )
@@ -16,7 +17,7 @@ import (
 type Quote struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID xid.ID `json:"id,omitempty"`
 	// D holds the value of the "D" field.
 	D time.Time `json:"D,omitempty"`
 	// O holds the value of the "O" field.
@@ -75,10 +76,12 @@ func (*Quote) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case quote.FieldO, quote.FieldC, quote.FieldH, quote.FieldL, quote.FieldV, quote.FieldCap, quote.FieldDivSum5Y, quote.FieldDivYield5Y:
 			values[i] = new(sql.NullFloat64)
-		case quote.FieldID, quote.FieldLotSize, quote.FieldListLevel:
+		case quote.FieldLotSize, quote.FieldListLevel:
 			values[i] = new(sql.NullInt64)
 		case quote.FieldD:
 			values[i] = new(sql.NullTime)
+		case quote.FieldID:
+			values[i] = new(xid.ID)
 		case quote.ForeignKeys[0]: // ticker_quotes
 			values[i] = new(sql.NullString)
 		default:
@@ -97,11 +100,11 @@ func (q *Quote) assignValues(columns []string, values []interface{}) error {
 	for i := range columns {
 		switch columns[i] {
 		case quote.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*xid.ID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				q.ID = *value
 			}
-			q.ID = int(value.Int64)
 		case quote.FieldD:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field D", values[i])

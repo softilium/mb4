@@ -28,43 +28,9 @@ func (qu *QuoteUpdate) Where(ps ...predicate.Quote) *QuoteUpdate {
 	return qu
 }
 
-// SetLotSize sets the "LotSize" field.
-func (qu *QuoteUpdate) SetLotSize(i int) *QuoteUpdate {
-	qu.mutation.ResetLotSize()
-	qu.mutation.SetLotSize(i)
-	return qu
-}
-
-// AddLotSize adds i to the "LotSize" field.
-func (qu *QuoteUpdate) AddLotSize(i int) *QuoteUpdate {
-	qu.mutation.AddLotSize(i)
-	return qu
-}
-
-// SetListLevel sets the "ListLevel" field.
-func (qu *QuoteUpdate) SetListLevel(i int) *QuoteUpdate {
-	qu.mutation.ResetListLevel()
-	qu.mutation.SetListLevel(i)
-	return qu
-}
-
-// AddListLevel adds i to the "ListLevel" field.
-func (qu *QuoteUpdate) AddListLevel(i int) *QuoteUpdate {
-	qu.mutation.AddListLevel(i)
-	return qu
-}
-
 // SetTickerID sets the "Ticker" edge to the Ticker entity by ID.
 func (qu *QuoteUpdate) SetTickerID(id string) *QuoteUpdate {
 	qu.mutation.SetTickerID(id)
-	return qu
-}
-
-// SetNillableTickerID sets the "Ticker" edge to the Ticker entity by ID if the given value is not nil.
-func (qu *QuoteUpdate) SetNillableTickerID(id *string) *QuoteUpdate {
-	if id != nil {
-		qu = qu.SetTickerID(*id)
-	}
 	return qu
 }
 
@@ -146,15 +112,8 @@ func (qu *QuoteUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (qu *QuoteUpdate) check() error {
-	if v, ok := qu.mutation.LotSize(); ok {
-		if err := quote.LotSizeValidator(v); err != nil {
-			return &ValidationError{Name: "LotSize", err: fmt.Errorf(`ent: validator failed for field "Quote.LotSize": %w`, err)}
-		}
-	}
-	if v, ok := qu.mutation.ListLevel(); ok {
-		if err := quote.ListLevelValidator(v); err != nil {
-			return &ValidationError{Name: "ListLevel", err: fmt.Errorf(`ent: validator failed for field "Quote.ListLevel": %w`, err)}
-		}
+	if _, ok := qu.mutation.TickerID(); qu.mutation.TickerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Quote.Ticker"`)
 	}
 	return nil
 }
@@ -165,7 +124,7 @@ func (qu *QuoteUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   quote.Table,
 			Columns: quote.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeString,
 				Column: quote.FieldID,
 			},
 		},
@@ -176,34 +135,6 @@ func (qu *QuoteUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := qu.mutation.LotSize(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: quote.FieldLotSize,
-		})
-	}
-	if value, ok := qu.mutation.AddedLotSize(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: quote.FieldLotSize,
-		})
-	}
-	if value, ok := qu.mutation.ListLevel(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: quote.FieldListLevel,
-		})
-	}
-	if value, ok := qu.mutation.AddedListLevel(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: quote.FieldListLevel,
-		})
 	}
 	if qu.mutation.TickerCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -259,43 +190,9 @@ type QuoteUpdateOne struct {
 	mutation *QuoteMutation
 }
 
-// SetLotSize sets the "LotSize" field.
-func (quo *QuoteUpdateOne) SetLotSize(i int) *QuoteUpdateOne {
-	quo.mutation.ResetLotSize()
-	quo.mutation.SetLotSize(i)
-	return quo
-}
-
-// AddLotSize adds i to the "LotSize" field.
-func (quo *QuoteUpdateOne) AddLotSize(i int) *QuoteUpdateOne {
-	quo.mutation.AddLotSize(i)
-	return quo
-}
-
-// SetListLevel sets the "ListLevel" field.
-func (quo *QuoteUpdateOne) SetListLevel(i int) *QuoteUpdateOne {
-	quo.mutation.ResetListLevel()
-	quo.mutation.SetListLevel(i)
-	return quo
-}
-
-// AddListLevel adds i to the "ListLevel" field.
-func (quo *QuoteUpdateOne) AddListLevel(i int) *QuoteUpdateOne {
-	quo.mutation.AddListLevel(i)
-	return quo
-}
-
 // SetTickerID sets the "Ticker" edge to the Ticker entity by ID.
 func (quo *QuoteUpdateOne) SetTickerID(id string) *QuoteUpdateOne {
 	quo.mutation.SetTickerID(id)
-	return quo
-}
-
-// SetNillableTickerID sets the "Ticker" edge to the Ticker entity by ID if the given value is not nil.
-func (quo *QuoteUpdateOne) SetNillableTickerID(id *string) *QuoteUpdateOne {
-	if id != nil {
-		quo = quo.SetTickerID(*id)
-	}
 	return quo
 }
 
@@ -384,15 +281,8 @@ func (quo *QuoteUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (quo *QuoteUpdateOne) check() error {
-	if v, ok := quo.mutation.LotSize(); ok {
-		if err := quote.LotSizeValidator(v); err != nil {
-			return &ValidationError{Name: "LotSize", err: fmt.Errorf(`ent: validator failed for field "Quote.LotSize": %w`, err)}
-		}
-	}
-	if v, ok := quo.mutation.ListLevel(); ok {
-		if err := quote.ListLevelValidator(v); err != nil {
-			return &ValidationError{Name: "ListLevel", err: fmt.Errorf(`ent: validator failed for field "Quote.ListLevel": %w`, err)}
-		}
+	if _, ok := quo.mutation.TickerID(); quo.mutation.TickerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Quote.Ticker"`)
 	}
 	return nil
 }
@@ -403,7 +293,7 @@ func (quo *QuoteUpdateOne) sqlSave(ctx context.Context) (_node *Quote, err error
 			Table:   quote.Table,
 			Columns: quote.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeString,
 				Column: quote.FieldID,
 			},
 		},
@@ -431,34 +321,6 @@ func (quo *QuoteUpdateOne) sqlSave(ctx context.Context) (_node *Quote, err error
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := quo.mutation.LotSize(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: quote.FieldLotSize,
-		})
-	}
-	if value, ok := quo.mutation.AddedLotSize(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: quote.FieldLotSize,
-		})
-	}
-	if value, ok := quo.mutation.ListLevel(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: quote.FieldListLevel,
-		})
-	}
-	if value, ok := quo.mutation.AddedListLevel(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: quote.FieldListLevel,
-		})
 	}
 	if quo.mutation.TickerCleared() {
 		edge := &sqlgraph.EdgeSpec{

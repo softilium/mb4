@@ -93,14 +93,6 @@ func (dpu *DivPayoutUpdate) SetTickersID(id string) *DivPayoutUpdate {
 	return dpu
 }
 
-// SetNillableTickersID sets the "Tickers" edge to the Ticker entity by ID if the given value is not nil.
-func (dpu *DivPayoutUpdate) SetNillableTickersID(id *string) *DivPayoutUpdate {
-	if id != nil {
-		dpu = dpu.SetTickersID(*id)
-	}
-	return dpu
-}
-
 // SetTickers sets the "Tickers" edge to the Ticker entity.
 func (dpu *DivPayoutUpdate) SetTickers(t *Ticker) *DivPayoutUpdate {
 	return dpu.SetTickersID(t.ID)
@@ -193,6 +185,9 @@ func (dpu *DivPayoutUpdate) check() error {
 		if err := divpayout.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "Status", err: fmt.Errorf(`ent: validator failed for field "DivPayout.Status": %w`, err)}
 		}
+	}
+	if _, ok := dpu.mutation.TickersID(); dpu.mutation.TickersCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "DivPayout.Tickers"`)
 	}
 	return nil
 }
@@ -396,14 +391,6 @@ func (dpuo *DivPayoutUpdateOne) SetTickersID(id string) *DivPayoutUpdateOne {
 	return dpuo
 }
 
-// SetNillableTickersID sets the "Tickers" edge to the Ticker entity by ID if the given value is not nil.
-func (dpuo *DivPayoutUpdateOne) SetNillableTickersID(id *string) *DivPayoutUpdateOne {
-	if id != nil {
-		dpuo = dpuo.SetTickersID(*id)
-	}
-	return dpuo
-}
-
 // SetTickers sets the "Tickers" edge to the Ticker entity.
 func (dpuo *DivPayoutUpdateOne) SetTickers(t *Ticker) *DivPayoutUpdateOne {
 	return dpuo.SetTickersID(t.ID)
@@ -503,6 +490,9 @@ func (dpuo *DivPayoutUpdateOne) check() error {
 		if err := divpayout.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "Status", err: fmt.Errorf(`ent: validator failed for field "DivPayout.Status": %w`, err)}
 		}
+	}
+	if _, ok := dpuo.mutation.TickersID(); dpuo.mutation.TickersCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "DivPayout.Tickers"`)
 	}
 	return nil
 }

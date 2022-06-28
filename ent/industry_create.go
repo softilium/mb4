@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/emitent"
 	"github.com/softilium/mb4/ent/industry"
 )
@@ -33,14 +34,14 @@ func (ic *IndustryCreate) SetID(s string) *IndustryCreate {
 }
 
 // AddEmitentIDs adds the "Emitents" edge to the Emitent entity by IDs.
-func (ic *IndustryCreate) AddEmitentIDs(ids ...int) *IndustryCreate {
+func (ic *IndustryCreate) AddEmitentIDs(ids ...xid.ID) *IndustryCreate {
 	ic.mutation.AddEmitentIDs(ids...)
 	return ic
 }
 
 // AddEmitents adds the "Emitents" edges to the Emitent entity.
 func (ic *IndustryCreate) AddEmitents(e ...*Emitent) *IndustryCreate {
-	ids := make([]int, len(e))
+	ids := make([]xid.ID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
@@ -183,7 +184,7 @@ func (ic *IndustryCreate) createSpec() (*Industry, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: emitent.FieldID,
 				},
 			},
