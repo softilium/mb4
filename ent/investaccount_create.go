@@ -171,6 +171,11 @@ func (iac *InvestAccountCreate) check() error {
 			return &ValidationError{Name: "Descr", err: fmt.Errorf(`ent: validator failed for field "InvestAccount.Descr": %w`, err)}
 		}
 	}
+	if v, ok := iac.mutation.ID(); ok {
+		if err := investaccount.IDValidator(v.String()); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "InvestAccount.id": %w`, err)}
+		}
+	}
 	if _, ok := iac.mutation.OwnerID(); !ok {
 		return &ValidationError{Name: "Owner", err: errors.New(`ent: missing required edge "InvestAccount.Owner"`)}
 	}

@@ -230,6 +230,11 @@ func (qc *QuoteCreate) check() error {
 	if _, ok := qc.mutation.ListLevel(); !ok {
 		return &ValidationError{Name: "ListLevel", err: errors.New(`ent: missing required field "Quote.ListLevel"`)}
 	}
+	if v, ok := qc.mutation.ID(); ok {
+		if err := quote.IDValidator(v.String()); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Quote.id": %w`, err)}
+		}
+	}
 	if _, ok := qc.mutation.TickerID(); !ok {
 		return &ValidationError{Name: "Ticker", err: errors.New(`ent: missing required edge "Quote.Ticker"`)}
 	}

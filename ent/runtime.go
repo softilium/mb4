@@ -5,6 +5,7 @@ package ent
 import (
 	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/divpayout"
+	"github.com/softilium/mb4/ent/emission"
 	"github.com/softilium/mb4/ent/emitent"
 	"github.com/softilium/mb4/ent/industry"
 	"github.com/softilium/mb4/ent/investaccount"
@@ -34,6 +35,28 @@ func init() {
 	divpayoutDescStatus := divpayoutFields[3].Descriptor()
 	// divpayout.StatusValidator is a validator for the "Status" field. It is called by the builders before save.
 	divpayout.StatusValidator = divpayoutDescStatus.Validators[0].(func(int) error)
+	emissionFields := schema.Emission{}.Fields()
+	_ = emissionFields
+	// emissionDescID is the schema descriptor for id field.
+	emissionDescID := emissionFields[0].Descriptor()
+	// emission.DefaultID holds the default value on creation for the id field.
+	emission.DefaultID = emissionDescID.Default.(func() xid.ID)
+	// emission.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	emission.IDValidator = func() func(string) error {
+		validators := emissionDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	emitentFields := schema.Emitent{}.Fields()
 	_ = emitentFields
 	// emitentDescDescr is the schema descriptor for Descr field.
@@ -59,6 +82,22 @@ func init() {
 	emitentDescID := emitentFields[0].Descriptor()
 	// emitent.DefaultID holds the default value on creation for the id field.
 	emitent.DefaultID = emitentDescID.Default.(func() xid.ID)
+	// emitent.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	emitent.IDValidator = func() func(string) error {
+		validators := emitentDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	industryFields := schema.Industry{}.Fields()
 	_ = industryFields
 	// industryDescDescr is the schema descriptor for Descr field.
@@ -124,18 +163,66 @@ func init() {
 	investaccountDescID := investaccountFields[0].Descriptor()
 	// investaccount.DefaultID holds the default value on creation for the id field.
 	investaccount.DefaultID = investaccountDescID.Default.(func() xid.ID)
+	// investaccount.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	investaccount.IDValidator = func() func(string) error {
+		validators := investaccountDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	investaccountcashflowFields := schema.InvestAccountCashflow{}.Fields()
 	_ = investaccountcashflowFields
 	// investaccountcashflowDescID is the schema descriptor for id field.
 	investaccountcashflowDescID := investaccountcashflowFields[0].Descriptor()
 	// investaccountcashflow.DefaultID holds the default value on creation for the id field.
 	investaccountcashflow.DefaultID = investaccountcashflowDescID.Default.(func() xid.ID)
+	// investaccountcashflow.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	investaccountcashflow.IDValidator = func() func(string) error {
+		validators := investaccountcashflowDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	investaccountvaluationFields := schema.InvestAccountValuation{}.Fields()
 	_ = investaccountvaluationFields
 	// investaccountvaluationDescID is the schema descriptor for id field.
 	investaccountvaluationDescID := investaccountvaluationFields[0].Descriptor()
 	// investaccountvaluation.DefaultID holds the default value on creation for the id field.
 	investaccountvaluation.DefaultID = investaccountvaluationDescID.Default.(func() xid.ID)
+	// investaccountvaluation.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	investaccountvaluation.IDValidator = func() func(string) error {
+		validators := investaccountvaluationDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	quoteFields := schema.Quote{}.Fields()
 	_ = quoteFields
 	// quoteDescLotSize is the schema descriptor for LotSize field.
@@ -146,6 +233,22 @@ func init() {
 	quoteDescID := quoteFields[0].Descriptor()
 	// quote.DefaultID holds the default value on creation for the id field.
 	quote.DefaultID = quoteDescID.Default.(func() xid.ID)
+	// quote.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	quote.IDValidator = func() func(string) error {
+		validators := quoteDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	tickerFields := schema.Ticker{}.Fields()
 	_ = tickerFields
 	// tickerDescDescr is the schema descriptor for Descr field.
@@ -219,4 +322,20 @@ func init() {
 	userDescID := userFields[0].Descriptor()
 	// user.DefaultID holds the default value on creation for the id field.
 	user.DefaultID = userDescID.Default.(func() xid.ID)
+	// user.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	user.IDValidator = func() func(string) error {
+		validators := userDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 }

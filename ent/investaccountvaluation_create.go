@@ -144,6 +144,11 @@ func (iavc *InvestAccountValuationCreate) check() error {
 	if _, ok := iavc.mutation.Value(); !ok {
 		return &ValidationError{Name: "Value", err: errors.New(`ent: missing required field "InvestAccountValuation.Value"`)}
 	}
+	if v, ok := iavc.mutation.ID(); ok {
+		if err := investaccountvaluation.IDValidator(v.String()); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "InvestAccountValuation.id": %w`, err)}
+		}
+	}
 	if _, ok := iavc.mutation.OwnerID(); !ok {
 		return &ValidationError{Name: "Owner", err: errors.New(`ent: missing required edge "InvestAccountValuation.Owner"`)}
 	}

@@ -14,7 +14,7 @@ type User struct {
 
 func (User) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").GoType(xid.ID{}).DefaultFunc(xid.New),
+		field.String("id").GoType(xid.ID{}).DefaultFunc(xid.New).MaxLen(20).Immutable().NotEmpty(),
 		field.String("UserName").NotEmpty().MinLen(3).MaxLen(50).Unique(),
 		field.String("PasswordHash"),
 		field.Bool("Admin").Default(false),

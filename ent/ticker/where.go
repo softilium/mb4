@@ -376,6 +376,34 @@ func HasDivPayoutsWith(preds ...predicate.DivPayout) predicate.Ticker {
 	})
 }
 
+// HasEmissions applies the HasEdge predicate on the "Emissions" edge.
+func HasEmissions() predicate.Ticker {
+	return predicate.Ticker(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(EmissionsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, EmissionsTable, EmissionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasEmissionsWith applies the HasEdge predicate on the "Emissions" edge with a given conditions (other predicates).
+func HasEmissionsWith(preds ...predicate.Emission) predicate.Ticker {
+	return predicate.Ticker(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(EmissionsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, EmissionsTable, EmissionsColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Ticker) predicate.Ticker {
 	return predicate.Ticker(func(s *sql.Selector) {

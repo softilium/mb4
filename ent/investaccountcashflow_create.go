@@ -144,6 +144,11 @@ func (iacc *InvestAccountCashflowCreate) check() error {
 	if _, ok := iacc.mutation.Qty(); !ok {
 		return &ValidationError{Name: "Qty", err: errors.New(`ent: missing required field "InvestAccountCashflow.Qty"`)}
 	}
+	if v, ok := iacc.mutation.ID(); ok {
+		if err := investaccountcashflow.IDValidator(v.String()); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "InvestAccountCashflow.id": %w`, err)}
+		}
+	}
 	if _, ok := iacc.mutation.OwnerID(); !ok {
 		return &ValidationError{Name: "Owner", err: errors.New(`ent: missing required edge "InvestAccountCashflow.Owner"`)}
 	}

@@ -65,6 +65,10 @@ func Tickers(w http.ResponseWriter, r *http.Request) {
 
 		//deleteOne(buf.ID, w)
 
+		tx, err := db.DB.Tx(context.Background())
+		handleErr(err, w)
+		defer tx.Rollback()
+
 		_, err = db.DB.Ticker.Create().
 			SetID(buf.ID).
 			SetDescr(buf.Descr).
@@ -72,6 +76,22 @@ func Tickers(w http.ResponseWriter, r *http.Request) {
 			SetEmitentID(buf.Edges.Emitent.ID).
 			Save(context.Background())
 		handleErr(err, w)
+
+		for _, v := range buf.Edges.Emissions {
+			_, err := db.DB.Emission.Create().
+				SetFreeFloat(v.FreeFloat).
+				SetListingLevel(v.ListingLevel).
+				SetLotSize(v.LotSize).
+				SetRecDate(v.RecDate).
+				SetSize(v.Size).
+				SetTickerID(buf.ID).
+				Save(context.Background())
+			handleErr(err, w)
+
+		}
+		err = tx.Commit()
+		handleErr(err, w)
+
 		return
 
 	}

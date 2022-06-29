@@ -11,6 +11,7 @@ import (
 	"github.com/softilium/mb4/ent/migrate"
 
 	"github.com/softilium/mb4/ent/divpayout"
+	"github.com/softilium/mb4/ent/emission"
 	"github.com/softilium/mb4/ent/emitent"
 	"github.com/softilium/mb4/ent/industry"
 	"github.com/softilium/mb4/ent/investaccount"
@@ -32,6 +33,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// DivPayout is the client for interacting with the DivPayout builders.
 	DivPayout *DivPayoutClient
+	// Emission is the client for interacting with the Emission builders.
+	Emission *EmissionClient
 	// Emitent is the client for interacting with the Emitent builders.
 	Emitent *EmitentClient
 	// Industry is the client for interacting with the Industry builders.
@@ -62,6 +65,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.DivPayout = NewDivPayoutClient(c.config)
+	c.Emission = NewEmissionClient(c.config)
 	c.Emitent = NewEmitentClient(c.config)
 	c.Industry = NewIndustryClient(c.config)
 	c.InvestAccount = NewInvestAccountClient(c.config)
@@ -104,6 +108,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:                    ctx,
 		config:                 cfg,
 		DivPayout:              NewDivPayoutClient(cfg),
+		Emission:               NewEmissionClient(cfg),
 		Emitent:                NewEmitentClient(cfg),
 		Industry:               NewIndustryClient(cfg),
 		InvestAccount:          NewInvestAccountClient(cfg),
@@ -132,6 +137,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:                    ctx,
 		config:                 cfg,
 		DivPayout:              NewDivPayoutClient(cfg),
+		Emission:               NewEmissionClient(cfg),
 		Emitent:                NewEmitentClient(cfg),
 		Industry:               NewIndustryClient(cfg),
 		InvestAccount:          NewInvestAccountClient(cfg),
@@ -170,6 +176,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.DivPayout.Use(hooks...)
+	c.Emission.Use(hooks...)
 	c.Emitent.Use(hooks...)
 	c.Industry.Use(hooks...)
 	c.InvestAccount.Use(hooks...)
@@ -284,6 +291,112 @@ func (c *DivPayoutClient) QueryTickers(dp *DivPayout) *TickerQuery {
 // Hooks returns the client hooks.
 func (c *DivPayoutClient) Hooks() []Hook {
 	return c.hooks.DivPayout
+}
+
+// EmissionClient is a client for the Emission schema.
+type EmissionClient struct {
+	config
+}
+
+// NewEmissionClient returns a client for the Emission from the given config.
+func NewEmissionClient(c config) *EmissionClient {
+	return &EmissionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `emission.Hooks(f(g(h())))`.
+func (c *EmissionClient) Use(hooks ...Hook) {
+	c.hooks.Emission = append(c.hooks.Emission, hooks...)
+}
+
+// Create returns a create builder for Emission.
+func (c *EmissionClient) Create() *EmissionCreate {
+	mutation := newEmissionMutation(c.config, OpCreate)
+	return &EmissionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Emission entities.
+func (c *EmissionClient) CreateBulk(builders ...*EmissionCreate) *EmissionCreateBulk {
+	return &EmissionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Emission.
+func (c *EmissionClient) Update() *EmissionUpdate {
+	mutation := newEmissionMutation(c.config, OpUpdate)
+	return &EmissionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EmissionClient) UpdateOne(e *Emission) *EmissionUpdateOne {
+	mutation := newEmissionMutation(c.config, OpUpdateOne, withEmission(e))
+	return &EmissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EmissionClient) UpdateOneID(id xid.ID) *EmissionUpdateOne {
+	mutation := newEmissionMutation(c.config, OpUpdateOne, withEmissionID(id))
+	return &EmissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Emission.
+func (c *EmissionClient) Delete() *EmissionDelete {
+	mutation := newEmissionMutation(c.config, OpDelete)
+	return &EmissionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *EmissionClient) DeleteOne(e *Emission) *EmissionDeleteOne {
+	return c.DeleteOneID(e.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *EmissionClient) DeleteOneID(id xid.ID) *EmissionDeleteOne {
+	builder := c.Delete().Where(emission.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EmissionDeleteOne{builder}
+}
+
+// Query returns a query builder for Emission.
+func (c *EmissionClient) Query() *EmissionQuery {
+	return &EmissionQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Emission entity by its id.
+func (c *EmissionClient) Get(ctx context.Context, id xid.ID) (*Emission, error) {
+	return c.Query().Where(emission.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EmissionClient) GetX(ctx context.Context, id xid.ID) *Emission {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryTicker queries the Ticker edge of a Emission.
+func (c *EmissionClient) QueryTicker(e *Emission) *TickerQuery {
+	query := &TickerQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(emission.Table, emission.FieldID, id),
+			sqlgraph.To(ticker.Table, ticker.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, emission.TickerTable, emission.TickerColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *EmissionClient) Hooks() []Hook {
+	return c.hooks.Emission
 }
 
 // EmitentClient is a client for the Emitent schema.
@@ -1096,6 +1209,22 @@ func (c *TickerClient) QueryDivPayouts(t *Ticker) *DivPayoutQuery {
 			sqlgraph.From(ticker.Table, ticker.FieldID, id),
 			sqlgraph.To(divpayout.Table, divpayout.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, ticker.DivPayoutsTable, ticker.DivPayoutsColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEmissions queries the Emissions edge of a Ticker.
+func (c *TickerClient) QueryEmissions(t *Ticker) *EmissionQuery {
+	query := &EmissionQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(ticker.Table, ticker.FieldID, id),
+			sqlgraph.To(emission.Table, emission.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ticker.EmissionsTable, ticker.EmissionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil

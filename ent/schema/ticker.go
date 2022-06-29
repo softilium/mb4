@@ -36,5 +36,6 @@ func (Ticker) Edges() []ent.Edge {
 		edge.From("Emitent", Emitent.Type).Ref("Tickers").Required().Unique(),
 		edge.To("Quotes", Quote.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
 		edge.To("DivPayouts", DivPayout.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
+		edge.To("Emissions", Emission.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
 	}
 }

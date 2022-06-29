@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/divpayout"
+	"github.com/softilium/mb4/ent/emission"
 	"github.com/softilium/mb4/ent/emitent"
 	"github.com/softilium/mb4/ent/predicate"
 	"github.com/softilium/mb4/ent/quote"
@@ -64,14 +65,6 @@ func (tu *TickerUpdate) SetEmitentID(id xid.ID) *TickerUpdate {
 	return tu
 }
 
-// SetNillableEmitentID sets the "Emitent" edge to the Emitent entity by ID if the given value is not nil.
-func (tu *TickerUpdate) SetNillableEmitentID(id *xid.ID) *TickerUpdate {
-	if id != nil {
-		tu = tu.SetEmitentID(*id)
-	}
-	return tu
-}
-
 // SetEmitent sets the "Emitent" edge to the Emitent entity.
 func (tu *TickerUpdate) SetEmitent(e *Emitent) *TickerUpdate {
 	return tu.SetEmitentID(e.ID)
@@ -105,6 +98,21 @@ func (tu *TickerUpdate) AddDivPayouts(d ...*DivPayout) *TickerUpdate {
 		ids[i] = d[i].ID
 	}
 	return tu.AddDivPayoutIDs(ids...)
+}
+
+// AddEmissionIDs adds the "Emissions" edge to the Emission entity by IDs.
+func (tu *TickerUpdate) AddEmissionIDs(ids ...xid.ID) *TickerUpdate {
+	tu.mutation.AddEmissionIDs(ids...)
+	return tu
+}
+
+// AddEmissions adds the "Emissions" edges to the Emission entity.
+func (tu *TickerUpdate) AddEmissions(e ...*Emission) *TickerUpdate {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return tu.AddEmissionIDs(ids...)
 }
 
 // Mutation returns the TickerMutation object of the builder.
@@ -158,6 +166,27 @@ func (tu *TickerUpdate) RemoveDivPayouts(d ...*DivPayout) *TickerUpdate {
 		ids[i] = d[i].ID
 	}
 	return tu.RemoveDivPayoutIDs(ids...)
+}
+
+// ClearEmissions clears all "Emissions" edges to the Emission entity.
+func (tu *TickerUpdate) ClearEmissions() *TickerUpdate {
+	tu.mutation.ClearEmissions()
+	return tu
+}
+
+// RemoveEmissionIDs removes the "Emissions" edge to Emission entities by IDs.
+func (tu *TickerUpdate) RemoveEmissionIDs(ids ...xid.ID) *TickerUpdate {
+	tu.mutation.RemoveEmissionIDs(ids...)
+	return tu
+}
+
+// RemoveEmissions removes "Emissions" edges to Emission entities.
+func (tu *TickerUpdate) RemoveEmissions(e ...*Emission) *TickerUpdate {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return tu.RemoveEmissionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -226,6 +255,9 @@ func (tu *TickerUpdate) check() error {
 		if err := ticker.DescrValidator(v); err != nil {
 			return &ValidationError{Name: "Descr", err: fmt.Errorf(`ent: validator failed for field "Ticker.Descr": %w`, err)}
 		}
+	}
+	if _, ok := tu.mutation.EmitentID(); tu.mutation.EmitentCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Ticker.Emitent"`)
 	}
 	return nil
 }
@@ -412,6 +444,60 @@ func (tu *TickerUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if tu.mutation.EmissionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   ticker.EmissionsTable,
+			Columns: []string{ticker.EmissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: emission.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.RemovedEmissionsIDs(); len(nodes) > 0 && !tu.mutation.EmissionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   ticker.EmissionsTable,
+			Columns: []string{ticker.EmissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: emission.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.EmissionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   ticker.EmissionsTable,
+			Columns: []string{ticker.EmissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: emission.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{ticker.Label}
@@ -464,14 +550,6 @@ func (tuo *TickerUpdateOne) SetEmitentID(id xid.ID) *TickerUpdateOne {
 	return tuo
 }
 
-// SetNillableEmitentID sets the "Emitent" edge to the Emitent entity by ID if the given value is not nil.
-func (tuo *TickerUpdateOne) SetNillableEmitentID(id *xid.ID) *TickerUpdateOne {
-	if id != nil {
-		tuo = tuo.SetEmitentID(*id)
-	}
-	return tuo
-}
-
 // SetEmitent sets the "Emitent" edge to the Emitent entity.
 func (tuo *TickerUpdateOne) SetEmitent(e *Emitent) *TickerUpdateOne {
 	return tuo.SetEmitentID(e.ID)
@@ -505,6 +583,21 @@ func (tuo *TickerUpdateOne) AddDivPayouts(d ...*DivPayout) *TickerUpdateOne {
 		ids[i] = d[i].ID
 	}
 	return tuo.AddDivPayoutIDs(ids...)
+}
+
+// AddEmissionIDs adds the "Emissions" edge to the Emission entity by IDs.
+func (tuo *TickerUpdateOne) AddEmissionIDs(ids ...xid.ID) *TickerUpdateOne {
+	tuo.mutation.AddEmissionIDs(ids...)
+	return tuo
+}
+
+// AddEmissions adds the "Emissions" edges to the Emission entity.
+func (tuo *TickerUpdateOne) AddEmissions(e ...*Emission) *TickerUpdateOne {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return tuo.AddEmissionIDs(ids...)
 }
 
 // Mutation returns the TickerMutation object of the builder.
@@ -558,6 +651,27 @@ func (tuo *TickerUpdateOne) RemoveDivPayouts(d ...*DivPayout) *TickerUpdateOne {
 		ids[i] = d[i].ID
 	}
 	return tuo.RemoveDivPayoutIDs(ids...)
+}
+
+// ClearEmissions clears all "Emissions" edges to the Emission entity.
+func (tuo *TickerUpdateOne) ClearEmissions() *TickerUpdateOne {
+	tuo.mutation.ClearEmissions()
+	return tuo
+}
+
+// RemoveEmissionIDs removes the "Emissions" edge to Emission entities by IDs.
+func (tuo *TickerUpdateOne) RemoveEmissionIDs(ids ...xid.ID) *TickerUpdateOne {
+	tuo.mutation.RemoveEmissionIDs(ids...)
+	return tuo
+}
+
+// RemoveEmissions removes "Emissions" edges to Emission entities.
+func (tuo *TickerUpdateOne) RemoveEmissions(e ...*Emission) *TickerUpdateOne {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return tuo.RemoveEmissionIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -633,6 +747,9 @@ func (tuo *TickerUpdateOne) check() error {
 		if err := ticker.DescrValidator(v); err != nil {
 			return &ValidationError{Name: "Descr", err: fmt.Errorf(`ent: validator failed for field "Ticker.Descr": %w`, err)}
 		}
+	}
+	if _, ok := tuo.mutation.EmitentID(); tuo.mutation.EmitentCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Ticker.Emitent"`)
 	}
 	return nil
 }
@@ -828,6 +945,60 @@ func (tuo *TickerUpdateOne) sqlSave(ctx context.Context) (_node *Ticker, err err
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: divpayout.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tuo.mutation.EmissionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   ticker.EmissionsTable,
+			Columns: []string{ticker.EmissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: emission.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.RemovedEmissionsIDs(); len(nodes) > 0 && !tuo.mutation.EmissionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   ticker.EmissionsTable,
+			Columns: []string{ticker.EmissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: emission.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.EmissionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   ticker.EmissionsTable,
+			Columns: []string{ticker.EmissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: emission.FieldID,
 				},
 			},
 		}

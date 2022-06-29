@@ -15,7 +15,7 @@ type InvestAccountValuation struct {
 // Fields of the InvestAccountValuation.
 func (InvestAccountValuation) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").GoType(xid.ID{}).DefaultFunc(xid.New),
+		field.String("id").GoType(xid.ID{}).DefaultFunc(xid.New).MaxLen(20).Immutable().NotEmpty(),
 		field.Time("RecDate"),
 		field.Float("Value"),
 	}

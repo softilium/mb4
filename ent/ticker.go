@@ -35,9 +35,11 @@ type TickerEdges struct {
 	Quotes []*Quote `json:"Quotes,omitempty"`
 	// DivPayouts holds the value of the DivPayouts edge.
 	DivPayouts []*DivPayout `json:"DivPayouts,omitempty"`
+	// Emissions holds the value of the Emissions edge.
+	Emissions []*Emission `json:"Emissions,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // EmitentOrErr returns the Emitent value or an error if the edge
@@ -70,6 +72,15 @@ func (e TickerEdges) DivPayoutsOrErr() ([]*DivPayout, error) {
 		return e.DivPayouts, nil
 	}
 	return nil, &NotLoadedError{edge: "DivPayouts"}
+}
+
+// EmissionsOrErr returns the Emissions value or an error if the edge
+// was not loaded in eager-loading.
+func (e TickerEdges) EmissionsOrErr() ([]*Emission, error) {
+	if e.loadedTypes[3] {
+		return e.Emissions, nil
+	}
+	return nil, &NotLoadedError{edge: "Emissions"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -141,6 +152,11 @@ func (t *Ticker) QueryQuotes() *QuoteQuery {
 // QueryDivPayouts queries the "DivPayouts" edge of the Ticker entity.
 func (t *Ticker) QueryDivPayouts() *DivPayoutQuery {
 	return (&TickerClient{config: t.config}).QueryDivPayouts(t)
+}
+
+// QueryEmissions queries the "Emissions" edge of the Ticker entity.
+func (t *Ticker) QueryEmissions() *EmissionQuery {
+	return (&TickerClient{config: t.config}).QueryEmissions(t)
 }
 
 // Update returns a builder for updating this Ticker.

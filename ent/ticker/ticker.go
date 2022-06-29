@@ -17,6 +17,8 @@ const (
 	EdgeQuotes = "Quotes"
 	// EdgeDivPayouts holds the string denoting the divpayouts edge name in mutations.
 	EdgeDivPayouts = "DivPayouts"
+	// EdgeEmissions holds the string denoting the emissions edge name in mutations.
+	EdgeEmissions = "Emissions"
 	// Table holds the table name of the ticker in the database.
 	Table = "tickers"
 	// EmitentTable is the table that holds the Emitent relation/edge.
@@ -40,6 +42,13 @@ const (
 	DivPayoutsInverseTable = "div_payouts"
 	// DivPayoutsColumn is the table column denoting the DivPayouts relation/edge.
 	DivPayoutsColumn = "ticker_div_payouts"
+	// EmissionsTable is the table that holds the Emissions relation/edge.
+	EmissionsTable = "emissions"
+	// EmissionsInverseTable is the table name for the Emission entity.
+	// It exists in this package in order to avoid circular dependency with the "emission" package.
+	EmissionsInverseTable = "emissions"
+	// EmissionsColumn is the table column denoting the Emissions relation/edge.
+	EmissionsColumn = "ticker_emissions"
 )
 
 // Columns holds all SQL columns for ticker fields.

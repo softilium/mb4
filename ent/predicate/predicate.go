@@ -9,6 +9,9 @@ import (
 // DivPayout is the predicate function for divpayout builders.
 type DivPayout func(*sql.Selector)
 
+// Emission is the predicate function for emission builders.
+type Emission func(*sql.Selector)
+
 // Emitent is the predicate function for emitent builders.
 type Emitent func(*sql.Selector)
 

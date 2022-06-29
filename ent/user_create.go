@@ -188,6 +188,11 @@ func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.Admin(); !ok {
 		return &ValidationError{Name: "Admin", err: errors.New(`ent: missing required field "User.Admin"`)}
 	}
+	if v, ok := uc.mutation.ID(); ok {
+		if err := user.IDValidator(v.String()); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "User.id": %w`, err)}
+		}
+	}
 	return nil
 }
 

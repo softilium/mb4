@@ -22,6 +22,19 @@ func (f DivPayoutFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return f(ctx, mv)
 }
 
+// The EmissionFunc type is an adapter to allow the use of ordinary
+// function as Emission mutator.
+type EmissionFunc func(context.Context, *ent.EmissionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f EmissionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.EmissionMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EmissionMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The EmitentFunc type is an adapter to allow the use of ordinary
 // function as Emitent mutator.
 type EmitentFunc func(context.Context, *ent.EmitentMutation) (ent.Value, error)

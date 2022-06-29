@@ -16,7 +16,7 @@ type Emitent struct {
 // Fields of the Emitent.
 func (Emitent) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").GoType(xid.ID{}).DefaultFunc(xid.New),
+		field.String("id").GoType(xid.ID{}).DefaultFunc(xid.New).MaxLen(20).Immutable().NotEmpty(),
 		field.String("Descr").NotEmpty().MinLen(1).MaxLen(100).Unique(),
 	}
 }

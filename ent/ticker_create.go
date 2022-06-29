@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/divpayout"
+	"github.com/softilium/mb4/ent/emission"
 	"github.com/softilium/mb4/ent/emitent"
 	"github.com/softilium/mb4/ent/quote"
 	"github.com/softilium/mb4/ent/ticker"
@@ -55,14 +56,6 @@ func (tc *TickerCreate) SetEmitentID(id xid.ID) *TickerCreate {
 	return tc
 }
 
-// SetNillableEmitentID sets the "Emitent" edge to the Emitent entity by ID if the given value is not nil.
-func (tc *TickerCreate) SetNillableEmitentID(id *xid.ID) *TickerCreate {
-	if id != nil {
-		tc = tc.SetEmitentID(*id)
-	}
-	return tc
-}
-
 // SetEmitent sets the "Emitent" edge to the Emitent entity.
 func (tc *TickerCreate) SetEmitent(e *Emitent) *TickerCreate {
 	return tc.SetEmitentID(e.ID)
@@ -96,6 +89,21 @@ func (tc *TickerCreate) AddDivPayouts(d ...*DivPayout) *TickerCreate {
 		ids[i] = d[i].ID
 	}
 	return tc.AddDivPayoutIDs(ids...)
+}
+
+// AddEmissionIDs adds the "Emissions" edge to the Emission entity by IDs.
+func (tc *TickerCreate) AddEmissionIDs(ids ...xid.ID) *TickerCreate {
+	tc.mutation.AddEmissionIDs(ids...)
+	return tc
+}
+
+// AddEmissions adds the "Emissions" edges to the Emission entity.
+func (tc *TickerCreate) AddEmissions(e ...*Emission) *TickerCreate {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return tc.AddEmissionIDs(ids...)
 }
 
 // Mutation returns the TickerMutation object of the builder.
@@ -192,6 +200,9 @@ func (tc *TickerCreate) check() error {
 		if err := ticker.IDValidator(v); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Ticker.id": %w`, err)}
 		}
+	}
+	if _, ok := tc.mutation.EmitentID(); !ok {
+		return &ValidationError{Name: "Emitent", err: errors.New(`ent: missing required edge "Ticker.Emitent"`)}
 	}
 	return nil
 }
@@ -295,6 +306,25 @@ func (tc *TickerCreate) createSpec() (*Ticker, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: divpayout.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := tc.mutation.EmissionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   ticker.EmissionsTable,
+			Columns: []string{ticker.EmissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: emission.FieldID,
 				},
 			},
 		}

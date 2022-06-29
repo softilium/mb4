@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/divpayout"
+	"github.com/softilium/mb4/ent/emission"
 	"github.com/softilium/mb4/ent/emitent"
 	"github.com/softilium/mb4/ent/predicate"
 	"github.com/softilium/mb4/ent/quote"
@@ -33,6 +34,7 @@ type TickerQuery struct {
 	withEmitent    *EmitentQuery
 	withQuotes     *QuoteQuery
 	withDivPayouts *DivPayoutQuery
+	withEmissions  *EmissionQuery
 	withFKs        bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -129,6 +131,28 @@ func (tq *TickerQuery) QueryDivPayouts() *DivPayoutQuery {
 			sqlgraph.From(ticker.Table, ticker.FieldID, selector),
 			sqlgraph.To(divpayout.Table, divpayout.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, ticker.DivPayoutsTable, ticker.DivPayoutsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryEmissions chains the current query on the "Emissions" edge.
+func (tq *TickerQuery) QueryEmissions() *EmissionQuery {
+	query := &EmissionQuery{config: tq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := tq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := tq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(ticker.Table, ticker.FieldID, selector),
+			sqlgraph.To(emission.Table, emission.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ticker.EmissionsTable, ticker.EmissionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 		return fromU, nil
@@ -320,6 +344,7 @@ func (tq *TickerQuery) Clone() *TickerQuery {
 		withEmitent:    tq.withEmitent.Clone(),
 		withQuotes:     tq.withQuotes.Clone(),
 		withDivPayouts: tq.withDivPayouts.Clone(),
+		withEmissions:  tq.withEmissions.Clone(),
 		// clone intermediate query.
 		sql:    tq.sql.Clone(),
 		path:   tq.path,
@@ -357,6 +382,17 @@ func (tq *TickerQuery) WithDivPayouts(opts ...func(*DivPayoutQuery)) *TickerQuer
 		opt(query)
 	}
 	tq.withDivPayouts = query
+	return tq
+}
+
+// WithEmissions tells the query-builder to eager-load the nodes that are connected to
+// the "Emissions" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *TickerQuery) WithEmissions(opts ...func(*EmissionQuery)) *TickerQuery {
+	query := &EmissionQuery{config: tq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	tq.withEmissions = query
 	return tq
 }
 
@@ -426,10 +462,11 @@ func (tq *TickerQuery) sqlAll(ctx context.Context) ([]*Ticker, error) {
 		nodes       = []*Ticker{}
 		withFKs     = tq.withFKs
 		_spec       = tq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			tq.withEmitent != nil,
 			tq.withQuotes != nil,
 			tq.withDivPayouts != nil,
+			tq.withEmissions != nil,
 		}
 	)
 	if tq.withEmitent != nil {
@@ -542,6 +579,35 @@ func (tq *TickerQuery) sqlAll(ctx context.Context) ([]*Ticker, error) {
 				return nil, fmt.Errorf(`unexpected foreign-key "ticker_div_payouts" returned %v for node %v`, *fk, n.ID)
 			}
 			node.Edges.DivPayouts = append(node.Edges.DivPayouts, n)
+		}
+	}
+
+	if query := tq.withEmissions; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[string]*Ticker)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Emissions = []*Emission{}
+		}
+		query.withFKs = true
+		query.Where(predicate.Emission(func(s *sql.Selector) {
+			s.Where(sql.InValues(ticker.EmissionsColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.ticker_emissions
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "ticker_emissions" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "ticker_emissions" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.Emissions = append(node.Edges.Emissions, n)
 		}
 	}
 

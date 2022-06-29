@@ -155,6 +155,11 @@ func (ec *EmitentCreate) check() error {
 			return &ValidationError{Name: "Descr", err: fmt.Errorf(`ent: validator failed for field "Emitent.Descr": %w`, err)}
 		}
 	}
+	if v, ok := ec.mutation.ID(); ok {
+		if err := emitent.IDValidator(v.String()); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Emitent.id": %w`, err)}
+		}
+	}
 	if _, ok := ec.mutation.IndustryID(); !ok {
 		return &ValidationError{Name: "Industry", err: errors.New(`ent: missing required edge "Emitent.Industry"`)}
 	}

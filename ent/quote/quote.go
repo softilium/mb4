@@ -88,4 +88,6 @@ var (
 	LotSizeValidator func(int) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
+	// IDValidator is a validator for the "id" field. It is called by the builders before save.
+	IDValidator func(string) error
 )

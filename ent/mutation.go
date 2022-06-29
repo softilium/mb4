@@ -11,6 +11,7 @@ import (
 
 	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/divpayout"
+	"github.com/softilium/mb4/ent/emission"
 	"github.com/softilium/mb4/ent/emitent"
 	"github.com/softilium/mb4/ent/industry"
 	"github.com/softilium/mb4/ent/investaccount"
@@ -34,6 +35,7 @@ const (
 
 	// Node types.
 	TypeDivPayout              = "DivPayout"
+	TypeEmission               = "Emission"
 	TypeEmitent                = "Emitent"
 	TypeIndustry               = "Industry"
 	TypeInvestAccount          = "InvestAccount"
@@ -773,6 +775,786 @@ func (m *DivPayoutMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown DivPayout edge %s", name)
+}
+
+// EmissionMutation represents an operation that mutates the Emission nodes in the graph.
+type EmissionMutation struct {
+	config
+	op               Op
+	typ              string
+	id               *xid.ID
+	_RecDate         *time.Time
+	_Size            *int64
+	add_Size         *int64
+	_FreeFloat       *int
+	add_FreeFloat    *int
+	_LotSize         *int
+	add_LotSize      *int
+	_ListingLevel    *int
+	add_ListingLevel *int
+	clearedFields    map[string]struct{}
+	_Ticker          *string
+	cleared_Ticker   bool
+	done             bool
+	oldValue         func(context.Context) (*Emission, error)
+	predicates       []predicate.Emission
+}
+
+var _ ent.Mutation = (*EmissionMutation)(nil)
+
+// emissionOption allows management of the mutation configuration using functional options.
+type emissionOption func(*EmissionMutation)
+
+// newEmissionMutation creates new mutation for the Emission entity.
+func newEmissionMutation(c config, op Op, opts ...emissionOption) *EmissionMutation {
+	m := &EmissionMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeEmission,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withEmissionID sets the ID field of the mutation.
+func withEmissionID(id xid.ID) emissionOption {
+	return func(m *EmissionMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Emission
+		)
+		m.oldValue = func(ctx context.Context) (*Emission, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Emission.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withEmission sets the old Emission of the mutation.
+func withEmission(node *Emission) emissionOption {
+	return func(m *EmissionMutation) {
+		m.oldValue = func(context.Context) (*Emission, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m EmissionMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m EmissionMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Emission entities.
+func (m *EmissionMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *EmissionMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *EmissionMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Emission.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetRecDate sets the "RecDate" field.
+func (m *EmissionMutation) SetRecDate(t time.Time) {
+	m._RecDate = &t
+}
+
+// RecDate returns the value of the "RecDate" field in the mutation.
+func (m *EmissionMutation) RecDate() (r time.Time, exists bool) {
+	v := m._RecDate
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRecDate returns the old "RecDate" field's value of the Emission entity.
+// If the Emission object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmissionMutation) OldRecDate(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRecDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRecDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRecDate: %w", err)
+	}
+	return oldValue.RecDate, nil
+}
+
+// ResetRecDate resets all changes to the "RecDate" field.
+func (m *EmissionMutation) ResetRecDate() {
+	m._RecDate = nil
+}
+
+// SetSize sets the "Size" field.
+func (m *EmissionMutation) SetSize(i int64) {
+	m._Size = &i
+	m.add_Size = nil
+}
+
+// Size returns the value of the "Size" field in the mutation.
+func (m *EmissionMutation) Size() (r int64, exists bool) {
+	v := m._Size
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSize returns the old "Size" field's value of the Emission entity.
+// If the Emission object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmissionMutation) OldSize(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSize is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSize requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSize: %w", err)
+	}
+	return oldValue.Size, nil
+}
+
+// AddSize adds i to the "Size" field.
+func (m *EmissionMutation) AddSize(i int64) {
+	if m.add_Size != nil {
+		*m.add_Size += i
+	} else {
+		m.add_Size = &i
+	}
+}
+
+// AddedSize returns the value that was added to the "Size" field in this mutation.
+func (m *EmissionMutation) AddedSize() (r int64, exists bool) {
+	v := m.add_Size
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSize resets all changes to the "Size" field.
+func (m *EmissionMutation) ResetSize() {
+	m._Size = nil
+	m.add_Size = nil
+}
+
+// SetFreeFloat sets the "FreeFloat" field.
+func (m *EmissionMutation) SetFreeFloat(i int) {
+	m._FreeFloat = &i
+	m.add_FreeFloat = nil
+}
+
+// FreeFloat returns the value of the "FreeFloat" field in the mutation.
+func (m *EmissionMutation) FreeFloat() (r int, exists bool) {
+	v := m._FreeFloat
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFreeFloat returns the old "FreeFloat" field's value of the Emission entity.
+// If the Emission object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmissionMutation) OldFreeFloat(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFreeFloat is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFreeFloat requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFreeFloat: %w", err)
+	}
+	return oldValue.FreeFloat, nil
+}
+
+// AddFreeFloat adds i to the "FreeFloat" field.
+func (m *EmissionMutation) AddFreeFloat(i int) {
+	if m.add_FreeFloat != nil {
+		*m.add_FreeFloat += i
+	} else {
+		m.add_FreeFloat = &i
+	}
+}
+
+// AddedFreeFloat returns the value that was added to the "FreeFloat" field in this mutation.
+func (m *EmissionMutation) AddedFreeFloat() (r int, exists bool) {
+	v := m.add_FreeFloat
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearFreeFloat clears the value of the "FreeFloat" field.
+func (m *EmissionMutation) ClearFreeFloat() {
+	m._FreeFloat = nil
+	m.add_FreeFloat = nil
+	m.clearedFields[emission.FieldFreeFloat] = struct{}{}
+}
+
+// FreeFloatCleared returns if the "FreeFloat" field was cleared in this mutation.
+func (m *EmissionMutation) FreeFloatCleared() bool {
+	_, ok := m.clearedFields[emission.FieldFreeFloat]
+	return ok
+}
+
+// ResetFreeFloat resets all changes to the "FreeFloat" field.
+func (m *EmissionMutation) ResetFreeFloat() {
+	m._FreeFloat = nil
+	m.add_FreeFloat = nil
+	delete(m.clearedFields, emission.FieldFreeFloat)
+}
+
+// SetLotSize sets the "LotSize" field.
+func (m *EmissionMutation) SetLotSize(i int) {
+	m._LotSize = &i
+	m.add_LotSize = nil
+}
+
+// LotSize returns the value of the "LotSize" field in the mutation.
+func (m *EmissionMutation) LotSize() (r int, exists bool) {
+	v := m._LotSize
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLotSize returns the old "LotSize" field's value of the Emission entity.
+// If the Emission object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmissionMutation) OldLotSize(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLotSize is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLotSize requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLotSize: %w", err)
+	}
+	return oldValue.LotSize, nil
+}
+
+// AddLotSize adds i to the "LotSize" field.
+func (m *EmissionMutation) AddLotSize(i int) {
+	if m.add_LotSize != nil {
+		*m.add_LotSize += i
+	} else {
+		m.add_LotSize = &i
+	}
+}
+
+// AddedLotSize returns the value that was added to the "LotSize" field in this mutation.
+func (m *EmissionMutation) AddedLotSize() (r int, exists bool) {
+	v := m.add_LotSize
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearLotSize clears the value of the "LotSize" field.
+func (m *EmissionMutation) ClearLotSize() {
+	m._LotSize = nil
+	m.add_LotSize = nil
+	m.clearedFields[emission.FieldLotSize] = struct{}{}
+}
+
+// LotSizeCleared returns if the "LotSize" field was cleared in this mutation.
+func (m *EmissionMutation) LotSizeCleared() bool {
+	_, ok := m.clearedFields[emission.FieldLotSize]
+	return ok
+}
+
+// ResetLotSize resets all changes to the "LotSize" field.
+func (m *EmissionMutation) ResetLotSize() {
+	m._LotSize = nil
+	m.add_LotSize = nil
+	delete(m.clearedFields, emission.FieldLotSize)
+}
+
+// SetListingLevel sets the "ListingLevel" field.
+func (m *EmissionMutation) SetListingLevel(i int) {
+	m._ListingLevel = &i
+	m.add_ListingLevel = nil
+}
+
+// ListingLevel returns the value of the "ListingLevel" field in the mutation.
+func (m *EmissionMutation) ListingLevel() (r int, exists bool) {
+	v := m._ListingLevel
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldListingLevel returns the old "ListingLevel" field's value of the Emission entity.
+// If the Emission object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmissionMutation) OldListingLevel(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldListingLevel is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldListingLevel requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldListingLevel: %w", err)
+	}
+	return oldValue.ListingLevel, nil
+}
+
+// AddListingLevel adds i to the "ListingLevel" field.
+func (m *EmissionMutation) AddListingLevel(i int) {
+	if m.add_ListingLevel != nil {
+		*m.add_ListingLevel += i
+	} else {
+		m.add_ListingLevel = &i
+	}
+}
+
+// AddedListingLevel returns the value that was added to the "ListingLevel" field in this mutation.
+func (m *EmissionMutation) AddedListingLevel() (r int, exists bool) {
+	v := m.add_ListingLevel
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetListingLevel resets all changes to the "ListingLevel" field.
+func (m *EmissionMutation) ResetListingLevel() {
+	m._ListingLevel = nil
+	m.add_ListingLevel = nil
+}
+
+// SetTickerID sets the "Ticker" edge to the Ticker entity by id.
+func (m *EmissionMutation) SetTickerID(id string) {
+	m._Ticker = &id
+}
+
+// ClearTicker clears the "Ticker" edge to the Ticker entity.
+func (m *EmissionMutation) ClearTicker() {
+	m.cleared_Ticker = true
+}
+
+// TickerCleared reports if the "Ticker" edge to the Ticker entity was cleared.
+func (m *EmissionMutation) TickerCleared() bool {
+	return m.cleared_Ticker
+}
+
+// TickerID returns the "Ticker" edge ID in the mutation.
+func (m *EmissionMutation) TickerID() (id string, exists bool) {
+	if m._Ticker != nil {
+		return *m._Ticker, true
+	}
+	return
+}
+
+// TickerIDs returns the "Ticker" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// TickerID instead. It exists only for internal usage by the builders.
+func (m *EmissionMutation) TickerIDs() (ids []string) {
+	if id := m._Ticker; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetTicker resets all changes to the "Ticker" edge.
+func (m *EmissionMutation) ResetTicker() {
+	m._Ticker = nil
+	m.cleared_Ticker = false
+}
+
+// Where appends a list predicates to the EmissionMutation builder.
+func (m *EmissionMutation) Where(ps ...predicate.Emission) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *EmissionMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (Emission).
+func (m *EmissionMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *EmissionMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m._RecDate != nil {
+		fields = append(fields, emission.FieldRecDate)
+	}
+	if m._Size != nil {
+		fields = append(fields, emission.FieldSize)
+	}
+	if m._FreeFloat != nil {
+		fields = append(fields, emission.FieldFreeFloat)
+	}
+	if m._LotSize != nil {
+		fields = append(fields, emission.FieldLotSize)
+	}
+	if m._ListingLevel != nil {
+		fields = append(fields, emission.FieldListingLevel)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *EmissionMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case emission.FieldRecDate:
+		return m.RecDate()
+	case emission.FieldSize:
+		return m.Size()
+	case emission.FieldFreeFloat:
+		return m.FreeFloat()
+	case emission.FieldLotSize:
+		return m.LotSize()
+	case emission.FieldListingLevel:
+		return m.ListingLevel()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *EmissionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case emission.FieldRecDate:
+		return m.OldRecDate(ctx)
+	case emission.FieldSize:
+		return m.OldSize(ctx)
+	case emission.FieldFreeFloat:
+		return m.OldFreeFloat(ctx)
+	case emission.FieldLotSize:
+		return m.OldLotSize(ctx)
+	case emission.FieldListingLevel:
+		return m.OldListingLevel(ctx)
+	}
+	return nil, fmt.Errorf("unknown Emission field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *EmissionMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case emission.FieldRecDate:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRecDate(v)
+		return nil
+	case emission.FieldSize:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSize(v)
+		return nil
+	case emission.FieldFreeFloat:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFreeFloat(v)
+		return nil
+	case emission.FieldLotSize:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLotSize(v)
+		return nil
+	case emission.FieldListingLevel:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetListingLevel(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Emission field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *EmissionMutation) AddedFields() []string {
+	var fields []string
+	if m.add_Size != nil {
+		fields = append(fields, emission.FieldSize)
+	}
+	if m.add_FreeFloat != nil {
+		fields = append(fields, emission.FieldFreeFloat)
+	}
+	if m.add_LotSize != nil {
+		fields = append(fields, emission.FieldLotSize)
+	}
+	if m.add_ListingLevel != nil {
+		fields = append(fields, emission.FieldListingLevel)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *EmissionMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case emission.FieldSize:
+		return m.AddedSize()
+	case emission.FieldFreeFloat:
+		return m.AddedFreeFloat()
+	case emission.FieldLotSize:
+		return m.AddedLotSize()
+	case emission.FieldListingLevel:
+		return m.AddedListingLevel()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *EmissionMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case emission.FieldSize:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSize(v)
+		return nil
+	case emission.FieldFreeFloat:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddFreeFloat(v)
+		return nil
+	case emission.FieldLotSize:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLotSize(v)
+		return nil
+	case emission.FieldListingLevel:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddListingLevel(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Emission numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *EmissionMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(emission.FieldFreeFloat) {
+		fields = append(fields, emission.FieldFreeFloat)
+	}
+	if m.FieldCleared(emission.FieldLotSize) {
+		fields = append(fields, emission.FieldLotSize)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *EmissionMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *EmissionMutation) ClearField(name string) error {
+	switch name {
+	case emission.FieldFreeFloat:
+		m.ClearFreeFloat()
+		return nil
+	case emission.FieldLotSize:
+		m.ClearLotSize()
+		return nil
+	}
+	return fmt.Errorf("unknown Emission nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *EmissionMutation) ResetField(name string) error {
+	switch name {
+	case emission.FieldRecDate:
+		m.ResetRecDate()
+		return nil
+	case emission.FieldSize:
+		m.ResetSize()
+		return nil
+	case emission.FieldFreeFloat:
+		m.ResetFreeFloat()
+		return nil
+	case emission.FieldLotSize:
+		m.ResetLotSize()
+		return nil
+	case emission.FieldListingLevel:
+		m.ResetListingLevel()
+		return nil
+	}
+	return fmt.Errorf("unknown Emission field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *EmissionMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m._Ticker != nil {
+		edges = append(edges, emission.EdgeTicker)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *EmissionMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case emission.EdgeTicker:
+		if id := m._Ticker; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *EmissionMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *EmissionMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *EmissionMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.cleared_Ticker {
+		edges = append(edges, emission.EdgeTicker)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *EmissionMutation) EdgeCleared(name string) bool {
+	switch name {
+	case emission.EdgeTicker:
+		return m.cleared_Ticker
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *EmissionMutation) ClearEdge(name string) error {
+	switch name {
+	case emission.EdgeTicker:
+		m.ClearTicker()
+		return nil
+	}
+	return fmt.Errorf("unknown Emission unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *EmissionMutation) ResetEdge(name string) error {
+	switch name {
+	case emission.EdgeTicker:
+		m.ResetTicker()
+		return nil
+	}
+	return fmt.Errorf("unknown Emission edge %s", name)
 }
 
 // EmitentMutation represents an operation that mutates the Emitent nodes in the graph.
@@ -4435,6 +5217,9 @@ type TickerMutation struct {
 	_DivPayouts        map[int]struct{}
 	removed_DivPayouts map[int]struct{}
 	cleared_DivPayouts bool
+	_Emissions         map[xid.ID]struct{}
+	removed_Emissions  map[xid.ID]struct{}
+	cleared_Emissions  bool
 	done               bool
 	oldValue           func(context.Context) (*Ticker, error)
 	predicates         []predicate.Ticker
@@ -4783,6 +5568,60 @@ func (m *TickerMutation) ResetDivPayouts() {
 	m.removed_DivPayouts = nil
 }
 
+// AddEmissionIDs adds the "Emissions" edge to the Emission entity by ids.
+func (m *TickerMutation) AddEmissionIDs(ids ...xid.ID) {
+	if m._Emissions == nil {
+		m._Emissions = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m._Emissions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearEmissions clears the "Emissions" edge to the Emission entity.
+func (m *TickerMutation) ClearEmissions() {
+	m.cleared_Emissions = true
+}
+
+// EmissionsCleared reports if the "Emissions" edge to the Emission entity was cleared.
+func (m *TickerMutation) EmissionsCleared() bool {
+	return m.cleared_Emissions
+}
+
+// RemoveEmissionIDs removes the "Emissions" edge to the Emission entity by IDs.
+func (m *TickerMutation) RemoveEmissionIDs(ids ...xid.ID) {
+	if m.removed_Emissions == nil {
+		m.removed_Emissions = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m._Emissions, ids[i])
+		m.removed_Emissions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedEmissions returns the removed IDs of the "Emissions" edge to the Emission entity.
+func (m *TickerMutation) RemovedEmissionsIDs() (ids []xid.ID) {
+	for id := range m.removed_Emissions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// EmissionsIDs returns the "Emissions" edge IDs in the mutation.
+func (m *TickerMutation) EmissionsIDs() (ids []xid.ID) {
+	for id := range m._Emissions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetEmissions resets all changes to the "Emissions" edge.
+func (m *TickerMutation) ResetEmissions() {
+	m._Emissions = nil
+	m.cleared_Emissions = false
+	m.removed_Emissions = nil
+}
+
 // Where appends a list predicates to the TickerMutation builder.
 func (m *TickerMutation) Where(ps ...predicate.Ticker) {
 	m.predicates = append(m.predicates, ps...)
@@ -4933,7 +5772,7 @@ func (m *TickerMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TickerMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m._Emitent != nil {
 		edges = append(edges, ticker.EdgeEmitent)
 	}
@@ -4942,6 +5781,9 @@ func (m *TickerMutation) AddedEdges() []string {
 	}
 	if m._DivPayouts != nil {
 		edges = append(edges, ticker.EdgeDivPayouts)
+	}
+	if m._Emissions != nil {
+		edges = append(edges, ticker.EdgeEmissions)
 	}
 	return edges
 }
@@ -4966,18 +5808,27 @@ func (m *TickerMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case ticker.EdgeEmissions:
+		ids := make([]ent.Value, 0, len(m._Emissions))
+		for id := range m._Emissions {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *TickerMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.removed_Quotes != nil {
 		edges = append(edges, ticker.EdgeQuotes)
 	}
 	if m.removed_DivPayouts != nil {
 		edges = append(edges, ticker.EdgeDivPayouts)
+	}
+	if m.removed_Emissions != nil {
+		edges = append(edges, ticker.EdgeEmissions)
 	}
 	return edges
 }
@@ -4998,13 +5849,19 @@ func (m *TickerMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case ticker.EdgeEmissions:
+		ids := make([]ent.Value, 0, len(m.removed_Emissions))
+		for id := range m.removed_Emissions {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TickerMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.cleared_Emitent {
 		edges = append(edges, ticker.EdgeEmitent)
 	}
@@ -5013,6 +5870,9 @@ func (m *TickerMutation) ClearedEdges() []string {
 	}
 	if m.cleared_DivPayouts {
 		edges = append(edges, ticker.EdgeDivPayouts)
+	}
+	if m.cleared_Emissions {
+		edges = append(edges, ticker.EdgeEmissions)
 	}
 	return edges
 }
@@ -5027,6 +5887,8 @@ func (m *TickerMutation) EdgeCleared(name string) bool {
 		return m.cleared_Quotes
 	case ticker.EdgeDivPayouts:
 		return m.cleared_DivPayouts
+	case ticker.EdgeEmissions:
+		return m.cleared_Emissions
 	}
 	return false
 }
@@ -5054,6 +5916,9 @@ func (m *TickerMutation) ResetEdge(name string) error {
 		return nil
 	case ticker.EdgeDivPayouts:
 		m.ResetDivPayouts()
+		return nil
+	case ticker.EdgeEmissions:
+		m.ResetEmissions()
 		return nil
 	}
 	return fmt.Errorf("unknown Ticker edge %s", name)

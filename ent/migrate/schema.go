@@ -32,9 +32,33 @@ var (
 			},
 		},
 	}
+	// EmissionsColumns holds the columns for the "emissions" table.
+	EmissionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "rec_date", Type: field.TypeTime},
+		{Name: "size", Type: field.TypeInt64},
+		{Name: "free_float", Type: field.TypeInt, Nullable: true},
+		{Name: "lot_size", Type: field.TypeInt, Nullable: true},
+		{Name: "listing_level", Type: field.TypeInt},
+		{Name: "ticker_emissions", Type: field.TypeString, Size: 20},
+	}
+	// EmissionsTable holds the schema information for the "emissions" table.
+	EmissionsTable = &schema.Table{
+		Name:       "emissions",
+		Columns:    EmissionsColumns,
+		PrimaryKey: []*schema.Column{EmissionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "emissions_tickers_Emissions",
+				Columns:    []*schema.Column{EmissionsColumns[6]},
+				RefColumns: []*schema.Column{TickersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// EmitentsColumns holds the columns for the "emitents" table.
 	EmitentsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString},
+		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "descr", Type: field.TypeString, Unique: true, Size: 100},
 		{Name: "industry_emitents", Type: field.TypeString, Size: 20},
 	}
@@ -65,9 +89,9 @@ var (
 	}
 	// InvestAccountsColumns holds the columns for the "invest_accounts" table.
 	InvestAccountsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString},
+		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "descr", Type: field.TypeString, Size: 100},
-		{Name: "user_invest_accounts", Type: field.TypeString},
+		{Name: "user_invest_accounts", Type: field.TypeString, Size: 20},
 	}
 	// InvestAccountsTable holds the schema information for the "invest_accounts" table.
 	InvestAccountsTable = &schema.Table{
@@ -85,10 +109,10 @@ var (
 	}
 	// InvestAccountCashflowsColumns holds the columns for the "invest_account_cashflows" table.
 	InvestAccountCashflowsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString},
+		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "rec_date", Type: field.TypeTime},
 		{Name: "qty", Type: field.TypeFloat64},
-		{Name: "invest_account_cashflows", Type: field.TypeString},
+		{Name: "invest_account_cashflows", Type: field.TypeString, Size: 20},
 	}
 	// InvestAccountCashflowsTable holds the schema information for the "invest_account_cashflows" table.
 	InvestAccountCashflowsTable = &schema.Table{
@@ -106,10 +130,10 @@ var (
 	}
 	// InvestAccountValuationsColumns holds the columns for the "invest_account_valuations" table.
 	InvestAccountValuationsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString},
+		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "rec_date", Type: field.TypeTime},
 		{Name: "value", Type: field.TypeFloat64},
-		{Name: "invest_account_valuations", Type: field.TypeString},
+		{Name: "invest_account_valuations", Type: field.TypeString, Size: 20},
 	}
 	// InvestAccountValuationsTable holds the schema information for the "invest_account_valuations" table.
 	InvestAccountValuationsTable = &schema.Table{
@@ -127,7 +151,7 @@ var (
 	}
 	// QuotesColumns holds the columns for the "quotes" table.
 	QuotesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString},
+		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "d", Type: field.TypeTime},
 		{Name: "o", Type: field.TypeFloat64},
 		{Name: "c", Type: field.TypeFloat64},
@@ -167,7 +191,7 @@ var (
 		{Name: "id", Type: field.TypeString, Unique: true, Size: 20},
 		{Name: "descr", Type: field.TypeString, Unique: true, Size: 50},
 		{Name: "kind", Type: field.TypeInt32, Default: 100},
-		{Name: "emitent_tickers", Type: field.TypeString, Nullable: true},
+		{Name: "emitent_tickers", Type: field.TypeString, Size: 20},
 	}
 	// TickersTable holds the schema information for the "tickers" table.
 	TickersTable = &schema.Table{
@@ -185,7 +209,7 @@ var (
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString},
+		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "user_name", Type: field.TypeString, Unique: true, Size: 50},
 		{Name: "password_hash", Type: field.TypeString},
 		{Name: "admin", Type: field.TypeBool, Default: false},
@@ -200,6 +224,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		DivPayoutsTable,
+		EmissionsTable,
 		EmitentsTable,
 		IndustriesTable,
 		InvestAccountsTable,
@@ -213,6 +238,7 @@ var (
 
 func init() {
 	DivPayoutsTable.ForeignKeys[0].RefTable = TickersTable
+	EmissionsTable.ForeignKeys[0].RefTable = TickersTable
 	EmitentsTable.ForeignKeys[0].RefTable = IndustriesTable
 	InvestAccountsTable.ForeignKeys[0].RefTable = UsersTable
 	InvestAccountCashflowsTable.ForeignKeys[0].RefTable = InvestAccountsTable

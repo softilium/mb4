@@ -16,7 +16,7 @@ type Quote struct {
 // Fields of the Quote.
 func (Quote) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").GoType(xid.ID{}).DefaultFunc(xid.New),
+		field.String("id").GoType(xid.ID{}).DefaultFunc(xid.New).MaxLen(20).Immutable().NotEmpty(),
 		field.Time("D").Immutable(),
 		field.Float("O").Immutable(),
 		field.Float("C").Immutable(),

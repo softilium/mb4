@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// DivPayout is the client for interacting with the DivPayout builders.
 	DivPayout *DivPayoutClient
+	// Emission is the client for interacting with the Emission builders.
+	Emission *EmissionClient
 	// Emitent is the client for interacting with the Emitent builders.
 	Emitent *EmitentClient
 	// Industry is the client for interacting with the Industry builders.
@@ -166,6 +168,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.DivPayout = NewDivPayoutClient(tx.config)
+	tx.Emission = NewEmissionClient(tx.config)
 	tx.Emitent = NewEmitentClient(tx.config)
 	tx.Industry = NewIndustryClient(tx.config)
 	tx.InvestAccount = NewInvestAccountClient(tx.config)

@@ -15,7 +15,7 @@ type InvestAccountCashflow struct {
 // Fields of the InvestAccountCashflow.
 func (InvestAccountCashflow) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").GoType(xid.ID{}).DefaultFunc(xid.New),
+		field.String("id").GoType(xid.ID{}).DefaultFunc(xid.New).MaxLen(20).Immutable().NotEmpty(),
 		field.Time("RecDate"),
 		field.Float("Qty"),
 	}
