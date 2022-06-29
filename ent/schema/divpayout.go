@@ -21,7 +21,7 @@ type DivPayout struct {
 // Fields of the DivPayout.
 func (DivPayout) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("ForYear").Range(1900, 9999),
+		field.Int("ForYear").Range(1900, 2999),
 		field.Int("ForQuarter").Range(1, 4),
 		field.Time("CloseDate"),
 		field.Int("Status").Range(DivPayoutStatus_CompanyCharter, DivPayoutStatus_Fact),

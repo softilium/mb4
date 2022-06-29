@@ -87,8 +87,20 @@ func Tickers(w http.ResponseWriter, r *http.Request) {
 				SetTickerID(buf.ID).
 				Save(context.Background())
 			handleErr(err, w)
-
 		}
+
+		for _, v := range buf.Edges.DivPayouts {
+			_, err := db.DB.DivPayout.Create().
+				SetTickersID(buf.ID).
+				SetForYear(v.ForYear).
+				SetForQuarter(v.ForQuarter).
+				SetCloseDate(v.CloseDate).
+				SetStatus(v.Status).
+				SetDPS(v.DPS).
+				Save(context.Background())
+			handleErr(err, w)
+		}
+
 		err = tx.Commit()
 		handleErr(err, w)
 
