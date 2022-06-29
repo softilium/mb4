@@ -21,7 +21,7 @@ const App = {
         async setNewSelectedVal() {
             this.selectedVal.id = null;
             this.selectedVal.Value = 0;
-            this.selectedVal.RecDate = '2022-01-01';
+            this.selectedVal.RecDate = new Date().toISOString().split('T')[0];
         },
         async setSelectedVal(item) {
             this.selectedVal.id = item.id;
@@ -30,7 +30,7 @@ const App = {
         },
         async saveSelectedVal() {
             let res = null;
-            this.selectedVal.RecDate += "T03:00:00+03:00"; // restore full time from date
+            this.selectedVal.RecDate += "T00:00:00+03:00"; // restore full time from date
             if (this.selectedVal.id == null) {
                 res = await fetch(`/api/invest-account-valuations?id=${this.selectedVal.id}&owner=${window.accid}`,
                     { method: 'POST', body: JSON.stringify(this.selectedVal) }

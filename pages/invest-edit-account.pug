@@ -10,12 +10,16 @@ extends layout.pug
         div#vueapp
             div.row
                 div.form-group.row
-                    label.col-sm-6.col-form-label[for="descr"] Инвестиционный счет
-                    div.col-sm-6
+                    div.col-sm-2
+                        label.col-form-label[for="descr"] Наименование
+                    div.col-sm-4
                         input.form-control.form-control-sm
                             [type="text"]
                             [v-model="obj.Descr"]
+                    div.col-sm-2
                         button.btn.btn-primary.btn-sm[v-on:click="setDescr()"] Сохранить
+            div.row
+                p &nbsp;
             div.row
                 div.col-3
                     h3 Оценки портфеля

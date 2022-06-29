@@ -15,10 +15,7 @@ func InvestAccount(w http.ResponseWriter, r *http.Request) {
 	pagedata := struct {
 		SessionStruct
 		AccId string
-	}{}
-	pagedata.SessionStruct = s
-	pagedata.AccId = r.URL.Query().Get("id")
-
+	}{SessionStruct: s, AccId: r.URL.Query().Get("id")}
 	templates["invest-edit-account"].Execute(w, pagedata)
 
 }

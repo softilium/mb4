@@ -69,20 +69,20 @@ func InvestAccountValuations(w http.ResponseWriter, r *http.Request) {
 	var id xid.ID
 	var err error
 
-	session := pages.LoadSessionStruct(r)
-	if !session.Authenticated {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
 	if r.Method != http.MethodDelete && r.Method != http.MethodPut && r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	if r.Method == http.MethodDelete && r.Method != http.MethodPut {
+	if r.Method == http.MethodDelete || r.Method == http.MethodPut {
 		id, err = xid.FromString(r.URL.Query().Get("id"))
 		handleErr(err, w)
+	}
+
+	session := pages.LoadSessionStruct(r)
+	if !session.Authenticated {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
 	}
 
 	accXids, err := session.GetInvestAccountXids()
@@ -107,7 +107,10 @@ func InvestAccountValuations(w http.ResponseWriter, r *http.Request) {
 		err = json.NewDecoder(r.Body).Decode(&par)
 		handleErr(err, w)
 
-		err := db.DB.InvestAccountValuation.UpdateOneID(id).SetRecDate(par.RecDate).SetValue(par.Value).Exec(context.Background())
+		err := db.DB.InvestAccountValuation.UpdateOneID(id).
+			SetRecDate(par.RecDate).
+			SetValue(par.Value).
+			Exec(context.Background())
 		handleErr(err, w)
 
 	}
