@@ -21,16 +21,16 @@ const App = {
         async setNewSelectedVal() {
             this.selectedVal.id = null;
             this.selectedVal.Value = 0;
-            this.selectedVal.RecDate = new Date().toISOString().split('T')[0];
+            this.selectedVal.RecDate = new Date().toISOString().split('T')[0]; // strip time
         },
         async setSelectedVal(item) {
             this.selectedVal.id = item.id;
             this.selectedVal.Value = item.Value;
-            this.selectedVal.RecDate = item.RecDate.split('T')[0]; // strip time from date
+            this.selectedVal.RecDate = item.RecDate.split('T')[0]; // strip time
         },
         async saveSelectedVal() {
             let res = null;
-            this.selectedVal.RecDate += "T00:00:00+03:00"; // restore full time from date
+            this.selectedVal.RecDate += "T00:00:00+03:00"; // add time
             if (this.selectedVal.id == null) {
                 res = await fetch(`/api/invest-account-valuations?id=${this.selectedVal.id}&owner=${window.accid}`,
                     { method: 'POST', body: JSON.stringify(this.selectedVal) }
@@ -40,7 +40,7 @@ const App = {
                     { method: 'PUT', body: JSON.stringify(this.selectedVal) }
                 );
             }
-            if (res.ok) this.getList(); else alert("Ошибка при сохранении");
+            if (res.ok) this.getList(); else alert(`Ошибка при сохранении значения: ${res.text()}`);
         },
         async getList() {
             let response = await fetch(`/api/invest-accounts?id=${window.accid}`, { method: 'GET' });
