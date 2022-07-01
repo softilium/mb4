@@ -12,6 +12,7 @@ import (
 	"github.com/softilium/mb4/ent/investaccountcashflow"
 	"github.com/softilium/mb4/ent/investaccountvaluation"
 	"github.com/softilium/mb4/ent/quote"
+	"github.com/softilium/mb4/ent/report"
 	"github.com/softilium/mb4/ent/schema"
 	"github.com/softilium/mb4/ent/ticker"
 	"github.com/softilium/mb4/ent/user"
@@ -236,6 +237,40 @@ func init() {
 	// quote.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	quote.IDValidator = func() func(string) error {
 		validators := quoteDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	reportFields := schema.Report{}.Fields()
+	_ = reportFields
+	// reportDescYear is the schema descriptor for Year field.
+	reportDescYear := reportFields[1].Descriptor()
+	// report.YearValidator is a validator for the "Year" field. It is called by the builders before save.
+	report.YearValidator = reportDescYear.Validators[0].(func(int) error)
+	// reportDescQuarter is the schema descriptor for Quarter field.
+	reportDescQuarter := reportFields[2].Descriptor()
+	// report.QuarterValidator is a validator for the "Quarter" field. It is called by the builders before save.
+	report.QuarterValidator = reportDescQuarter.Validators[0].(func(int) error)
+	// reportDescURL is the schema descriptor for Url field.
+	reportDescURL := reportFields[17].Descriptor()
+	// report.URLValidator is a validator for the "Url" field. It is called by the builders before save.
+	report.URLValidator = reportDescURL.Validators[0].(func(string) error)
+	// reportDescID is the schema descriptor for id field.
+	reportDescID := reportFields[0].Descriptor()
+	// report.DefaultID holds the default value on creation for the id field.
+	report.DefaultID = reportDescID.Default.(func() xid.ID)
+	// report.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	report.IDValidator = func() func(string) error {
+		validators := reportDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

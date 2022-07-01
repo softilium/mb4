@@ -16,6 +16,7 @@ import (
 	"github.com/softilium/mb4/ent/emitent"
 	"github.com/softilium/mb4/ent/industry"
 	"github.com/softilium/mb4/ent/predicate"
+	"github.com/softilium/mb4/ent/report"
 	"github.com/softilium/mb4/ent/ticker"
 )
 
@@ -31,6 +32,7 @@ type EmitentQuery struct {
 	// eager-loading edges.
 	withIndustry *IndustryQuery
 	withTickers  *TickerQuery
+	withReports  *ReportQuery
 	withFKs      bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -105,6 +107,28 @@ func (eq *EmitentQuery) QueryTickers() *TickerQuery {
 			sqlgraph.From(emitent.Table, emitent.FieldID, selector),
 			sqlgraph.To(ticker.Table, ticker.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, emitent.TickersTable, emitent.TickersColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryReports chains the current query on the "Reports" edge.
+func (eq *EmitentQuery) QueryReports() *ReportQuery {
+	query := &ReportQuery{config: eq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(emitent.Table, emitent.FieldID, selector),
+			sqlgraph.To(report.Table, report.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, emitent.ReportsTable, emitent.ReportsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -295,6 +319,7 @@ func (eq *EmitentQuery) Clone() *EmitentQuery {
 		predicates:   append([]predicate.Emitent{}, eq.predicates...),
 		withIndustry: eq.withIndustry.Clone(),
 		withTickers:  eq.withTickers.Clone(),
+		withReports:  eq.withReports.Clone(),
 		// clone intermediate query.
 		sql:    eq.sql.Clone(),
 		path:   eq.path,
@@ -321,6 +346,17 @@ func (eq *EmitentQuery) WithTickers(opts ...func(*TickerQuery)) *EmitentQuery {
 		opt(query)
 	}
 	eq.withTickers = query
+	return eq
+}
+
+// WithReports tells the query-builder to eager-load the nodes that are connected to
+// the "Reports" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EmitentQuery) WithReports(opts ...func(*ReportQuery)) *EmitentQuery {
+	query := &ReportQuery{config: eq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withReports = query
 	return eq
 }
 
@@ -390,9 +426,10 @@ func (eq *EmitentQuery) sqlAll(ctx context.Context) ([]*Emitent, error) {
 		nodes       = []*Emitent{}
 		withFKs     = eq.withFKs
 		_spec       = eq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			eq.withIndustry != nil,
 			eq.withTickers != nil,
+			eq.withReports != nil,
 		}
 	)
 	if eq.withIndustry != nil {
@@ -476,6 +513,35 @@ func (eq *EmitentQuery) sqlAll(ctx context.Context) ([]*Emitent, error) {
 				return nil, fmt.Errorf(`unexpected foreign-key "emitent_tickers" returned %v for node %v`, *fk, n.ID)
 			}
 			node.Edges.Tickers = append(node.Edges.Tickers, n)
+		}
+	}
+
+	if query := eq.withReports; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[xid.ID]*Emitent)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Reports = []*Report{}
+		}
+		query.withFKs = true
+		query.Where(predicate.Report(func(s *sql.Selector) {
+			s.Where(sql.InValues(emitent.ReportsColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.emitent_reports
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "emitent_reports" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "emitent_reports" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.Reports = append(node.Edges.Reports, n)
 		}
 	}
 

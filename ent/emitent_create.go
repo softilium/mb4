@@ -12,6 +12,7 @@ import (
 	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/emitent"
 	"github.com/softilium/mb4/ent/industry"
+	"github.com/softilium/mb4/ent/report"
 	"github.com/softilium/mb4/ent/ticker"
 )
 
@@ -66,6 +67,21 @@ func (ec *EmitentCreate) AddTickers(t ...*Ticker) *EmitentCreate {
 		ids[i] = t[i].ID
 	}
 	return ec.AddTickerIDs(ids...)
+}
+
+// AddReportIDs adds the "Reports" edge to the Report entity by IDs.
+func (ec *EmitentCreate) AddReportIDs(ids ...xid.ID) *EmitentCreate {
+	ec.mutation.AddReportIDs(ids...)
+	return ec
+}
+
+// AddReports adds the "Reports" edges to the Report entity.
+func (ec *EmitentCreate) AddReports(r ...*Report) *EmitentCreate {
+	ids := make([]xid.ID, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return ec.AddReportIDs(ids...)
 }
 
 // Mutation returns the EmitentMutation object of the builder.
@@ -238,6 +254,25 @@ func (ec *EmitentCreate) createSpec() (*Emitent, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeString,
 					Column: ticker.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.ReportsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   emitent.ReportsTable,
+			Columns: []string{emitent.ReportsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: report.FieldID,
 				},
 			},
 		}

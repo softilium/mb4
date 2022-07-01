@@ -186,6 +186,49 @@ var (
 			},
 		},
 	}
+	// ReportsColumns holds the columns for the "reports" table.
+	ReportsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "year", Type: field.TypeInt},
+		{Name: "quarter", Type: field.TypeInt},
+		{Name: "report_date", Type: field.TypeTime},
+		{Name: "pnl_revenue_ytd", Type: field.TypeFloat64},
+		{Name: "pnl_amortization_ytd", Type: field.TypeFloat64},
+		{Name: "pnl_operation_income_ytd", Type: field.TypeFloat64},
+		{Name: "pnl_interest_income_ytd", Type: field.TypeFloat64},
+		{Name: "pnl_interest_expenses_ytd", Type: field.TypeFloat64},
+		{Name: "pnl_income_tax_ytd", Type: field.TypeFloat64},
+		{Name: "pnl_net_income_ytd", Type: field.TypeFloat64},
+		{Name: "cf_cash_sld", Type: field.TypeFloat64},
+		{Name: "cf_non_current_liabilities_sld", Type: field.TypeFloat64},
+		{Name: "cf_current_liabilites_sld", Type: field.TypeFloat64},
+		{Name: "cf_non_controlled_sld", Type: field.TypeFloat64},
+		{Name: "cf_equity_sld", Type: field.TypeFloat64},
+		{Name: "cf_total_sld", Type: field.TypeFloat64},
+		{Name: "url", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "emitent_reports", Type: field.TypeString, Size: 20},
+	}
+	// ReportsTable holds the schema information for the "reports" table.
+	ReportsTable = &schema.Table{
+		Name:       "reports",
+		Columns:    ReportsColumns,
+		PrimaryKey: []*schema.Column{ReportsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "reports_emitents_Reports",
+				Columns:    []*schema.Column{ReportsColumns[18]},
+				RefColumns: []*schema.Column{EmitentsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "report_quarter_emitent_reports",
+				Unique:  true,
+				Columns: []*schema.Column{ReportsColumns[2], ReportsColumns[18]},
+			},
+		},
+	}
 	// TickersColumns holds the columns for the "tickers" table.
 	TickersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true, Size: 20},
@@ -231,6 +274,7 @@ var (
 		InvestAccountCashflowsTable,
 		InvestAccountValuationsTable,
 		QuotesTable,
+		ReportsTable,
 		TickersTable,
 		UsersTable,
 	}
@@ -244,5 +288,6 @@ func init() {
 	InvestAccountCashflowsTable.ForeignKeys[0].RefTable = InvestAccountsTable
 	InvestAccountValuationsTable.ForeignKeys[0].RefTable = InvestAccountsTable
 	QuotesTable.ForeignKeys[0].RefTable = TickersTable
+	ReportsTable.ForeignKeys[0].RefTable = EmitentsTable
 	TickersTable.ForeignKeys[0].RefTable = EmitentsTable
 }

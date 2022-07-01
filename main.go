@@ -11,6 +11,7 @@ import (
 	gh "github.com/gorilla/handlers"
 	"github.com/softilium/mb4/api"
 	"github.com/softilium/mb4/config"
+	"github.com/softilium/mb4/cube"
 	"github.com/softilium/mb4/pages"
 )
 
@@ -79,6 +80,16 @@ func main() {
 	quit := make(chan os.Signal, 1)
 
 	signal.Notify(quit, os.Interrupt)
+
+	log.Println("Loading market cube...")
+	clRoutine := func() {
+		err := cube.Market.LoadCube()
+		if err != nil {
+			log.Fatalf("Could not load market cube: %v\n", err)
+		}
+		log.Println("Market cube loaded.")
+	}
+	go clRoutine()
 
 	server := initServer(listenAddr)
 	go gracefullShutdown(server, quit, done)

@@ -32,6 +32,7 @@ type hooks struct {
 	InvestAccountCashflow  []ent.Hook
 	InvestAccountValuation []ent.Hook
 	Quote                  []ent.Hook
+	Report                 []ent.Hook
 	Ticker                 []ent.Hook
 	User                   []ent.Hook
 }

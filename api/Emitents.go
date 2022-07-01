@@ -69,12 +69,43 @@ func Emitents(w http.ResponseWriter, r *http.Request) {
 
 		//deleteOne(buf.ID, w)
 
-		newdata, err := db.DB.Emitent.Create().
+		tx, err := db.DB.Tx(context.Background())
+		handleErr(err, w)
+		defer tx.Rollback()
+
+		newdata, err := tx.Emitent.Create().
 			SetID(buf.ID).
 			SetDescr(buf.Descr).
 			SetIndustryID(buf.Edges.Industry.ID).
 			Save(context.Background())
 		handleErr(err, w)
+
+		for _, v := range buf.Edges.Reports {
+			v.Edges.Emitent.ID = newdata.ID
+			_, err := tx.Report.Create().
+				SetEmitentID(newdata.ID).
+				SetYear(v.Year).
+				SetQuarter(v.Quarter).
+				SetReportDate(v.ReportDate).
+				SetPnlRevenueYtd(v.PnlRevenueYtd).
+				SetPnlAmortizationYtd(v.PnlAmortizationYtd).
+				SetPnlOperationIncomeYtd(v.PnlOperationIncomeYtd).
+				SetPnlInterestIncomeYtd(v.PnlInterestIncomeYtd).
+				SetPnlInterestExpensesYtd(v.PnlInterestExpensesYtd).
+				SetPnlIncomeTaxYtd(v.PnlIncomeTaxYtd).
+				SetPnlNetIncomeYtd(v.PnlNetIncomeYtd).
+				SetCfCashSld(v.CfCashSld).
+				SetCfNonCurrentLiabilitiesSld(v.CfNonCurrentLiabilitiesSld).
+				SetCfCurrentLiabilitesSld(v.CfCurrentLiabilitesSld).
+				SetCfNonControlledSld(v.CfNonControlledSld).
+				SetCfEquitySld(v.CfEquitySld).
+				SetCfTotalSld(v.CfTotalSld).
+				Save(context.Background())
+			handleErr(err, w)
+
+		}
+
+		tx.Commit()
 
 		w.Write([]byte(newdata.ID.String()))
 		return

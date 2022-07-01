@@ -266,6 +266,34 @@ func HasTickersWith(preds ...predicate.Ticker) predicate.Emitent {
 	})
 }
 
+// HasReports applies the HasEdge predicate on the "Reports" edge.
+func HasReports() predicate.Emitent {
+	return predicate.Emitent(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ReportsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ReportsTable, ReportsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasReportsWith applies the HasEdge predicate on the "Reports" edge with a given conditions (other predicates).
+func HasReportsWith(preds ...predicate.Report) predicate.Emitent {
+	return predicate.Emitent(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ReportsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ReportsTable, ReportsColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Emitent) predicate.Emitent {
 	return predicate.Emitent(func(s *sql.Selector) {

@@ -18,6 +18,7 @@ import (
 	"github.com/softilium/mb4/ent/investaccountcashflow"
 	"github.com/softilium/mb4/ent/investaccountvaluation"
 	"github.com/softilium/mb4/ent/quote"
+	"github.com/softilium/mb4/ent/report"
 	"github.com/softilium/mb4/ent/ticker"
 	"github.com/softilium/mb4/ent/user"
 
@@ -47,6 +48,8 @@ type Client struct {
 	InvestAccountValuation *InvestAccountValuationClient
 	// Quote is the client for interacting with the Quote builders.
 	Quote *QuoteClient
+	// Report is the client for interacting with the Report builders.
+	Report *ReportClient
 	// Ticker is the client for interacting with the Ticker builders.
 	Ticker *TickerClient
 	// User is the client for interacting with the User builders.
@@ -72,6 +75,7 @@ func (c *Client) init() {
 	c.InvestAccountCashflow = NewInvestAccountCashflowClient(c.config)
 	c.InvestAccountValuation = NewInvestAccountValuationClient(c.config)
 	c.Quote = NewQuoteClient(c.config)
+	c.Report = NewReportClient(c.config)
 	c.Ticker = NewTickerClient(c.config)
 	c.User = NewUserClient(c.config)
 }
@@ -115,6 +119,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		InvestAccountCashflow:  NewInvestAccountCashflowClient(cfg),
 		InvestAccountValuation: NewInvestAccountValuationClient(cfg),
 		Quote:                  NewQuoteClient(cfg),
+		Report:                 NewReportClient(cfg),
 		Ticker:                 NewTickerClient(cfg),
 		User:                   NewUserClient(cfg),
 	}, nil
@@ -144,6 +149,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		InvestAccountCashflow:  NewInvestAccountCashflowClient(cfg),
 		InvestAccountValuation: NewInvestAccountValuationClient(cfg),
 		Quote:                  NewQuoteClient(cfg),
+		Report:                 NewReportClient(cfg),
 		Ticker:                 NewTickerClient(cfg),
 		User:                   NewUserClient(cfg),
 	}, nil
@@ -183,6 +189,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.InvestAccountCashflow.Use(hooks...)
 	c.InvestAccountValuation.Use(hooks...)
 	c.Quote.Use(hooks...)
+	c.Report.Use(hooks...)
 	c.Ticker.Use(hooks...)
 	c.User.Use(hooks...)
 }
@@ -509,6 +516,22 @@ func (c *EmitentClient) QueryTickers(e *Emitent) *TickerQuery {
 			sqlgraph.From(emitent.Table, emitent.FieldID, id),
 			sqlgraph.To(ticker.Table, ticker.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, emitent.TickersTable, emitent.TickersColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryReports queries the Reports edge of a Emitent.
+func (c *EmitentClient) QueryReports(e *Emitent) *ReportQuery {
+	query := &ReportQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(emitent.Table, emitent.FieldID, id),
+			sqlgraph.To(report.Table, report.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, emitent.ReportsTable, emitent.ReportsColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -1081,6 +1104,112 @@ func (c *QuoteClient) QueryTicker(q *Quote) *TickerQuery {
 // Hooks returns the client hooks.
 func (c *QuoteClient) Hooks() []Hook {
 	return c.hooks.Quote
+}
+
+// ReportClient is a client for the Report schema.
+type ReportClient struct {
+	config
+}
+
+// NewReportClient returns a client for the Report from the given config.
+func NewReportClient(c config) *ReportClient {
+	return &ReportClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `report.Hooks(f(g(h())))`.
+func (c *ReportClient) Use(hooks ...Hook) {
+	c.hooks.Report = append(c.hooks.Report, hooks...)
+}
+
+// Create returns a create builder for Report.
+func (c *ReportClient) Create() *ReportCreate {
+	mutation := newReportMutation(c.config, OpCreate)
+	return &ReportCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Report entities.
+func (c *ReportClient) CreateBulk(builders ...*ReportCreate) *ReportCreateBulk {
+	return &ReportCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Report.
+func (c *ReportClient) Update() *ReportUpdate {
+	mutation := newReportMutation(c.config, OpUpdate)
+	return &ReportUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ReportClient) UpdateOne(r *Report) *ReportUpdateOne {
+	mutation := newReportMutation(c.config, OpUpdateOne, withReport(r))
+	return &ReportUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ReportClient) UpdateOneID(id xid.ID) *ReportUpdateOne {
+	mutation := newReportMutation(c.config, OpUpdateOne, withReportID(id))
+	return &ReportUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Report.
+func (c *ReportClient) Delete() *ReportDelete {
+	mutation := newReportMutation(c.config, OpDelete)
+	return &ReportDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *ReportClient) DeleteOne(r *Report) *ReportDeleteOne {
+	return c.DeleteOneID(r.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *ReportClient) DeleteOneID(id xid.ID) *ReportDeleteOne {
+	builder := c.Delete().Where(report.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ReportDeleteOne{builder}
+}
+
+// Query returns a query builder for Report.
+func (c *ReportClient) Query() *ReportQuery {
+	return &ReportQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Report entity by its id.
+func (c *ReportClient) Get(ctx context.Context, id xid.ID) (*Report, error) {
+	return c.Query().Where(report.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ReportClient) GetX(ctx context.Context, id xid.ID) *Report {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryEmitent queries the Emitent edge of a Report.
+func (c *ReportClient) QueryEmitent(r *Report) *EmitentQuery {
+	query := &EmitentQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(report.Table, report.FieldID, id),
+			sqlgraph.To(emitent.Table, emitent.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, report.EmitentTable, report.EmitentColumn),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ReportClient) Hooks() []Hook {
+	return c.hooks.Report
 }
 
 // TickerClient is a client for the Ticker schema.

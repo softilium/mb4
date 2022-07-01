@@ -16,6 +16,7 @@ import (
 	"github.com/softilium/mb4/ent/investaccountcashflow"
 	"github.com/softilium/mb4/ent/investaccountvaluation"
 	"github.com/softilium/mb4/ent/quote"
+	"github.com/softilium/mb4/ent/report"
 	"github.com/softilium/mb4/ent/ticker"
 	"github.com/softilium/mb4/ent/user"
 )
@@ -46,6 +47,7 @@ func columnChecker(table string) func(string) error {
 		investaccountcashflow.Table:  investaccountcashflow.ValidColumn,
 		investaccountvaluation.Table: investaccountvaluation.ValidColumn,
 		quote.Table:                  quote.ValidColumn,
+		report.Table:                 report.ValidColumn,
 		ticker.Table:                 ticker.ValidColumn,
 		user.Table:                   user.ValidColumn,
 	}

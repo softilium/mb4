@@ -17,6 +17,8 @@ const (
 	EdgeIndustry = "Industry"
 	// EdgeTickers holds the string denoting the tickers edge name in mutations.
 	EdgeTickers = "Tickers"
+	// EdgeReports holds the string denoting the reports edge name in mutations.
+	EdgeReports = "Reports"
 	// Table holds the table name of the emitent in the database.
 	Table = "emitents"
 	// IndustryTable is the table that holds the Industry relation/edge.
@@ -33,6 +35,13 @@ const (
 	TickersInverseTable = "tickers"
 	// TickersColumn is the table column denoting the Tickers relation/edge.
 	TickersColumn = "emitent_tickers"
+	// ReportsTable is the table that holds the Reports relation/edge.
+	ReportsTable = "reports"
+	// ReportsInverseTable is the table name for the Report entity.
+	// It exists in this package in order to avoid circular dependency with the "report" package.
+	ReportsInverseTable = "reports"
+	// ReportsColumn is the table column denoting the Reports relation/edge.
+	ReportsColumn = "emitent_reports"
 )
 
 // Columns holds all SQL columns for emitent fields.

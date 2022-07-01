@@ -30,6 +30,9 @@ type InvestAccountValuation func(*sql.Selector)
 // Quote is the predicate function for quote builders.
 type Quote func(*sql.Selector)
 
+// Report is the predicate function for report builders.
+type Report func(*sql.Selector)
+
 // Ticker is the predicate function for ticker builders.
 type Ticker func(*sql.Selector)
 

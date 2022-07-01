@@ -28,6 +28,8 @@ type Tx struct {
 	InvestAccountValuation *InvestAccountValuationClient
 	// Quote is the client for interacting with the Quote builders.
 	Quote *QuoteClient
+	// Report is the client for interacting with the Report builders.
+	Report *ReportClient
 	// Ticker is the client for interacting with the Ticker builders.
 	Ticker *TickerClient
 	// User is the client for interacting with the User builders.
@@ -175,6 +177,7 @@ func (tx *Tx) init() {
 	tx.InvestAccountCashflow = NewInvestAccountCashflowClient(tx.config)
 	tx.InvestAccountValuation = NewInvestAccountValuationClient(tx.config)
 	tx.Quote = NewQuoteClient(tx.config)
+	tx.Report = NewReportClient(tx.config)
 	tx.Ticker = NewTickerClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }

@@ -31,9 +31,11 @@ type EmitentEdges struct {
 	Industry *Industry `json:"Industry,omitempty"`
 	// Tickers holds the value of the Tickers edge.
 	Tickers []*Ticker `json:"Tickers,omitempty"`
+	// Reports holds the value of the Reports edge.
+	Reports []*Report `json:"Reports,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // IndustryOrErr returns the Industry value or an error if the edge
@@ -57,6 +59,15 @@ func (e EmitentEdges) TickersOrErr() ([]*Ticker, error) {
 		return e.Tickers, nil
 	}
 	return nil, &NotLoadedError{edge: "Tickers"}
+}
+
+// ReportsOrErr returns the Reports value or an error if the edge
+// was not loaded in eager-loading.
+func (e EmitentEdges) ReportsOrErr() ([]*Report, error) {
+	if e.loadedTypes[2] {
+		return e.Reports, nil
+	}
+	return nil, &NotLoadedError{edge: "Reports"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -117,6 +128,11 @@ func (e *Emitent) QueryIndustry() *IndustryQuery {
 // QueryTickers queries the "Tickers" edge of the Emitent entity.
 func (e *Emitent) QueryTickers() *TickerQuery {
 	return (&EmitentClient{config: e.config}).QueryTickers(e)
+}
+
+// QueryReports queries the "Reports" edge of the Emitent entity.
+func (e *Emitent) QueryReports() *ReportQuery {
+	return (&EmitentClient{config: e.config}).QueryReports(e)
 }
 
 // Update returns a builder for updating this Emitent.

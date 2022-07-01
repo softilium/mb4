@@ -10,9 +10,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/emitent"
 	"github.com/softilium/mb4/ent/industry"
 	"github.com/softilium/mb4/ent/predicate"
+	"github.com/softilium/mb4/ent/report"
 	"github.com/softilium/mb4/ent/ticker"
 )
 
@@ -61,6 +63,21 @@ func (eu *EmitentUpdate) AddTickers(t ...*Ticker) *EmitentUpdate {
 	return eu.AddTickerIDs(ids...)
 }
 
+// AddReportIDs adds the "Reports" edge to the Report entity by IDs.
+func (eu *EmitentUpdate) AddReportIDs(ids ...xid.ID) *EmitentUpdate {
+	eu.mutation.AddReportIDs(ids...)
+	return eu
+}
+
+// AddReports adds the "Reports" edges to the Report entity.
+func (eu *EmitentUpdate) AddReports(r ...*Report) *EmitentUpdate {
+	ids := make([]xid.ID, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return eu.AddReportIDs(ids...)
+}
+
 // Mutation returns the EmitentMutation object of the builder.
 func (eu *EmitentUpdate) Mutation() *EmitentMutation {
 	return eu.mutation
@@ -91,6 +108,27 @@ func (eu *EmitentUpdate) RemoveTickers(t ...*Ticker) *EmitentUpdate {
 		ids[i] = t[i].ID
 	}
 	return eu.RemoveTickerIDs(ids...)
+}
+
+// ClearReports clears all "Reports" edges to the Report entity.
+func (eu *EmitentUpdate) ClearReports() *EmitentUpdate {
+	eu.mutation.ClearReports()
+	return eu
+}
+
+// RemoveReportIDs removes the "Reports" edge to Report entities by IDs.
+func (eu *EmitentUpdate) RemoveReportIDs(ids ...xid.ID) *EmitentUpdate {
+	eu.mutation.RemoveReportIDs(ids...)
+	return eu
+}
+
+// RemoveReports removes "Reports" edges to Report entities.
+func (eu *EmitentUpdate) RemoveReports(r ...*Report) *EmitentUpdate {
+	ids := make([]xid.ID, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return eu.RemoveReportIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -280,6 +318,60 @@ func (eu *EmitentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if eu.mutation.ReportsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   emitent.ReportsTable,
+			Columns: []string{emitent.ReportsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: report.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.RemovedReportsIDs(); len(nodes) > 0 && !eu.mutation.ReportsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   emitent.ReportsTable,
+			Columns: []string{emitent.ReportsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: report.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.ReportsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   emitent.ReportsTable,
+			Columns: []string{emitent.ReportsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: report.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, eu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{emitent.Label}
@@ -331,6 +423,21 @@ func (euo *EmitentUpdateOne) AddTickers(t ...*Ticker) *EmitentUpdateOne {
 	return euo.AddTickerIDs(ids...)
 }
 
+// AddReportIDs adds the "Reports" edge to the Report entity by IDs.
+func (euo *EmitentUpdateOne) AddReportIDs(ids ...xid.ID) *EmitentUpdateOne {
+	euo.mutation.AddReportIDs(ids...)
+	return euo
+}
+
+// AddReports adds the "Reports" edges to the Report entity.
+func (euo *EmitentUpdateOne) AddReports(r ...*Report) *EmitentUpdateOne {
+	ids := make([]xid.ID, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return euo.AddReportIDs(ids...)
+}
+
 // Mutation returns the EmitentMutation object of the builder.
 func (euo *EmitentUpdateOne) Mutation() *EmitentMutation {
 	return euo.mutation
@@ -361,6 +468,27 @@ func (euo *EmitentUpdateOne) RemoveTickers(t ...*Ticker) *EmitentUpdateOne {
 		ids[i] = t[i].ID
 	}
 	return euo.RemoveTickerIDs(ids...)
+}
+
+// ClearReports clears all "Reports" edges to the Report entity.
+func (euo *EmitentUpdateOne) ClearReports() *EmitentUpdateOne {
+	euo.mutation.ClearReports()
+	return euo
+}
+
+// RemoveReportIDs removes the "Reports" edge to Report entities by IDs.
+func (euo *EmitentUpdateOne) RemoveReportIDs(ids ...xid.ID) *EmitentUpdateOne {
+	euo.mutation.RemoveReportIDs(ids...)
+	return euo
+}
+
+// RemoveReports removes "Reports" edges to Report entities.
+func (euo *EmitentUpdateOne) RemoveReports(r ...*Report) *EmitentUpdateOne {
+	ids := make([]xid.ID, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return euo.RemoveReportIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -566,6 +694,60 @@ func (euo *EmitentUpdateOne) sqlSave(ctx context.Context) (_node *Emitent, err e
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeString,
 					Column: ticker.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.ReportsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   emitent.ReportsTable,
+			Columns: []string{emitent.ReportsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: report.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.RemovedReportsIDs(); len(nodes) > 0 && !euo.mutation.ReportsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   emitent.ReportsTable,
+			Columns: []string{emitent.ReportsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: report.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.ReportsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   emitent.ReportsTable,
+			Columns: []string{emitent.ReportsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: report.FieldID,
 				},
 			},
 		}

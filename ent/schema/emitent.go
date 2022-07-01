@@ -26,5 +26,6 @@ func (Emitent) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("Industry", Industry.Type).Ref("Emitents").Required().Unique(),
 		edge.To("Tickers", Ticker.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
+		edge.To("Reports", Report.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
 	}
 }
