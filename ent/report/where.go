@@ -94,17 +94,17 @@ func IDLTE(id xid.ID) predicate.Report {
 	})
 }
 
-// Year applies equality check predicate on the "Year" field. It's identical to YearEQ.
-func Year(v int) predicate.Report {
+// ReportYear applies equality check predicate on the "ReportYear" field. It's identical to ReportYearEQ.
+func ReportYear(v int) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldYear), v))
+		s.Where(sql.EQ(s.C(FieldReportYear), v))
 	})
 }
 
-// Quarter applies equality check predicate on the "Quarter" field. It's identical to QuarterEQ.
-func Quarter(v int) predicate.Report {
+// ReportQuarter applies equality check predicate on the "ReportQuarter" field. It's identical to ReportQuarterEQ.
+func ReportQuarter(v int) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldQuarter), v))
+		s.Where(sql.EQ(s.C(FieldReportQuarter), v))
 	})
 }
 
@@ -129,10 +129,10 @@ func PnlAmortizationYtd(v float64) predicate.Report {
 	})
 }
 
-// PnlOperationIncomeYtd applies equality check predicate on the "PnlOperationIncomeYtd" field. It's identical to PnlOperationIncomeYtdEQ.
-func PnlOperationIncomeYtd(v float64) predicate.Report {
+// PnlOperatingIncomeYtd applies equality check predicate on the "PnlOperatingIncomeYtd" field. It's identical to PnlOperatingIncomeYtdEQ.
+func PnlOperatingIncomeYtd(v float64) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldPnlOperationIncomeYtd), v))
+		s.Where(sql.EQ(s.C(FieldPnlOperatingIncomeYtd), v))
 	})
 }
 
@@ -185,10 +185,10 @@ func CfCurrentLiabilitesSld(v float64) predicate.Report {
 	})
 }
 
-// CfNonControlledSld applies equality check predicate on the "CfNonControlledSld" field. It's identical to CfNonControlledSldEQ.
-func CfNonControlledSld(v float64) predicate.Report {
+// CfNonControllingSld applies equality check predicate on the "CfNonControllingSld" field. It's identical to CfNonControllingSldEQ.
+func CfNonControllingSld(v float64) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCfNonControlledSld), v))
+		s.Where(sql.EQ(s.C(FieldCfNonControllingSld), v))
 	})
 }
 
@@ -213,22 +213,22 @@ func URL(v string) predicate.Report {
 	})
 }
 
-// YearEQ applies the EQ predicate on the "Year" field.
-func YearEQ(v int) predicate.Report {
+// ReportYearEQ applies the EQ predicate on the "ReportYear" field.
+func ReportYearEQ(v int) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldYear), v))
+		s.Where(sql.EQ(s.C(FieldReportYear), v))
 	})
 }
 
-// YearNEQ applies the NEQ predicate on the "Year" field.
-func YearNEQ(v int) predicate.Report {
+// ReportYearNEQ applies the NEQ predicate on the "ReportYear" field.
+func ReportYearNEQ(v int) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldYear), v))
+		s.Where(sql.NEQ(s.C(FieldReportYear), v))
 	})
 }
 
-// YearIn applies the In predicate on the "Year" field.
-func YearIn(vs ...int) predicate.Report {
+// ReportYearIn applies the In predicate on the "ReportYear" field.
+func ReportYearIn(vs ...int) predicate.Report {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -240,12 +240,12 @@ func YearIn(vs ...int) predicate.Report {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldYear), v...))
+		s.Where(sql.In(s.C(FieldReportYear), v...))
 	})
 }
 
-// YearNotIn applies the NotIn predicate on the "Year" field.
-func YearNotIn(vs ...int) predicate.Report {
+// ReportYearNotIn applies the NotIn predicate on the "ReportYear" field.
+func ReportYearNotIn(vs ...int) predicate.Report {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -257,54 +257,54 @@ func YearNotIn(vs ...int) predicate.Report {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldYear), v...))
+		s.Where(sql.NotIn(s.C(FieldReportYear), v...))
 	})
 }
 
-// YearGT applies the GT predicate on the "Year" field.
-func YearGT(v int) predicate.Report {
+// ReportYearGT applies the GT predicate on the "ReportYear" field.
+func ReportYearGT(v int) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldYear), v))
+		s.Where(sql.GT(s.C(FieldReportYear), v))
 	})
 }
 
-// YearGTE applies the GTE predicate on the "Year" field.
-func YearGTE(v int) predicate.Report {
+// ReportYearGTE applies the GTE predicate on the "ReportYear" field.
+func ReportYearGTE(v int) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldYear), v))
+		s.Where(sql.GTE(s.C(FieldReportYear), v))
 	})
 }
 
-// YearLT applies the LT predicate on the "Year" field.
-func YearLT(v int) predicate.Report {
+// ReportYearLT applies the LT predicate on the "ReportYear" field.
+func ReportYearLT(v int) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldYear), v))
+		s.Where(sql.LT(s.C(FieldReportYear), v))
 	})
 }
 
-// YearLTE applies the LTE predicate on the "Year" field.
-func YearLTE(v int) predicate.Report {
+// ReportYearLTE applies the LTE predicate on the "ReportYear" field.
+func ReportYearLTE(v int) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldYear), v))
+		s.Where(sql.LTE(s.C(FieldReportYear), v))
 	})
 }
 
-// QuarterEQ applies the EQ predicate on the "Quarter" field.
-func QuarterEQ(v int) predicate.Report {
+// ReportQuarterEQ applies the EQ predicate on the "ReportQuarter" field.
+func ReportQuarterEQ(v int) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldQuarter), v))
+		s.Where(sql.EQ(s.C(FieldReportQuarter), v))
 	})
 }
 
-// QuarterNEQ applies the NEQ predicate on the "Quarter" field.
-func QuarterNEQ(v int) predicate.Report {
+// ReportQuarterNEQ applies the NEQ predicate on the "ReportQuarter" field.
+func ReportQuarterNEQ(v int) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldQuarter), v))
+		s.Where(sql.NEQ(s.C(FieldReportQuarter), v))
 	})
 }
 
-// QuarterIn applies the In predicate on the "Quarter" field.
-func QuarterIn(vs ...int) predicate.Report {
+// ReportQuarterIn applies the In predicate on the "ReportQuarter" field.
+func ReportQuarterIn(vs ...int) predicate.Report {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -316,12 +316,12 @@ func QuarterIn(vs ...int) predicate.Report {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldQuarter), v...))
+		s.Where(sql.In(s.C(FieldReportQuarter), v...))
 	})
 }
 
-// QuarterNotIn applies the NotIn predicate on the "Quarter" field.
-func QuarterNotIn(vs ...int) predicate.Report {
+// ReportQuarterNotIn applies the NotIn predicate on the "ReportQuarter" field.
+func ReportQuarterNotIn(vs ...int) predicate.Report {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -333,35 +333,35 @@ func QuarterNotIn(vs ...int) predicate.Report {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldQuarter), v...))
+		s.Where(sql.NotIn(s.C(FieldReportQuarter), v...))
 	})
 }
 
-// QuarterGT applies the GT predicate on the "Quarter" field.
-func QuarterGT(v int) predicate.Report {
+// ReportQuarterGT applies the GT predicate on the "ReportQuarter" field.
+func ReportQuarterGT(v int) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldQuarter), v))
+		s.Where(sql.GT(s.C(FieldReportQuarter), v))
 	})
 }
 
-// QuarterGTE applies the GTE predicate on the "Quarter" field.
-func QuarterGTE(v int) predicate.Report {
+// ReportQuarterGTE applies the GTE predicate on the "ReportQuarter" field.
+func ReportQuarterGTE(v int) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldQuarter), v))
+		s.Where(sql.GTE(s.C(FieldReportQuarter), v))
 	})
 }
 
-// QuarterLT applies the LT predicate on the "Quarter" field.
-func QuarterLT(v int) predicate.Report {
+// ReportQuarterLT applies the LT predicate on the "ReportQuarter" field.
+func ReportQuarterLT(v int) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldQuarter), v))
+		s.Where(sql.LT(s.C(FieldReportQuarter), v))
 	})
 }
 
-// QuarterLTE applies the LTE predicate on the "Quarter" field.
-func QuarterLTE(v int) predicate.Report {
+// ReportQuarterLTE applies the LTE predicate on the "ReportQuarter" field.
+func ReportQuarterLTE(v int) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldQuarter), v))
+		s.Where(sql.LTE(s.C(FieldReportQuarter), v))
 	})
 }
 
@@ -593,22 +593,22 @@ func PnlAmortizationYtdLTE(v float64) predicate.Report {
 	})
 }
 
-// PnlOperationIncomeYtdEQ applies the EQ predicate on the "PnlOperationIncomeYtd" field.
-func PnlOperationIncomeYtdEQ(v float64) predicate.Report {
+// PnlOperatingIncomeYtdEQ applies the EQ predicate on the "PnlOperatingIncomeYtd" field.
+func PnlOperatingIncomeYtdEQ(v float64) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldPnlOperationIncomeYtd), v))
+		s.Where(sql.EQ(s.C(FieldPnlOperatingIncomeYtd), v))
 	})
 }
 
-// PnlOperationIncomeYtdNEQ applies the NEQ predicate on the "PnlOperationIncomeYtd" field.
-func PnlOperationIncomeYtdNEQ(v float64) predicate.Report {
+// PnlOperatingIncomeYtdNEQ applies the NEQ predicate on the "PnlOperatingIncomeYtd" field.
+func PnlOperatingIncomeYtdNEQ(v float64) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldPnlOperationIncomeYtd), v))
+		s.Where(sql.NEQ(s.C(FieldPnlOperatingIncomeYtd), v))
 	})
 }
 
-// PnlOperationIncomeYtdIn applies the In predicate on the "PnlOperationIncomeYtd" field.
-func PnlOperationIncomeYtdIn(vs ...float64) predicate.Report {
+// PnlOperatingIncomeYtdIn applies the In predicate on the "PnlOperatingIncomeYtd" field.
+func PnlOperatingIncomeYtdIn(vs ...float64) predicate.Report {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -620,12 +620,12 @@ func PnlOperationIncomeYtdIn(vs ...float64) predicate.Report {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldPnlOperationIncomeYtd), v...))
+		s.Where(sql.In(s.C(FieldPnlOperatingIncomeYtd), v...))
 	})
 }
 
-// PnlOperationIncomeYtdNotIn applies the NotIn predicate on the "PnlOperationIncomeYtd" field.
-func PnlOperationIncomeYtdNotIn(vs ...float64) predicate.Report {
+// PnlOperatingIncomeYtdNotIn applies the NotIn predicate on the "PnlOperatingIncomeYtd" field.
+func PnlOperatingIncomeYtdNotIn(vs ...float64) predicate.Report {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -637,35 +637,35 @@ func PnlOperationIncomeYtdNotIn(vs ...float64) predicate.Report {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldPnlOperationIncomeYtd), v...))
+		s.Where(sql.NotIn(s.C(FieldPnlOperatingIncomeYtd), v...))
 	})
 }
 
-// PnlOperationIncomeYtdGT applies the GT predicate on the "PnlOperationIncomeYtd" field.
-func PnlOperationIncomeYtdGT(v float64) predicate.Report {
+// PnlOperatingIncomeYtdGT applies the GT predicate on the "PnlOperatingIncomeYtd" field.
+func PnlOperatingIncomeYtdGT(v float64) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldPnlOperationIncomeYtd), v))
+		s.Where(sql.GT(s.C(FieldPnlOperatingIncomeYtd), v))
 	})
 }
 
-// PnlOperationIncomeYtdGTE applies the GTE predicate on the "PnlOperationIncomeYtd" field.
-func PnlOperationIncomeYtdGTE(v float64) predicate.Report {
+// PnlOperatingIncomeYtdGTE applies the GTE predicate on the "PnlOperatingIncomeYtd" field.
+func PnlOperatingIncomeYtdGTE(v float64) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldPnlOperationIncomeYtd), v))
+		s.Where(sql.GTE(s.C(FieldPnlOperatingIncomeYtd), v))
 	})
 }
 
-// PnlOperationIncomeYtdLT applies the LT predicate on the "PnlOperationIncomeYtd" field.
-func PnlOperationIncomeYtdLT(v float64) predicate.Report {
+// PnlOperatingIncomeYtdLT applies the LT predicate on the "PnlOperatingIncomeYtd" field.
+func PnlOperatingIncomeYtdLT(v float64) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldPnlOperationIncomeYtd), v))
+		s.Where(sql.LT(s.C(FieldPnlOperatingIncomeYtd), v))
 	})
 }
 
-// PnlOperationIncomeYtdLTE applies the LTE predicate on the "PnlOperationIncomeYtd" field.
-func PnlOperationIncomeYtdLTE(v float64) predicate.Report {
+// PnlOperatingIncomeYtdLTE applies the LTE predicate on the "PnlOperatingIncomeYtd" field.
+func PnlOperatingIncomeYtdLTE(v float64) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldPnlOperationIncomeYtd), v))
+		s.Where(sql.LTE(s.C(FieldPnlOperatingIncomeYtd), v))
 	})
 }
 
@@ -1201,22 +1201,22 @@ func CfCurrentLiabilitesSldLTE(v float64) predicate.Report {
 	})
 }
 
-// CfNonControlledSldEQ applies the EQ predicate on the "CfNonControlledSld" field.
-func CfNonControlledSldEQ(v float64) predicate.Report {
+// CfNonControllingSldEQ applies the EQ predicate on the "CfNonControllingSld" field.
+func CfNonControllingSldEQ(v float64) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCfNonControlledSld), v))
+		s.Where(sql.EQ(s.C(FieldCfNonControllingSld), v))
 	})
 }
 
-// CfNonControlledSldNEQ applies the NEQ predicate on the "CfNonControlledSld" field.
-func CfNonControlledSldNEQ(v float64) predicate.Report {
+// CfNonControllingSldNEQ applies the NEQ predicate on the "CfNonControllingSld" field.
+func CfNonControllingSldNEQ(v float64) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldCfNonControlledSld), v))
+		s.Where(sql.NEQ(s.C(FieldCfNonControllingSld), v))
 	})
 }
 
-// CfNonControlledSldIn applies the In predicate on the "CfNonControlledSld" field.
-func CfNonControlledSldIn(vs ...float64) predicate.Report {
+// CfNonControllingSldIn applies the In predicate on the "CfNonControllingSld" field.
+func CfNonControllingSldIn(vs ...float64) predicate.Report {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -1228,12 +1228,12 @@ func CfNonControlledSldIn(vs ...float64) predicate.Report {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldCfNonControlledSld), v...))
+		s.Where(sql.In(s.C(FieldCfNonControllingSld), v...))
 	})
 }
 
-// CfNonControlledSldNotIn applies the NotIn predicate on the "CfNonControlledSld" field.
-func CfNonControlledSldNotIn(vs ...float64) predicate.Report {
+// CfNonControllingSldNotIn applies the NotIn predicate on the "CfNonControllingSld" field.
+func CfNonControllingSldNotIn(vs ...float64) predicate.Report {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -1245,35 +1245,35 @@ func CfNonControlledSldNotIn(vs ...float64) predicate.Report {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldCfNonControlledSld), v...))
+		s.Where(sql.NotIn(s.C(FieldCfNonControllingSld), v...))
 	})
 }
 
-// CfNonControlledSldGT applies the GT predicate on the "CfNonControlledSld" field.
-func CfNonControlledSldGT(v float64) predicate.Report {
+// CfNonControllingSldGT applies the GT predicate on the "CfNonControllingSld" field.
+func CfNonControllingSldGT(v float64) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldCfNonControlledSld), v))
+		s.Where(sql.GT(s.C(FieldCfNonControllingSld), v))
 	})
 }
 
-// CfNonControlledSldGTE applies the GTE predicate on the "CfNonControlledSld" field.
-func CfNonControlledSldGTE(v float64) predicate.Report {
+// CfNonControllingSldGTE applies the GTE predicate on the "CfNonControllingSld" field.
+func CfNonControllingSldGTE(v float64) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldCfNonControlledSld), v))
+		s.Where(sql.GTE(s.C(FieldCfNonControllingSld), v))
 	})
 }
 
-// CfNonControlledSldLT applies the LT predicate on the "CfNonControlledSld" field.
-func CfNonControlledSldLT(v float64) predicate.Report {
+// CfNonControllingSldLT applies the LT predicate on the "CfNonControllingSld" field.
+func CfNonControllingSldLT(v float64) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldCfNonControlledSld), v))
+		s.Where(sql.LT(s.C(FieldCfNonControllingSld), v))
 	})
 }
 
-// CfNonControlledSldLTE applies the LTE predicate on the "CfNonControlledSld" field.
-func CfNonControlledSldLTE(v float64) predicate.Report {
+// CfNonControllingSldLTE applies the LTE predicate on the "CfNonControllingSld" field.
+func CfNonControllingSldLTE(v float64) predicate.Report {
 	return predicate.Report(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldCfNonControlledSld), v))
+		s.Where(sql.LTE(s.C(FieldCfNonControllingSld), v))
 	})
 }
 

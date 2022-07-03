@@ -81,15 +81,14 @@ func Emitents(w http.ResponseWriter, r *http.Request) {
 		handleErr(err, w)
 
 		for _, v := range buf.Edges.Reports {
-			v.Edges.Emitent.ID = newdata.ID
 			_, err := tx.Report.Create().
 				SetEmitentID(newdata.ID).
-				SetYear(v.Year).
-				SetQuarter(v.Quarter).
+				SetReportYear(v.ReportYear).
+				SetReportQuarter(v.ReportQuarter).
 				SetReportDate(v.ReportDate).
 				SetPnlRevenueYtd(v.PnlRevenueYtd).
 				SetPnlAmortizationYtd(v.PnlAmortizationYtd).
-				SetPnlOperationIncomeYtd(v.PnlOperationIncomeYtd).
+				SetPnlOperatingIncomeYtd(v.PnlOperatingIncomeYtd).
 				SetPnlInterestIncomeYtd(v.PnlInterestIncomeYtd).
 				SetPnlInterestExpensesYtd(v.PnlInterestExpensesYtd).
 				SetPnlIncomeTaxYtd(v.PnlIncomeTaxYtd).
@@ -97,7 +96,7 @@ func Emitents(w http.ResponseWriter, r *http.Request) {
 				SetCfCashSld(v.CfCashSld).
 				SetCfNonCurrentLiabilitiesSld(v.CfNonCurrentLiabilitiesSld).
 				SetCfCurrentLiabilitesSld(v.CfCurrentLiabilitesSld).
-				SetCfNonControlledSld(v.CfNonControlledSld).
+				SetCfNonControllingSld(v.CfNonControllingSld).
 				SetCfEquitySld(v.CfEquitySld).
 				SetCfTotalSld(v.CfTotalSld).
 				Save(context.Background())

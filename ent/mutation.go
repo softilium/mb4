@@ -4855,17 +4855,17 @@ type ReportMutation struct {
 	op                             Op
 	typ                            string
 	id                             *xid.ID
-	_Year                          *int
-	add_Year                       *int
-	_Quarter                       *int
-	add_Quarter                    *int
+	_ReportYear                    *int
+	add_ReportYear                 *int
+	_ReportQuarter                 *int
+	add_ReportQuarter              *int
 	_ReportDate                    *time.Time
 	_PnlRevenueYtd                 *float64
 	add_PnlRevenueYtd              *float64
 	_PnlAmortizationYtd            *float64
 	add_PnlAmortizationYtd         *float64
-	_PnlOperationIncomeYtd         *float64
-	add_PnlOperationIncomeYtd      *float64
+	_PnlOperatingIncomeYtd         *float64
+	add_PnlOperatingIncomeYtd      *float64
 	_PnlInterestIncomeYtd          *float64
 	add_PnlInterestIncomeYtd       *float64
 	_PnlInterestExpensesYtd        *float64
@@ -4880,8 +4880,8 @@ type ReportMutation struct {
 	add_CfNonCurrentLiabilitiesSld *float64
 	_CfCurrentLiabilitesSld        *float64
 	add_CfCurrentLiabilitesSld     *float64
-	_CfNonControlledSld            *float64
-	add_CfNonControlledSld         *float64
+	_CfNonControllingSld           *float64
+	add_CfNonControllingSld        *float64
 	_CfEquitySld                   *float64
 	add_CfEquitySld                *float64
 	_CfTotalSld                    *float64
@@ -4999,116 +4999,116 @@ func (m *ReportMutation) IDs(ctx context.Context) ([]xid.ID, error) {
 	}
 }
 
-// SetYear sets the "Year" field.
-func (m *ReportMutation) SetYear(i int) {
-	m._Year = &i
-	m.add_Year = nil
+// SetReportYear sets the "ReportYear" field.
+func (m *ReportMutation) SetReportYear(i int) {
+	m._ReportYear = &i
+	m.add_ReportYear = nil
 }
 
-// Year returns the value of the "Year" field in the mutation.
-func (m *ReportMutation) Year() (r int, exists bool) {
-	v := m._Year
+// ReportYear returns the value of the "ReportYear" field in the mutation.
+func (m *ReportMutation) ReportYear() (r int, exists bool) {
+	v := m._ReportYear
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldYear returns the old "Year" field's value of the Report entity.
+// OldReportYear returns the old "ReportYear" field's value of the Report entity.
 // If the Report object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ReportMutation) OldYear(ctx context.Context) (v int, err error) {
+func (m *ReportMutation) OldReportYear(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldYear is only allowed on UpdateOne operations")
+		return v, errors.New("OldReportYear is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldYear requires an ID field in the mutation")
+		return v, errors.New("OldReportYear requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldYear: %w", err)
+		return v, fmt.Errorf("querying old value for OldReportYear: %w", err)
 	}
-	return oldValue.Year, nil
+	return oldValue.ReportYear, nil
 }
 
-// AddYear adds i to the "Year" field.
-func (m *ReportMutation) AddYear(i int) {
-	if m.add_Year != nil {
-		*m.add_Year += i
+// AddReportYear adds i to the "ReportYear" field.
+func (m *ReportMutation) AddReportYear(i int) {
+	if m.add_ReportYear != nil {
+		*m.add_ReportYear += i
 	} else {
-		m.add_Year = &i
+		m.add_ReportYear = &i
 	}
 }
 
-// AddedYear returns the value that was added to the "Year" field in this mutation.
-func (m *ReportMutation) AddedYear() (r int, exists bool) {
-	v := m.add_Year
+// AddedReportYear returns the value that was added to the "ReportYear" field in this mutation.
+func (m *ReportMutation) AddedReportYear() (r int, exists bool) {
+	v := m.add_ReportYear
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetYear resets all changes to the "Year" field.
-func (m *ReportMutation) ResetYear() {
-	m._Year = nil
-	m.add_Year = nil
+// ResetReportYear resets all changes to the "ReportYear" field.
+func (m *ReportMutation) ResetReportYear() {
+	m._ReportYear = nil
+	m.add_ReportYear = nil
 }
 
-// SetQuarter sets the "Quarter" field.
-func (m *ReportMutation) SetQuarter(i int) {
-	m._Quarter = &i
-	m.add_Quarter = nil
+// SetReportQuarter sets the "ReportQuarter" field.
+func (m *ReportMutation) SetReportQuarter(i int) {
+	m._ReportQuarter = &i
+	m.add_ReportQuarter = nil
 }
 
-// Quarter returns the value of the "Quarter" field in the mutation.
-func (m *ReportMutation) Quarter() (r int, exists bool) {
-	v := m._Quarter
+// ReportQuarter returns the value of the "ReportQuarter" field in the mutation.
+func (m *ReportMutation) ReportQuarter() (r int, exists bool) {
+	v := m._ReportQuarter
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldQuarter returns the old "Quarter" field's value of the Report entity.
+// OldReportQuarter returns the old "ReportQuarter" field's value of the Report entity.
 // If the Report object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ReportMutation) OldQuarter(ctx context.Context) (v int, err error) {
+func (m *ReportMutation) OldReportQuarter(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldQuarter is only allowed on UpdateOne operations")
+		return v, errors.New("OldReportQuarter is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldQuarter requires an ID field in the mutation")
+		return v, errors.New("OldReportQuarter requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldQuarter: %w", err)
+		return v, fmt.Errorf("querying old value for OldReportQuarter: %w", err)
 	}
-	return oldValue.Quarter, nil
+	return oldValue.ReportQuarter, nil
 }
 
-// AddQuarter adds i to the "Quarter" field.
-func (m *ReportMutation) AddQuarter(i int) {
-	if m.add_Quarter != nil {
-		*m.add_Quarter += i
+// AddReportQuarter adds i to the "ReportQuarter" field.
+func (m *ReportMutation) AddReportQuarter(i int) {
+	if m.add_ReportQuarter != nil {
+		*m.add_ReportQuarter += i
 	} else {
-		m.add_Quarter = &i
+		m.add_ReportQuarter = &i
 	}
 }
 
-// AddedQuarter returns the value that was added to the "Quarter" field in this mutation.
-func (m *ReportMutation) AddedQuarter() (r int, exists bool) {
-	v := m.add_Quarter
+// AddedReportQuarter returns the value that was added to the "ReportQuarter" field in this mutation.
+func (m *ReportMutation) AddedReportQuarter() (r int, exists bool) {
+	v := m.add_ReportQuarter
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetQuarter resets all changes to the "Quarter" field.
-func (m *ReportMutation) ResetQuarter() {
-	m._Quarter = nil
-	m.add_Quarter = nil
+// ResetReportQuarter resets all changes to the "ReportQuarter" field.
+func (m *ReportMutation) ResetReportQuarter() {
+	m._ReportQuarter = nil
+	m.add_ReportQuarter = nil
 }
 
 // SetReportDate sets the "ReportDate" field.
@@ -5259,60 +5259,60 @@ func (m *ReportMutation) ResetPnlAmortizationYtd() {
 	m.add_PnlAmortizationYtd = nil
 }
 
-// SetPnlOperationIncomeYtd sets the "PnlOperationIncomeYtd" field.
-func (m *ReportMutation) SetPnlOperationIncomeYtd(f float64) {
-	m._PnlOperationIncomeYtd = &f
-	m.add_PnlOperationIncomeYtd = nil
+// SetPnlOperatingIncomeYtd sets the "PnlOperatingIncomeYtd" field.
+func (m *ReportMutation) SetPnlOperatingIncomeYtd(f float64) {
+	m._PnlOperatingIncomeYtd = &f
+	m.add_PnlOperatingIncomeYtd = nil
 }
 
-// PnlOperationIncomeYtd returns the value of the "PnlOperationIncomeYtd" field in the mutation.
-func (m *ReportMutation) PnlOperationIncomeYtd() (r float64, exists bool) {
-	v := m._PnlOperationIncomeYtd
+// PnlOperatingIncomeYtd returns the value of the "PnlOperatingIncomeYtd" field in the mutation.
+func (m *ReportMutation) PnlOperatingIncomeYtd() (r float64, exists bool) {
+	v := m._PnlOperatingIncomeYtd
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldPnlOperationIncomeYtd returns the old "PnlOperationIncomeYtd" field's value of the Report entity.
+// OldPnlOperatingIncomeYtd returns the old "PnlOperatingIncomeYtd" field's value of the Report entity.
 // If the Report object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ReportMutation) OldPnlOperationIncomeYtd(ctx context.Context) (v float64, err error) {
+func (m *ReportMutation) OldPnlOperatingIncomeYtd(ctx context.Context) (v float64, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPnlOperationIncomeYtd is only allowed on UpdateOne operations")
+		return v, errors.New("OldPnlOperatingIncomeYtd is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPnlOperationIncomeYtd requires an ID field in the mutation")
+		return v, errors.New("OldPnlOperatingIncomeYtd requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPnlOperationIncomeYtd: %w", err)
+		return v, fmt.Errorf("querying old value for OldPnlOperatingIncomeYtd: %w", err)
 	}
-	return oldValue.PnlOperationIncomeYtd, nil
+	return oldValue.PnlOperatingIncomeYtd, nil
 }
 
-// AddPnlOperationIncomeYtd adds f to the "PnlOperationIncomeYtd" field.
-func (m *ReportMutation) AddPnlOperationIncomeYtd(f float64) {
-	if m.add_PnlOperationIncomeYtd != nil {
-		*m.add_PnlOperationIncomeYtd += f
+// AddPnlOperatingIncomeYtd adds f to the "PnlOperatingIncomeYtd" field.
+func (m *ReportMutation) AddPnlOperatingIncomeYtd(f float64) {
+	if m.add_PnlOperatingIncomeYtd != nil {
+		*m.add_PnlOperatingIncomeYtd += f
 	} else {
-		m.add_PnlOperationIncomeYtd = &f
+		m.add_PnlOperatingIncomeYtd = &f
 	}
 }
 
-// AddedPnlOperationIncomeYtd returns the value that was added to the "PnlOperationIncomeYtd" field in this mutation.
-func (m *ReportMutation) AddedPnlOperationIncomeYtd() (r float64, exists bool) {
-	v := m.add_PnlOperationIncomeYtd
+// AddedPnlOperatingIncomeYtd returns the value that was added to the "PnlOperatingIncomeYtd" field in this mutation.
+func (m *ReportMutation) AddedPnlOperatingIncomeYtd() (r float64, exists bool) {
+	v := m.add_PnlOperatingIncomeYtd
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetPnlOperationIncomeYtd resets all changes to the "PnlOperationIncomeYtd" field.
-func (m *ReportMutation) ResetPnlOperationIncomeYtd() {
-	m._PnlOperationIncomeYtd = nil
-	m.add_PnlOperationIncomeYtd = nil
+// ResetPnlOperatingIncomeYtd resets all changes to the "PnlOperatingIncomeYtd" field.
+func (m *ReportMutation) ResetPnlOperatingIncomeYtd() {
+	m._PnlOperatingIncomeYtd = nil
+	m.add_PnlOperatingIncomeYtd = nil
 }
 
 // SetPnlInterestIncomeYtd sets the "PnlInterestIncomeYtd" field.
@@ -5707,60 +5707,60 @@ func (m *ReportMutation) ResetCfCurrentLiabilitesSld() {
 	m.add_CfCurrentLiabilitesSld = nil
 }
 
-// SetCfNonControlledSld sets the "CfNonControlledSld" field.
-func (m *ReportMutation) SetCfNonControlledSld(f float64) {
-	m._CfNonControlledSld = &f
-	m.add_CfNonControlledSld = nil
+// SetCfNonControllingSld sets the "CfNonControllingSld" field.
+func (m *ReportMutation) SetCfNonControllingSld(f float64) {
+	m._CfNonControllingSld = &f
+	m.add_CfNonControllingSld = nil
 }
 
-// CfNonControlledSld returns the value of the "CfNonControlledSld" field in the mutation.
-func (m *ReportMutation) CfNonControlledSld() (r float64, exists bool) {
-	v := m._CfNonControlledSld
+// CfNonControllingSld returns the value of the "CfNonControllingSld" field in the mutation.
+func (m *ReportMutation) CfNonControllingSld() (r float64, exists bool) {
+	v := m._CfNonControllingSld
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldCfNonControlledSld returns the old "CfNonControlledSld" field's value of the Report entity.
+// OldCfNonControllingSld returns the old "CfNonControllingSld" field's value of the Report entity.
 // If the Report object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ReportMutation) OldCfNonControlledSld(ctx context.Context) (v float64, err error) {
+func (m *ReportMutation) OldCfNonControllingSld(ctx context.Context) (v float64, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCfNonControlledSld is only allowed on UpdateOne operations")
+		return v, errors.New("OldCfNonControllingSld is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCfNonControlledSld requires an ID field in the mutation")
+		return v, errors.New("OldCfNonControllingSld requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCfNonControlledSld: %w", err)
+		return v, fmt.Errorf("querying old value for OldCfNonControllingSld: %w", err)
 	}
-	return oldValue.CfNonControlledSld, nil
+	return oldValue.CfNonControllingSld, nil
 }
 
-// AddCfNonControlledSld adds f to the "CfNonControlledSld" field.
-func (m *ReportMutation) AddCfNonControlledSld(f float64) {
-	if m.add_CfNonControlledSld != nil {
-		*m.add_CfNonControlledSld += f
+// AddCfNonControllingSld adds f to the "CfNonControllingSld" field.
+func (m *ReportMutation) AddCfNonControllingSld(f float64) {
+	if m.add_CfNonControllingSld != nil {
+		*m.add_CfNonControllingSld += f
 	} else {
-		m.add_CfNonControlledSld = &f
+		m.add_CfNonControllingSld = &f
 	}
 }
 
-// AddedCfNonControlledSld returns the value that was added to the "CfNonControlledSld" field in this mutation.
-func (m *ReportMutation) AddedCfNonControlledSld() (r float64, exists bool) {
-	v := m.add_CfNonControlledSld
+// AddedCfNonControllingSld returns the value that was added to the "CfNonControllingSld" field in this mutation.
+func (m *ReportMutation) AddedCfNonControllingSld() (r float64, exists bool) {
+	v := m.add_CfNonControllingSld
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetCfNonControlledSld resets all changes to the "CfNonControlledSld" field.
-func (m *ReportMutation) ResetCfNonControlledSld() {
-	m._CfNonControlledSld = nil
-	m.add_CfNonControlledSld = nil
+// ResetCfNonControllingSld resets all changes to the "CfNonControllingSld" field.
+func (m *ReportMutation) ResetCfNonControllingSld() {
+	m._CfNonControllingSld = nil
+	m.add_CfNonControllingSld = nil
 }
 
 // SetCfEquitySld sets the "CfEquitySld" field.
@@ -5983,11 +5983,11 @@ func (m *ReportMutation) Type() string {
 // AddedFields().
 func (m *ReportMutation) Fields() []string {
 	fields := make([]string, 0, 17)
-	if m._Year != nil {
-		fields = append(fields, report.FieldYear)
+	if m._ReportYear != nil {
+		fields = append(fields, report.FieldReportYear)
 	}
-	if m._Quarter != nil {
-		fields = append(fields, report.FieldQuarter)
+	if m._ReportQuarter != nil {
+		fields = append(fields, report.FieldReportQuarter)
 	}
 	if m._ReportDate != nil {
 		fields = append(fields, report.FieldReportDate)
@@ -5998,8 +5998,8 @@ func (m *ReportMutation) Fields() []string {
 	if m._PnlAmortizationYtd != nil {
 		fields = append(fields, report.FieldPnlAmortizationYtd)
 	}
-	if m._PnlOperationIncomeYtd != nil {
-		fields = append(fields, report.FieldPnlOperationIncomeYtd)
+	if m._PnlOperatingIncomeYtd != nil {
+		fields = append(fields, report.FieldPnlOperatingIncomeYtd)
 	}
 	if m._PnlInterestIncomeYtd != nil {
 		fields = append(fields, report.FieldPnlInterestIncomeYtd)
@@ -6022,8 +6022,8 @@ func (m *ReportMutation) Fields() []string {
 	if m._CfCurrentLiabilitesSld != nil {
 		fields = append(fields, report.FieldCfCurrentLiabilitesSld)
 	}
-	if m._CfNonControlledSld != nil {
-		fields = append(fields, report.FieldCfNonControlledSld)
+	if m._CfNonControllingSld != nil {
+		fields = append(fields, report.FieldCfNonControllingSld)
 	}
 	if m._CfEquitySld != nil {
 		fields = append(fields, report.FieldCfEquitySld)
@@ -6042,18 +6042,18 @@ func (m *ReportMutation) Fields() []string {
 // schema.
 func (m *ReportMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case report.FieldYear:
-		return m.Year()
-	case report.FieldQuarter:
-		return m.Quarter()
+	case report.FieldReportYear:
+		return m.ReportYear()
+	case report.FieldReportQuarter:
+		return m.ReportQuarter()
 	case report.FieldReportDate:
 		return m.ReportDate()
 	case report.FieldPnlRevenueYtd:
 		return m.PnlRevenueYtd()
 	case report.FieldPnlAmortizationYtd:
 		return m.PnlAmortizationYtd()
-	case report.FieldPnlOperationIncomeYtd:
-		return m.PnlOperationIncomeYtd()
+	case report.FieldPnlOperatingIncomeYtd:
+		return m.PnlOperatingIncomeYtd()
 	case report.FieldPnlInterestIncomeYtd:
 		return m.PnlInterestIncomeYtd()
 	case report.FieldPnlInterestExpensesYtd:
@@ -6068,8 +6068,8 @@ func (m *ReportMutation) Field(name string) (ent.Value, bool) {
 		return m.CfNonCurrentLiabilitiesSld()
 	case report.FieldCfCurrentLiabilitesSld:
 		return m.CfCurrentLiabilitesSld()
-	case report.FieldCfNonControlledSld:
-		return m.CfNonControlledSld()
+	case report.FieldCfNonControllingSld:
+		return m.CfNonControllingSld()
 	case report.FieldCfEquitySld:
 		return m.CfEquitySld()
 	case report.FieldCfTotalSld:
@@ -6085,18 +6085,18 @@ func (m *ReportMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *ReportMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case report.FieldYear:
-		return m.OldYear(ctx)
-	case report.FieldQuarter:
-		return m.OldQuarter(ctx)
+	case report.FieldReportYear:
+		return m.OldReportYear(ctx)
+	case report.FieldReportQuarter:
+		return m.OldReportQuarter(ctx)
 	case report.FieldReportDate:
 		return m.OldReportDate(ctx)
 	case report.FieldPnlRevenueYtd:
 		return m.OldPnlRevenueYtd(ctx)
 	case report.FieldPnlAmortizationYtd:
 		return m.OldPnlAmortizationYtd(ctx)
-	case report.FieldPnlOperationIncomeYtd:
-		return m.OldPnlOperationIncomeYtd(ctx)
+	case report.FieldPnlOperatingIncomeYtd:
+		return m.OldPnlOperatingIncomeYtd(ctx)
 	case report.FieldPnlInterestIncomeYtd:
 		return m.OldPnlInterestIncomeYtd(ctx)
 	case report.FieldPnlInterestExpensesYtd:
@@ -6111,8 +6111,8 @@ func (m *ReportMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldCfNonCurrentLiabilitiesSld(ctx)
 	case report.FieldCfCurrentLiabilitesSld:
 		return m.OldCfCurrentLiabilitesSld(ctx)
-	case report.FieldCfNonControlledSld:
-		return m.OldCfNonControlledSld(ctx)
+	case report.FieldCfNonControllingSld:
+		return m.OldCfNonControllingSld(ctx)
 	case report.FieldCfEquitySld:
 		return m.OldCfEquitySld(ctx)
 	case report.FieldCfTotalSld:
@@ -6128,19 +6128,19 @@ func (m *ReportMutation) OldField(ctx context.Context, name string) (ent.Value, 
 // type.
 func (m *ReportMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case report.FieldYear:
+	case report.FieldReportYear:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetYear(v)
+		m.SetReportYear(v)
 		return nil
-	case report.FieldQuarter:
+	case report.FieldReportQuarter:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetQuarter(v)
+		m.SetReportQuarter(v)
 		return nil
 	case report.FieldReportDate:
 		v, ok := value.(time.Time)
@@ -6163,12 +6163,12 @@ func (m *ReportMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetPnlAmortizationYtd(v)
 		return nil
-	case report.FieldPnlOperationIncomeYtd:
+	case report.FieldPnlOperatingIncomeYtd:
 		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetPnlOperationIncomeYtd(v)
+		m.SetPnlOperatingIncomeYtd(v)
 		return nil
 	case report.FieldPnlInterestIncomeYtd:
 		v, ok := value.(float64)
@@ -6219,12 +6219,12 @@ func (m *ReportMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetCfCurrentLiabilitesSld(v)
 		return nil
-	case report.FieldCfNonControlledSld:
+	case report.FieldCfNonControllingSld:
 		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetCfNonControlledSld(v)
+		m.SetCfNonControllingSld(v)
 		return nil
 	case report.FieldCfEquitySld:
 		v, ok := value.(float64)
@@ -6255,11 +6255,11 @@ func (m *ReportMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *ReportMutation) AddedFields() []string {
 	var fields []string
-	if m.add_Year != nil {
-		fields = append(fields, report.FieldYear)
+	if m.add_ReportYear != nil {
+		fields = append(fields, report.FieldReportYear)
 	}
-	if m.add_Quarter != nil {
-		fields = append(fields, report.FieldQuarter)
+	if m.add_ReportQuarter != nil {
+		fields = append(fields, report.FieldReportQuarter)
 	}
 	if m.add_PnlRevenueYtd != nil {
 		fields = append(fields, report.FieldPnlRevenueYtd)
@@ -6267,8 +6267,8 @@ func (m *ReportMutation) AddedFields() []string {
 	if m.add_PnlAmortizationYtd != nil {
 		fields = append(fields, report.FieldPnlAmortizationYtd)
 	}
-	if m.add_PnlOperationIncomeYtd != nil {
-		fields = append(fields, report.FieldPnlOperationIncomeYtd)
+	if m.add_PnlOperatingIncomeYtd != nil {
+		fields = append(fields, report.FieldPnlOperatingIncomeYtd)
 	}
 	if m.add_PnlInterestIncomeYtd != nil {
 		fields = append(fields, report.FieldPnlInterestIncomeYtd)
@@ -6291,8 +6291,8 @@ func (m *ReportMutation) AddedFields() []string {
 	if m.add_CfCurrentLiabilitesSld != nil {
 		fields = append(fields, report.FieldCfCurrentLiabilitesSld)
 	}
-	if m.add_CfNonControlledSld != nil {
-		fields = append(fields, report.FieldCfNonControlledSld)
+	if m.add_CfNonControllingSld != nil {
+		fields = append(fields, report.FieldCfNonControllingSld)
 	}
 	if m.add_CfEquitySld != nil {
 		fields = append(fields, report.FieldCfEquitySld)
@@ -6308,16 +6308,16 @@ func (m *ReportMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *ReportMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case report.FieldYear:
-		return m.AddedYear()
-	case report.FieldQuarter:
-		return m.AddedQuarter()
+	case report.FieldReportYear:
+		return m.AddedReportYear()
+	case report.FieldReportQuarter:
+		return m.AddedReportQuarter()
 	case report.FieldPnlRevenueYtd:
 		return m.AddedPnlRevenueYtd()
 	case report.FieldPnlAmortizationYtd:
 		return m.AddedPnlAmortizationYtd()
-	case report.FieldPnlOperationIncomeYtd:
-		return m.AddedPnlOperationIncomeYtd()
+	case report.FieldPnlOperatingIncomeYtd:
+		return m.AddedPnlOperatingIncomeYtd()
 	case report.FieldPnlInterestIncomeYtd:
 		return m.AddedPnlInterestIncomeYtd()
 	case report.FieldPnlInterestExpensesYtd:
@@ -6332,8 +6332,8 @@ func (m *ReportMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedCfNonCurrentLiabilitiesSld()
 	case report.FieldCfCurrentLiabilitesSld:
 		return m.AddedCfCurrentLiabilitesSld()
-	case report.FieldCfNonControlledSld:
-		return m.AddedCfNonControlledSld()
+	case report.FieldCfNonControllingSld:
+		return m.AddedCfNonControllingSld()
 	case report.FieldCfEquitySld:
 		return m.AddedCfEquitySld()
 	case report.FieldCfTotalSld:
@@ -6347,19 +6347,19 @@ func (m *ReportMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *ReportMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case report.FieldYear:
+	case report.FieldReportYear:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddYear(v)
+		m.AddReportYear(v)
 		return nil
-	case report.FieldQuarter:
+	case report.FieldReportQuarter:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddQuarter(v)
+		m.AddReportQuarter(v)
 		return nil
 	case report.FieldPnlRevenueYtd:
 		v, ok := value.(float64)
@@ -6375,12 +6375,12 @@ func (m *ReportMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddPnlAmortizationYtd(v)
 		return nil
-	case report.FieldPnlOperationIncomeYtd:
+	case report.FieldPnlOperatingIncomeYtd:
 		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddPnlOperationIncomeYtd(v)
+		m.AddPnlOperatingIncomeYtd(v)
 		return nil
 	case report.FieldPnlInterestIncomeYtd:
 		v, ok := value.(float64)
@@ -6431,12 +6431,12 @@ func (m *ReportMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddCfCurrentLiabilitesSld(v)
 		return nil
-	case report.FieldCfNonControlledSld:
+	case report.FieldCfNonControllingSld:
 		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddCfNonControlledSld(v)
+		m.AddCfNonControllingSld(v)
 		return nil
 	case report.FieldCfEquitySld:
 		v, ok := value.(float64)
@@ -6488,11 +6488,11 @@ func (m *ReportMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *ReportMutation) ResetField(name string) error {
 	switch name {
-	case report.FieldYear:
-		m.ResetYear()
+	case report.FieldReportYear:
+		m.ResetReportYear()
 		return nil
-	case report.FieldQuarter:
-		m.ResetQuarter()
+	case report.FieldReportQuarter:
+		m.ResetReportQuarter()
 		return nil
 	case report.FieldReportDate:
 		m.ResetReportDate()
@@ -6503,8 +6503,8 @@ func (m *ReportMutation) ResetField(name string) error {
 	case report.FieldPnlAmortizationYtd:
 		m.ResetPnlAmortizationYtd()
 		return nil
-	case report.FieldPnlOperationIncomeYtd:
-		m.ResetPnlOperationIncomeYtd()
+	case report.FieldPnlOperatingIncomeYtd:
+		m.ResetPnlOperatingIncomeYtd()
 		return nil
 	case report.FieldPnlInterestIncomeYtd:
 		m.ResetPnlInterestIncomeYtd()
@@ -6527,8 +6527,8 @@ func (m *ReportMutation) ResetField(name string) error {
 	case report.FieldCfCurrentLiabilitesSld:
 		m.ResetCfCurrentLiabilitesSld()
 		return nil
-	case report.FieldCfNonControlledSld:
-		m.ResetCfNonControlledSld()
+	case report.FieldCfNonControllingSld:
+		m.ResetCfNonControllingSld()
 		return nil
 	case report.FieldCfEquitySld:
 		m.ResetCfEquitySld()

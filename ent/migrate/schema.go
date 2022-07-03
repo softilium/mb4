@@ -184,12 +184,12 @@ var (
 	// ReportsColumns holds the columns for the "reports" table.
 	ReportsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
-		{Name: "year", Type: field.TypeInt},
-		{Name: "quarter", Type: field.TypeInt},
+		{Name: "report_year", Type: field.TypeInt},
+		{Name: "report_quarter", Type: field.TypeInt},
 		{Name: "report_date", Type: field.TypeTime},
 		{Name: "pnl_revenue_ytd", Type: field.TypeFloat64},
 		{Name: "pnl_amortization_ytd", Type: field.TypeFloat64},
-		{Name: "pnl_operation_income_ytd", Type: field.TypeFloat64},
+		{Name: "pnl_operating_income_ytd", Type: field.TypeFloat64},
 		{Name: "pnl_interest_income_ytd", Type: field.TypeFloat64},
 		{Name: "pnl_interest_expenses_ytd", Type: field.TypeFloat64},
 		{Name: "pnl_income_tax_ytd", Type: field.TypeFloat64},
@@ -197,7 +197,7 @@ var (
 		{Name: "cf_cash_sld", Type: field.TypeFloat64},
 		{Name: "cf_non_current_liabilities_sld", Type: field.TypeFloat64},
 		{Name: "cf_current_liabilites_sld", Type: field.TypeFloat64},
-		{Name: "cf_non_controlled_sld", Type: field.TypeFloat64},
+		{Name: "cf_non_controlling_sld", Type: field.TypeFloat64},
 		{Name: "cf_equity_sld", Type: field.TypeFloat64},
 		{Name: "cf_total_sld", Type: field.TypeFloat64},
 		{Name: "url", Type: field.TypeString, Nullable: true, Size: 255},
@@ -214,13 +214,6 @@ var (
 				Columns:    []*schema.Column{ReportsColumns[18]},
 				RefColumns: []*schema.Column{EmitentsColumns[0]},
 				OnDelete:   schema.Cascade,
-			},
-		},
-		Indexes: []*schema.Index{
-			{
-				Name:    "report_quarter_emitent_reports",
-				Unique:  true,
-				Columns: []*schema.Column{ReportsColumns[2], ReportsColumns[18]},
 			},
 		},
 	}

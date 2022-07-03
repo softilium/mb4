@@ -22,15 +22,15 @@ type ReportCreate struct {
 	hooks    []Hook
 }
 
-// SetYear sets the "Year" field.
-func (rc *ReportCreate) SetYear(i int) *ReportCreate {
-	rc.mutation.SetYear(i)
+// SetReportYear sets the "ReportYear" field.
+func (rc *ReportCreate) SetReportYear(i int) *ReportCreate {
+	rc.mutation.SetReportYear(i)
 	return rc
 }
 
-// SetQuarter sets the "Quarter" field.
-func (rc *ReportCreate) SetQuarter(i int) *ReportCreate {
-	rc.mutation.SetQuarter(i)
+// SetReportQuarter sets the "ReportQuarter" field.
+func (rc *ReportCreate) SetReportQuarter(i int) *ReportCreate {
+	rc.mutation.SetReportQuarter(i)
 	return rc
 }
 
@@ -52,9 +52,9 @@ func (rc *ReportCreate) SetPnlAmortizationYtd(f float64) *ReportCreate {
 	return rc
 }
 
-// SetPnlOperationIncomeYtd sets the "PnlOperationIncomeYtd" field.
-func (rc *ReportCreate) SetPnlOperationIncomeYtd(f float64) *ReportCreate {
-	rc.mutation.SetPnlOperationIncomeYtd(f)
+// SetPnlOperatingIncomeYtd sets the "PnlOperatingIncomeYtd" field.
+func (rc *ReportCreate) SetPnlOperatingIncomeYtd(f float64) *ReportCreate {
+	rc.mutation.SetPnlOperatingIncomeYtd(f)
 	return rc
 }
 
@@ -100,9 +100,9 @@ func (rc *ReportCreate) SetCfCurrentLiabilitesSld(f float64) *ReportCreate {
 	return rc
 }
 
-// SetCfNonControlledSld sets the "CfNonControlledSld" field.
-func (rc *ReportCreate) SetCfNonControlledSld(f float64) *ReportCreate {
-	rc.mutation.SetCfNonControlledSld(f)
+// SetCfNonControllingSld sets the "CfNonControllingSld" field.
+func (rc *ReportCreate) SetCfNonControllingSld(f float64) *ReportCreate {
+	rc.mutation.SetCfNonControllingSld(f)
 	return rc
 }
 
@@ -236,20 +236,20 @@ func (rc *ReportCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (rc *ReportCreate) check() error {
-	if _, ok := rc.mutation.Year(); !ok {
-		return &ValidationError{Name: "Year", err: errors.New(`ent: missing required field "Report.Year"`)}
+	if _, ok := rc.mutation.ReportYear(); !ok {
+		return &ValidationError{Name: "ReportYear", err: errors.New(`ent: missing required field "Report.ReportYear"`)}
 	}
-	if v, ok := rc.mutation.Year(); ok {
-		if err := report.YearValidator(v); err != nil {
-			return &ValidationError{Name: "Year", err: fmt.Errorf(`ent: validator failed for field "Report.Year": %w`, err)}
+	if v, ok := rc.mutation.ReportYear(); ok {
+		if err := report.ReportYearValidator(v); err != nil {
+			return &ValidationError{Name: "ReportYear", err: fmt.Errorf(`ent: validator failed for field "Report.ReportYear": %w`, err)}
 		}
 	}
-	if _, ok := rc.mutation.Quarter(); !ok {
-		return &ValidationError{Name: "Quarter", err: errors.New(`ent: missing required field "Report.Quarter"`)}
+	if _, ok := rc.mutation.ReportQuarter(); !ok {
+		return &ValidationError{Name: "ReportQuarter", err: errors.New(`ent: missing required field "Report.ReportQuarter"`)}
 	}
-	if v, ok := rc.mutation.Quarter(); ok {
-		if err := report.QuarterValidator(v); err != nil {
-			return &ValidationError{Name: "Quarter", err: fmt.Errorf(`ent: validator failed for field "Report.Quarter": %w`, err)}
+	if v, ok := rc.mutation.ReportQuarter(); ok {
+		if err := report.ReportQuarterValidator(v); err != nil {
+			return &ValidationError{Name: "ReportQuarter", err: fmt.Errorf(`ent: validator failed for field "Report.ReportQuarter": %w`, err)}
 		}
 	}
 	if _, ok := rc.mutation.ReportDate(); !ok {
@@ -261,8 +261,8 @@ func (rc *ReportCreate) check() error {
 	if _, ok := rc.mutation.PnlAmortizationYtd(); !ok {
 		return &ValidationError{Name: "PnlAmortizationYtd", err: errors.New(`ent: missing required field "Report.PnlAmortizationYtd"`)}
 	}
-	if _, ok := rc.mutation.PnlOperationIncomeYtd(); !ok {
-		return &ValidationError{Name: "PnlOperationIncomeYtd", err: errors.New(`ent: missing required field "Report.PnlOperationIncomeYtd"`)}
+	if _, ok := rc.mutation.PnlOperatingIncomeYtd(); !ok {
+		return &ValidationError{Name: "PnlOperatingIncomeYtd", err: errors.New(`ent: missing required field "Report.PnlOperatingIncomeYtd"`)}
 	}
 	if _, ok := rc.mutation.PnlInterestIncomeYtd(); !ok {
 		return &ValidationError{Name: "PnlInterestIncomeYtd", err: errors.New(`ent: missing required field "Report.PnlInterestIncomeYtd"`)}
@@ -285,8 +285,8 @@ func (rc *ReportCreate) check() error {
 	if _, ok := rc.mutation.CfCurrentLiabilitesSld(); !ok {
 		return &ValidationError{Name: "CfCurrentLiabilitesSld", err: errors.New(`ent: missing required field "Report.CfCurrentLiabilitesSld"`)}
 	}
-	if _, ok := rc.mutation.CfNonControlledSld(); !ok {
-		return &ValidationError{Name: "CfNonControlledSld", err: errors.New(`ent: missing required field "Report.CfNonControlledSld"`)}
+	if _, ok := rc.mutation.CfNonControllingSld(); !ok {
+		return &ValidationError{Name: "CfNonControllingSld", err: errors.New(`ent: missing required field "Report.CfNonControllingSld"`)}
 	}
 	if _, ok := rc.mutation.CfEquitySld(); !ok {
 		return &ValidationError{Name: "CfEquitySld", err: errors.New(`ent: missing required field "Report.CfEquitySld"`)}
@@ -343,21 +343,21 @@ func (rc *ReportCreate) createSpec() (*Report, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := rc.mutation.Year(); ok {
+	if value, ok := rc.mutation.ReportYear(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
-			Column: report.FieldYear,
+			Column: report.FieldReportYear,
 		})
-		_node.Year = value
+		_node.ReportYear = value
 	}
-	if value, ok := rc.mutation.Quarter(); ok {
+	if value, ok := rc.mutation.ReportQuarter(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
-			Column: report.FieldQuarter,
+			Column: report.FieldReportQuarter,
 		})
-		_node.Quarter = value
+		_node.ReportQuarter = value
 	}
 	if value, ok := rc.mutation.ReportDate(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -383,13 +383,13 @@ func (rc *ReportCreate) createSpec() (*Report, *sqlgraph.CreateSpec) {
 		})
 		_node.PnlAmortizationYtd = value
 	}
-	if value, ok := rc.mutation.PnlOperationIncomeYtd(); ok {
+	if value, ok := rc.mutation.PnlOperatingIncomeYtd(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeFloat64,
 			Value:  value,
-			Column: report.FieldPnlOperationIncomeYtd,
+			Column: report.FieldPnlOperatingIncomeYtd,
 		})
-		_node.PnlOperationIncomeYtd = value
+		_node.PnlOperatingIncomeYtd = value
 	}
 	if value, ok := rc.mutation.PnlInterestIncomeYtd(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -447,13 +447,13 @@ func (rc *ReportCreate) createSpec() (*Report, *sqlgraph.CreateSpec) {
 		})
 		_node.CfCurrentLiabilitesSld = value
 	}
-	if value, ok := rc.mutation.CfNonControlledSld(); ok {
+	if value, ok := rc.mutation.CfNonControllingSld(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeFloat64,
 			Value:  value,
-			Column: report.FieldCfNonControlledSld,
+			Column: report.FieldCfNonControllingSld,
 		})
-		_node.CfNonControlledSld = value
+		_node.CfNonControllingSld = value
 	}
 	if value, ok := rc.mutation.CfEquitySld(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

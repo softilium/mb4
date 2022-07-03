@@ -248,14 +248,14 @@ func init() {
 	}()
 	reportFields := schema.Report{}.Fields()
 	_ = reportFields
-	// reportDescYear is the schema descriptor for Year field.
-	reportDescYear := reportFields[1].Descriptor()
-	// report.YearValidator is a validator for the "Year" field. It is called by the builders before save.
-	report.YearValidator = reportDescYear.Validators[0].(func(int) error)
-	// reportDescQuarter is the schema descriptor for Quarter field.
-	reportDescQuarter := reportFields[2].Descriptor()
-	// report.QuarterValidator is a validator for the "Quarter" field. It is called by the builders before save.
-	report.QuarterValidator = reportDescQuarter.Validators[0].(func(int) error)
+	// reportDescReportYear is the schema descriptor for ReportYear field.
+	reportDescReportYear := reportFields[1].Descriptor()
+	// report.ReportYearValidator is a validator for the "ReportYear" field. It is called by the builders before save.
+	report.ReportYearValidator = reportDescReportYear.Validators[0].(func(int) error)
+	// reportDescReportQuarter is the schema descriptor for ReportQuarter field.
+	reportDescReportQuarter := reportFields[2].Descriptor()
+	// report.ReportQuarterValidator is a validator for the "ReportQuarter" field. It is called by the builders before save.
+	report.ReportQuarterValidator = reportDescReportQuarter.Validators[0].(func(int) error)
 	// reportDescURL is the schema descriptor for Url field.
 	reportDescURL := reportFields[17].Descriptor()
 	// report.URLValidator is a validator for the "Url" field. It is called by the builders before save.

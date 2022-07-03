@@ -25,11 +25,11 @@ type Cell struct {
 	Report   *ent.Report
 
 	// loadDivsAndCaps
+	Cap          float64
 	DivSum5Y     float64
 	DivSum3Y     float64
 	DivYield5Y   float64
 	DivYield3Y   float64
-	Cap          float64
 	DSI          float64
 	DSIStability byte
 	DSIGrowth    byte
@@ -105,6 +105,10 @@ func (c *Cube) LoadCube() (err error) {
 
 	if err = c.linkEmissions(); err != nil {
 		return err
+	}
+
+	if len(c.allDays) == 0 {
+		return nil
 	}
 
 	if err = c.loadDivsAndCaps(); err != nil {

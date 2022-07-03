@@ -11,18 +11,18 @@ const (
 	Label = "report"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldYear holds the string denoting the year field in the database.
-	FieldYear = "year"
-	// FieldQuarter holds the string denoting the quarter field in the database.
-	FieldQuarter = "quarter"
+	// FieldReportYear holds the string denoting the reportyear field in the database.
+	FieldReportYear = "report_year"
+	// FieldReportQuarter holds the string denoting the reportquarter field in the database.
+	FieldReportQuarter = "report_quarter"
 	// FieldReportDate holds the string denoting the reportdate field in the database.
 	FieldReportDate = "report_date"
 	// FieldPnlRevenueYtd holds the string denoting the pnlrevenueytd field in the database.
 	FieldPnlRevenueYtd = "pnl_revenue_ytd"
 	// FieldPnlAmortizationYtd holds the string denoting the pnlamortizationytd field in the database.
 	FieldPnlAmortizationYtd = "pnl_amortization_ytd"
-	// FieldPnlOperationIncomeYtd holds the string denoting the pnloperationincomeytd field in the database.
-	FieldPnlOperationIncomeYtd = "pnl_operation_income_ytd"
+	// FieldPnlOperatingIncomeYtd holds the string denoting the pnloperatingincomeytd field in the database.
+	FieldPnlOperatingIncomeYtd = "pnl_operating_income_ytd"
 	// FieldPnlInterestIncomeYtd holds the string denoting the pnlinterestincomeytd field in the database.
 	FieldPnlInterestIncomeYtd = "pnl_interest_income_ytd"
 	// FieldPnlInterestExpensesYtd holds the string denoting the pnlinterestexpensesytd field in the database.
@@ -37,8 +37,8 @@ const (
 	FieldCfNonCurrentLiabilitiesSld = "cf_non_current_liabilities_sld"
 	// FieldCfCurrentLiabilitesSld holds the string denoting the cfcurrentliabilitessld field in the database.
 	FieldCfCurrentLiabilitesSld = "cf_current_liabilites_sld"
-	// FieldCfNonControlledSld holds the string denoting the cfnoncontrolledsld field in the database.
-	FieldCfNonControlledSld = "cf_non_controlled_sld"
+	// FieldCfNonControllingSld holds the string denoting the cfnoncontrollingsld field in the database.
+	FieldCfNonControllingSld = "cf_non_controlling_sld"
 	// FieldCfEquitySld holds the string denoting the cfequitysld field in the database.
 	FieldCfEquitySld = "cf_equity_sld"
 	// FieldCfTotalSld holds the string denoting the cftotalsld field in the database.
@@ -61,12 +61,12 @@ const (
 // Columns holds all SQL columns for report fields.
 var Columns = []string{
 	FieldID,
-	FieldYear,
-	FieldQuarter,
+	FieldReportYear,
+	FieldReportQuarter,
 	FieldReportDate,
 	FieldPnlRevenueYtd,
 	FieldPnlAmortizationYtd,
-	FieldPnlOperationIncomeYtd,
+	FieldPnlOperatingIncomeYtd,
 	FieldPnlInterestIncomeYtd,
 	FieldPnlInterestExpensesYtd,
 	FieldPnlIncomeTaxYtd,
@@ -74,7 +74,7 @@ var Columns = []string{
 	FieldCfCashSld,
 	FieldCfNonCurrentLiabilitiesSld,
 	FieldCfCurrentLiabilitesSld,
-	FieldCfNonControlledSld,
+	FieldCfNonControllingSld,
 	FieldCfEquitySld,
 	FieldCfTotalSld,
 	FieldURL,
@@ -102,10 +102,10 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// YearValidator is a validator for the "Year" field. It is called by the builders before save.
-	YearValidator func(int) error
-	// QuarterValidator is a validator for the "Quarter" field. It is called by the builders before save.
-	QuarterValidator func(int) error
+	// ReportYearValidator is a validator for the "ReportYear" field. It is called by the builders before save.
+	ReportYearValidator func(int) error
+	// ReportQuarterValidator is a validator for the "ReportQuarter" field. It is called by the builders before save.
+	ReportQuarterValidator func(int) error
 	// URLValidator is a validator for the "Url" field. It is called by the builders before save.
 	URLValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.

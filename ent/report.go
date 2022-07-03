@@ -18,18 +18,18 @@ type Report struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID xid.ID `json:"id,omitempty"`
-	// Year holds the value of the "Year" field.
-	Year int `json:"Year,omitempty"`
-	// Quarter holds the value of the "Quarter" field.
-	Quarter int `json:"Quarter,omitempty"`
+	// ReportYear holds the value of the "ReportYear" field.
+	ReportYear int `json:"ReportYear,omitempty"`
+	// ReportQuarter holds the value of the "ReportQuarter" field.
+	ReportQuarter int `json:"ReportQuarter,omitempty"`
 	// ReportDate holds the value of the "ReportDate" field.
 	ReportDate time.Time `json:"ReportDate,omitempty"`
 	// PnlRevenueYtd holds the value of the "PnlRevenueYtd" field.
 	PnlRevenueYtd float64 `json:"PnlRevenueYtd,omitempty"`
 	// PnlAmortizationYtd holds the value of the "PnlAmortizationYtd" field.
 	PnlAmortizationYtd float64 `json:"PnlAmortizationYtd,omitempty"`
-	// PnlOperationIncomeYtd holds the value of the "PnlOperationIncomeYtd" field.
-	PnlOperationIncomeYtd float64 `json:"PnlOperationIncomeYtd,omitempty"`
+	// PnlOperatingIncomeYtd holds the value of the "PnlOperatingIncomeYtd" field.
+	PnlOperatingIncomeYtd float64 `json:"PnlOperatingIncomeYtd,omitempty"`
 	// PnlInterestIncomeYtd holds the value of the "PnlInterestIncomeYtd" field.
 	PnlInterestIncomeYtd float64 `json:"PnlInterestIncomeYtd,omitempty"`
 	// PnlInterestExpensesYtd holds the value of the "PnlInterestExpensesYtd" field.
@@ -44,8 +44,8 @@ type Report struct {
 	CfNonCurrentLiabilitiesSld float64 `json:"CfNonCurrentLiabilitiesSld,omitempty"`
 	// CfCurrentLiabilitesSld holds the value of the "CfCurrentLiabilitesSld" field.
 	CfCurrentLiabilitesSld float64 `json:"CfCurrentLiabilitesSld,omitempty"`
-	// CfNonControlledSld holds the value of the "CfNonControlledSld" field.
-	CfNonControlledSld float64 `json:"CfNonControlledSld,omitempty"`
+	// CfNonControllingSld holds the value of the "CfNonControllingSld" field.
+	CfNonControllingSld float64 `json:"CfNonControllingSld,omitempty"`
 	// CfEquitySld holds the value of the "CfEquitySld" field.
 	CfEquitySld float64 `json:"CfEquitySld,omitempty"`
 	// CfTotalSld holds the value of the "CfTotalSld" field.
@@ -86,9 +86,9 @@ func (*Report) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case report.FieldPnlRevenueYtd, report.FieldPnlAmortizationYtd, report.FieldPnlOperationIncomeYtd, report.FieldPnlInterestIncomeYtd, report.FieldPnlInterestExpensesYtd, report.FieldPnlIncomeTaxYtd, report.FieldPnlNetIncomeYtd, report.FieldCfCashSld, report.FieldCfNonCurrentLiabilitiesSld, report.FieldCfCurrentLiabilitesSld, report.FieldCfNonControlledSld, report.FieldCfEquitySld, report.FieldCfTotalSld:
+		case report.FieldPnlRevenueYtd, report.FieldPnlAmortizationYtd, report.FieldPnlOperatingIncomeYtd, report.FieldPnlInterestIncomeYtd, report.FieldPnlInterestExpensesYtd, report.FieldPnlIncomeTaxYtd, report.FieldPnlNetIncomeYtd, report.FieldCfCashSld, report.FieldCfNonCurrentLiabilitiesSld, report.FieldCfCurrentLiabilitesSld, report.FieldCfNonControllingSld, report.FieldCfEquitySld, report.FieldCfTotalSld:
 			values[i] = new(sql.NullFloat64)
-		case report.FieldYear, report.FieldQuarter:
+		case report.FieldReportYear, report.FieldReportQuarter:
 			values[i] = new(sql.NullInt64)
 		case report.FieldURL:
 			values[i] = new(sql.NullString)
@@ -119,17 +119,17 @@ func (r *Report) assignValues(columns []string, values []interface{}) error {
 			} else if value != nil {
 				r.ID = *value
 			}
-		case report.FieldYear:
+		case report.FieldReportYear:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field Year", values[i])
+				return fmt.Errorf("unexpected type %T for field ReportYear", values[i])
 			} else if value.Valid {
-				r.Year = int(value.Int64)
+				r.ReportYear = int(value.Int64)
 			}
-		case report.FieldQuarter:
+		case report.FieldReportQuarter:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field Quarter", values[i])
+				return fmt.Errorf("unexpected type %T for field ReportQuarter", values[i])
 			} else if value.Valid {
-				r.Quarter = int(value.Int64)
+				r.ReportQuarter = int(value.Int64)
 			}
 		case report.FieldReportDate:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -149,11 +149,11 @@ func (r *Report) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				r.PnlAmortizationYtd = value.Float64
 			}
-		case report.FieldPnlOperationIncomeYtd:
+		case report.FieldPnlOperatingIncomeYtd:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
-				return fmt.Errorf("unexpected type %T for field PnlOperationIncomeYtd", values[i])
+				return fmt.Errorf("unexpected type %T for field PnlOperatingIncomeYtd", values[i])
 			} else if value.Valid {
-				r.PnlOperationIncomeYtd = value.Float64
+				r.PnlOperatingIncomeYtd = value.Float64
 			}
 		case report.FieldPnlInterestIncomeYtd:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
@@ -197,11 +197,11 @@ func (r *Report) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				r.CfCurrentLiabilitesSld = value.Float64
 			}
-		case report.FieldCfNonControlledSld:
+		case report.FieldCfNonControllingSld:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
-				return fmt.Errorf("unexpected type %T for field CfNonControlledSld", values[i])
+				return fmt.Errorf("unexpected type %T for field CfNonControllingSld", values[i])
 			} else if value.Valid {
-				r.CfNonControlledSld = value.Float64
+				r.CfNonControllingSld = value.Float64
 			}
 		case report.FieldCfEquitySld:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
@@ -261,18 +261,18 @@ func (r *Report) String() string {
 	var builder strings.Builder
 	builder.WriteString("Report(")
 	builder.WriteString(fmt.Sprintf("id=%v", r.ID))
-	builder.WriteString(", Year=")
-	builder.WriteString(fmt.Sprintf("%v", r.Year))
-	builder.WriteString(", Quarter=")
-	builder.WriteString(fmt.Sprintf("%v", r.Quarter))
+	builder.WriteString(", ReportYear=")
+	builder.WriteString(fmt.Sprintf("%v", r.ReportYear))
+	builder.WriteString(", ReportQuarter=")
+	builder.WriteString(fmt.Sprintf("%v", r.ReportQuarter))
 	builder.WriteString(", ReportDate=")
 	builder.WriteString(r.ReportDate.Format(time.ANSIC))
 	builder.WriteString(", PnlRevenueYtd=")
 	builder.WriteString(fmt.Sprintf("%v", r.PnlRevenueYtd))
 	builder.WriteString(", PnlAmortizationYtd=")
 	builder.WriteString(fmt.Sprintf("%v", r.PnlAmortizationYtd))
-	builder.WriteString(", PnlOperationIncomeYtd=")
-	builder.WriteString(fmt.Sprintf("%v", r.PnlOperationIncomeYtd))
+	builder.WriteString(", PnlOperatingIncomeYtd=")
+	builder.WriteString(fmt.Sprintf("%v", r.PnlOperatingIncomeYtd))
 	builder.WriteString(", PnlInterestIncomeYtd=")
 	builder.WriteString(fmt.Sprintf("%v", r.PnlInterestIncomeYtd))
 	builder.WriteString(", PnlInterestExpensesYtd=")
@@ -287,8 +287,8 @@ func (r *Report) String() string {
 	builder.WriteString(fmt.Sprintf("%v", r.CfNonCurrentLiabilitiesSld))
 	builder.WriteString(", CfCurrentLiabilitesSld=")
 	builder.WriteString(fmt.Sprintf("%v", r.CfCurrentLiabilitesSld))
-	builder.WriteString(", CfNonControlledSld=")
-	builder.WriteString(fmt.Sprintf("%v", r.CfNonControlledSld))
+	builder.WriteString(", CfNonControllingSld=")
+	builder.WriteString(fmt.Sprintf("%v", r.CfNonControllingSld))
 	builder.WriteString(", CfEquitySld=")
 	builder.WriteString(fmt.Sprintf("%v", r.CfEquitySld))
 	builder.WriteString(", CfTotalSld=")

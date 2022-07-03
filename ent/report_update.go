@@ -30,29 +30,29 @@ func (ru *ReportUpdate) Where(ps ...predicate.Report) *ReportUpdate {
 	return ru
 }
 
-// SetYear sets the "Year" field.
-func (ru *ReportUpdate) SetYear(i int) *ReportUpdate {
-	ru.mutation.ResetYear()
-	ru.mutation.SetYear(i)
+// SetReportYear sets the "ReportYear" field.
+func (ru *ReportUpdate) SetReportYear(i int) *ReportUpdate {
+	ru.mutation.ResetReportYear()
+	ru.mutation.SetReportYear(i)
 	return ru
 }
 
-// AddYear adds i to the "Year" field.
-func (ru *ReportUpdate) AddYear(i int) *ReportUpdate {
-	ru.mutation.AddYear(i)
+// AddReportYear adds i to the "ReportYear" field.
+func (ru *ReportUpdate) AddReportYear(i int) *ReportUpdate {
+	ru.mutation.AddReportYear(i)
 	return ru
 }
 
-// SetQuarter sets the "Quarter" field.
-func (ru *ReportUpdate) SetQuarter(i int) *ReportUpdate {
-	ru.mutation.ResetQuarter()
-	ru.mutation.SetQuarter(i)
+// SetReportQuarter sets the "ReportQuarter" field.
+func (ru *ReportUpdate) SetReportQuarter(i int) *ReportUpdate {
+	ru.mutation.ResetReportQuarter()
+	ru.mutation.SetReportQuarter(i)
 	return ru
 }
 
-// AddQuarter adds i to the "Quarter" field.
-func (ru *ReportUpdate) AddQuarter(i int) *ReportUpdate {
-	ru.mutation.AddQuarter(i)
+// AddReportQuarter adds i to the "ReportQuarter" field.
+func (ru *ReportUpdate) AddReportQuarter(i int) *ReportUpdate {
+	ru.mutation.AddReportQuarter(i)
 	return ru
 }
 
@@ -88,16 +88,16 @@ func (ru *ReportUpdate) AddPnlAmortizationYtd(f float64) *ReportUpdate {
 	return ru
 }
 
-// SetPnlOperationIncomeYtd sets the "PnlOperationIncomeYtd" field.
-func (ru *ReportUpdate) SetPnlOperationIncomeYtd(f float64) *ReportUpdate {
-	ru.mutation.ResetPnlOperationIncomeYtd()
-	ru.mutation.SetPnlOperationIncomeYtd(f)
+// SetPnlOperatingIncomeYtd sets the "PnlOperatingIncomeYtd" field.
+func (ru *ReportUpdate) SetPnlOperatingIncomeYtd(f float64) *ReportUpdate {
+	ru.mutation.ResetPnlOperatingIncomeYtd()
+	ru.mutation.SetPnlOperatingIncomeYtd(f)
 	return ru
 }
 
-// AddPnlOperationIncomeYtd adds f to the "PnlOperationIncomeYtd" field.
-func (ru *ReportUpdate) AddPnlOperationIncomeYtd(f float64) *ReportUpdate {
-	ru.mutation.AddPnlOperationIncomeYtd(f)
+// AddPnlOperatingIncomeYtd adds f to the "PnlOperatingIncomeYtd" field.
+func (ru *ReportUpdate) AddPnlOperatingIncomeYtd(f float64) *ReportUpdate {
+	ru.mutation.AddPnlOperatingIncomeYtd(f)
 	return ru
 }
 
@@ -192,16 +192,16 @@ func (ru *ReportUpdate) AddCfCurrentLiabilitesSld(f float64) *ReportUpdate {
 	return ru
 }
 
-// SetCfNonControlledSld sets the "CfNonControlledSld" field.
-func (ru *ReportUpdate) SetCfNonControlledSld(f float64) *ReportUpdate {
-	ru.mutation.ResetCfNonControlledSld()
-	ru.mutation.SetCfNonControlledSld(f)
+// SetCfNonControllingSld sets the "CfNonControllingSld" field.
+func (ru *ReportUpdate) SetCfNonControllingSld(f float64) *ReportUpdate {
+	ru.mutation.ResetCfNonControllingSld()
+	ru.mutation.SetCfNonControllingSld(f)
 	return ru
 }
 
-// AddCfNonControlledSld adds f to the "CfNonControlledSld" field.
-func (ru *ReportUpdate) AddCfNonControlledSld(f float64) *ReportUpdate {
-	ru.mutation.AddCfNonControlledSld(f)
+// AddCfNonControllingSld adds f to the "CfNonControllingSld" field.
+func (ru *ReportUpdate) AddCfNonControllingSld(f float64) *ReportUpdate {
+	ru.mutation.AddCfNonControllingSld(f)
 	return ru
 }
 
@@ -335,14 +335,14 @@ func (ru *ReportUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (ru *ReportUpdate) check() error {
-	if v, ok := ru.mutation.Year(); ok {
-		if err := report.YearValidator(v); err != nil {
-			return &ValidationError{Name: "Year", err: fmt.Errorf(`ent: validator failed for field "Report.Year": %w`, err)}
+	if v, ok := ru.mutation.ReportYear(); ok {
+		if err := report.ReportYearValidator(v); err != nil {
+			return &ValidationError{Name: "ReportYear", err: fmt.Errorf(`ent: validator failed for field "Report.ReportYear": %w`, err)}
 		}
 	}
-	if v, ok := ru.mutation.Quarter(); ok {
-		if err := report.QuarterValidator(v); err != nil {
-			return &ValidationError{Name: "Quarter", err: fmt.Errorf(`ent: validator failed for field "Report.Quarter": %w`, err)}
+	if v, ok := ru.mutation.ReportQuarter(); ok {
+		if err := report.ReportQuarterValidator(v); err != nil {
+			return &ValidationError{Name: "ReportQuarter", err: fmt.Errorf(`ent: validator failed for field "Report.ReportQuarter": %w`, err)}
 		}
 	}
 	if v, ok := ru.mutation.URL(); ok {
@@ -374,32 +374,32 @@ func (ru *ReportUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := ru.mutation.Year(); ok {
+	if value, ok := ru.mutation.ReportYear(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
-			Column: report.FieldYear,
+			Column: report.FieldReportYear,
 		})
 	}
-	if value, ok := ru.mutation.AddedYear(); ok {
+	if value, ok := ru.mutation.AddedReportYear(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
-			Column: report.FieldYear,
+			Column: report.FieldReportYear,
 		})
 	}
-	if value, ok := ru.mutation.Quarter(); ok {
+	if value, ok := ru.mutation.ReportQuarter(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
-			Column: report.FieldQuarter,
+			Column: report.FieldReportQuarter,
 		})
 	}
-	if value, ok := ru.mutation.AddedQuarter(); ok {
+	if value, ok := ru.mutation.AddedReportQuarter(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
-			Column: report.FieldQuarter,
+			Column: report.FieldReportQuarter,
 		})
 	}
 	if value, ok := ru.mutation.ReportDate(); ok {
@@ -437,18 +437,18 @@ func (ru *ReportUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: report.FieldPnlAmortizationYtd,
 		})
 	}
-	if value, ok := ru.mutation.PnlOperationIncomeYtd(); ok {
+	if value, ok := ru.mutation.PnlOperatingIncomeYtd(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeFloat64,
 			Value:  value,
-			Column: report.FieldPnlOperationIncomeYtd,
+			Column: report.FieldPnlOperatingIncomeYtd,
 		})
 	}
-	if value, ok := ru.mutation.AddedPnlOperationIncomeYtd(); ok {
+	if value, ok := ru.mutation.AddedPnlOperatingIncomeYtd(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
 			Type:   field.TypeFloat64,
 			Value:  value,
-			Column: report.FieldPnlOperationIncomeYtd,
+			Column: report.FieldPnlOperatingIncomeYtd,
 		})
 	}
 	if value, ok := ru.mutation.PnlInterestIncomeYtd(); ok {
@@ -549,18 +549,18 @@ func (ru *ReportUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: report.FieldCfCurrentLiabilitesSld,
 		})
 	}
-	if value, ok := ru.mutation.CfNonControlledSld(); ok {
+	if value, ok := ru.mutation.CfNonControllingSld(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeFloat64,
 			Value:  value,
-			Column: report.FieldCfNonControlledSld,
+			Column: report.FieldCfNonControllingSld,
 		})
 	}
-	if value, ok := ru.mutation.AddedCfNonControlledSld(); ok {
+	if value, ok := ru.mutation.AddedCfNonControllingSld(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
 			Type:   field.TypeFloat64,
 			Value:  value,
-			Column: report.FieldCfNonControlledSld,
+			Column: report.FieldCfNonControllingSld,
 		})
 	}
 	if value, ok := ru.mutation.CfEquitySld(); ok {
@@ -658,29 +658,29 @@ type ReportUpdateOne struct {
 	mutation *ReportMutation
 }
 
-// SetYear sets the "Year" field.
-func (ruo *ReportUpdateOne) SetYear(i int) *ReportUpdateOne {
-	ruo.mutation.ResetYear()
-	ruo.mutation.SetYear(i)
+// SetReportYear sets the "ReportYear" field.
+func (ruo *ReportUpdateOne) SetReportYear(i int) *ReportUpdateOne {
+	ruo.mutation.ResetReportYear()
+	ruo.mutation.SetReportYear(i)
 	return ruo
 }
 
-// AddYear adds i to the "Year" field.
-func (ruo *ReportUpdateOne) AddYear(i int) *ReportUpdateOne {
-	ruo.mutation.AddYear(i)
+// AddReportYear adds i to the "ReportYear" field.
+func (ruo *ReportUpdateOne) AddReportYear(i int) *ReportUpdateOne {
+	ruo.mutation.AddReportYear(i)
 	return ruo
 }
 
-// SetQuarter sets the "Quarter" field.
-func (ruo *ReportUpdateOne) SetQuarter(i int) *ReportUpdateOne {
-	ruo.mutation.ResetQuarter()
-	ruo.mutation.SetQuarter(i)
+// SetReportQuarter sets the "ReportQuarter" field.
+func (ruo *ReportUpdateOne) SetReportQuarter(i int) *ReportUpdateOne {
+	ruo.mutation.ResetReportQuarter()
+	ruo.mutation.SetReportQuarter(i)
 	return ruo
 }
 
-// AddQuarter adds i to the "Quarter" field.
-func (ruo *ReportUpdateOne) AddQuarter(i int) *ReportUpdateOne {
-	ruo.mutation.AddQuarter(i)
+// AddReportQuarter adds i to the "ReportQuarter" field.
+func (ruo *ReportUpdateOne) AddReportQuarter(i int) *ReportUpdateOne {
+	ruo.mutation.AddReportQuarter(i)
 	return ruo
 }
 
@@ -716,16 +716,16 @@ func (ruo *ReportUpdateOne) AddPnlAmortizationYtd(f float64) *ReportUpdateOne {
 	return ruo
 }
 
-// SetPnlOperationIncomeYtd sets the "PnlOperationIncomeYtd" field.
-func (ruo *ReportUpdateOne) SetPnlOperationIncomeYtd(f float64) *ReportUpdateOne {
-	ruo.mutation.ResetPnlOperationIncomeYtd()
-	ruo.mutation.SetPnlOperationIncomeYtd(f)
+// SetPnlOperatingIncomeYtd sets the "PnlOperatingIncomeYtd" field.
+func (ruo *ReportUpdateOne) SetPnlOperatingIncomeYtd(f float64) *ReportUpdateOne {
+	ruo.mutation.ResetPnlOperatingIncomeYtd()
+	ruo.mutation.SetPnlOperatingIncomeYtd(f)
 	return ruo
 }
 
-// AddPnlOperationIncomeYtd adds f to the "PnlOperationIncomeYtd" field.
-func (ruo *ReportUpdateOne) AddPnlOperationIncomeYtd(f float64) *ReportUpdateOne {
-	ruo.mutation.AddPnlOperationIncomeYtd(f)
+// AddPnlOperatingIncomeYtd adds f to the "PnlOperatingIncomeYtd" field.
+func (ruo *ReportUpdateOne) AddPnlOperatingIncomeYtd(f float64) *ReportUpdateOne {
+	ruo.mutation.AddPnlOperatingIncomeYtd(f)
 	return ruo
 }
 
@@ -820,16 +820,16 @@ func (ruo *ReportUpdateOne) AddCfCurrentLiabilitesSld(f float64) *ReportUpdateOn
 	return ruo
 }
 
-// SetCfNonControlledSld sets the "CfNonControlledSld" field.
-func (ruo *ReportUpdateOne) SetCfNonControlledSld(f float64) *ReportUpdateOne {
-	ruo.mutation.ResetCfNonControlledSld()
-	ruo.mutation.SetCfNonControlledSld(f)
+// SetCfNonControllingSld sets the "CfNonControllingSld" field.
+func (ruo *ReportUpdateOne) SetCfNonControllingSld(f float64) *ReportUpdateOne {
+	ruo.mutation.ResetCfNonControllingSld()
+	ruo.mutation.SetCfNonControllingSld(f)
 	return ruo
 }
 
-// AddCfNonControlledSld adds f to the "CfNonControlledSld" field.
-func (ruo *ReportUpdateOne) AddCfNonControlledSld(f float64) *ReportUpdateOne {
-	ruo.mutation.AddCfNonControlledSld(f)
+// AddCfNonControllingSld adds f to the "CfNonControllingSld" field.
+func (ruo *ReportUpdateOne) AddCfNonControllingSld(f float64) *ReportUpdateOne {
+	ruo.mutation.AddCfNonControllingSld(f)
 	return ruo
 }
 
@@ -970,14 +970,14 @@ func (ruo *ReportUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (ruo *ReportUpdateOne) check() error {
-	if v, ok := ruo.mutation.Year(); ok {
-		if err := report.YearValidator(v); err != nil {
-			return &ValidationError{Name: "Year", err: fmt.Errorf(`ent: validator failed for field "Report.Year": %w`, err)}
+	if v, ok := ruo.mutation.ReportYear(); ok {
+		if err := report.ReportYearValidator(v); err != nil {
+			return &ValidationError{Name: "ReportYear", err: fmt.Errorf(`ent: validator failed for field "Report.ReportYear": %w`, err)}
 		}
 	}
-	if v, ok := ruo.mutation.Quarter(); ok {
-		if err := report.QuarterValidator(v); err != nil {
-			return &ValidationError{Name: "Quarter", err: fmt.Errorf(`ent: validator failed for field "Report.Quarter": %w`, err)}
+	if v, ok := ruo.mutation.ReportQuarter(); ok {
+		if err := report.ReportQuarterValidator(v); err != nil {
+			return &ValidationError{Name: "ReportQuarter", err: fmt.Errorf(`ent: validator failed for field "Report.ReportQuarter": %w`, err)}
 		}
 	}
 	if v, ok := ruo.mutation.URL(); ok {
@@ -1026,32 +1026,32 @@ func (ruo *ReportUpdateOne) sqlSave(ctx context.Context) (_node *Report, err err
 			}
 		}
 	}
-	if value, ok := ruo.mutation.Year(); ok {
+	if value, ok := ruo.mutation.ReportYear(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
-			Column: report.FieldYear,
+			Column: report.FieldReportYear,
 		})
 	}
-	if value, ok := ruo.mutation.AddedYear(); ok {
+	if value, ok := ruo.mutation.AddedReportYear(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
-			Column: report.FieldYear,
+			Column: report.FieldReportYear,
 		})
 	}
-	if value, ok := ruo.mutation.Quarter(); ok {
+	if value, ok := ruo.mutation.ReportQuarter(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
-			Column: report.FieldQuarter,
+			Column: report.FieldReportQuarter,
 		})
 	}
-	if value, ok := ruo.mutation.AddedQuarter(); ok {
+	if value, ok := ruo.mutation.AddedReportQuarter(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
-			Column: report.FieldQuarter,
+			Column: report.FieldReportQuarter,
 		})
 	}
 	if value, ok := ruo.mutation.ReportDate(); ok {
@@ -1089,18 +1089,18 @@ func (ruo *ReportUpdateOne) sqlSave(ctx context.Context) (_node *Report, err err
 			Column: report.FieldPnlAmortizationYtd,
 		})
 	}
-	if value, ok := ruo.mutation.PnlOperationIncomeYtd(); ok {
+	if value, ok := ruo.mutation.PnlOperatingIncomeYtd(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeFloat64,
 			Value:  value,
-			Column: report.FieldPnlOperationIncomeYtd,
+			Column: report.FieldPnlOperatingIncomeYtd,
 		})
 	}
-	if value, ok := ruo.mutation.AddedPnlOperationIncomeYtd(); ok {
+	if value, ok := ruo.mutation.AddedPnlOperatingIncomeYtd(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
 			Type:   field.TypeFloat64,
 			Value:  value,
-			Column: report.FieldPnlOperationIncomeYtd,
+			Column: report.FieldPnlOperatingIncomeYtd,
 		})
 	}
 	if value, ok := ruo.mutation.PnlInterestIncomeYtd(); ok {
@@ -1201,18 +1201,18 @@ func (ruo *ReportUpdateOne) sqlSave(ctx context.Context) (_node *Report, err err
 			Column: report.FieldCfCurrentLiabilitesSld,
 		})
 	}
-	if value, ok := ruo.mutation.CfNonControlledSld(); ok {
+	if value, ok := ruo.mutation.CfNonControllingSld(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeFloat64,
 			Value:  value,
-			Column: report.FieldCfNonControlledSld,
+			Column: report.FieldCfNonControllingSld,
 		})
 	}
-	if value, ok := ruo.mutation.AddedCfNonControlledSld(); ok {
+	if value, ok := ruo.mutation.AddedCfNonControllingSld(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
 			Type:   field.TypeFloat64,
 			Value:  value,
-			Column: report.FieldCfNonControlledSld,
+			Column: report.FieldCfNonControllingSld,
 		})
 	}
 	if value, ok := ruo.mutation.CfEquitySld(); ok {

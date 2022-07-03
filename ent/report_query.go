@@ -293,12 +293,12 @@ func (rq *ReportQuery) WithEmitent(opts ...func(*EmitentQuery)) *ReportQuery {
 // Example:
 //
 //	var v []struct {
-//		Year int `json:"Year,omitempty"`
+//		ReportYear int `json:"ReportYear,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Report.Query().
-//		GroupBy(report.FieldYear).
+//		GroupBy(report.FieldReportYear).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -320,11 +320,11 @@ func (rq *ReportQuery) GroupBy(field string, fields ...string) *ReportGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Year int `json:"Year,omitempty"`
+//		ReportYear int `json:"ReportYear,omitempty"`
 //	}
 //
 //	client.Report.Query().
-//		Select(report.FieldYear).
+//		Select(report.FieldReportYear).
 //		Scan(ctx, &v)
 //
 func (rq *ReportQuery) Select(fields ...string) *ReportSelect {
