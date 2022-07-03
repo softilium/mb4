@@ -78,11 +78,11 @@ func Quotes(w http.ResponseWriter, r *http.Request) {
 				SetH(v.H).
 				SetL(v.L).
 				SetV(v.V).
-				SetCap(v.Cap).
-				SetLotSize(v.LotSize).
-				SetListLevel(v.ListLevel).
-				SetDivSum5Y(v.DivSum5Y).
-				SetDivYield5Y(v.DivYield5Y).
+				//SetCap(v.Cap).
+				//SetLotSize(v.LotSize).
+				//SetListLevel(v.ListLevel).
+				//SetDivSum5Y(v.DivSum5Y).
+				//SetDivYield5Y(v.DivYield5Y).
 				Save(context.Background())
 			handleErr(err, w)
 		}

@@ -4,4 +4,35 @@ extends layout.pug
         title moneyBox
 
     block content
-        h1 Hello, kitty
+        div.row
+            div.col-12.col-md-6.col-xl-3
+                h2 Дивидендная доходность
+                table.table.table-sm
+                    thead
+                        tr
+                            th Тикер
+                            th.text-end Yield-5Y
+                            th.text-end DSI
+                    tbody
+                        each $item in TopY
+                            tr 
+                                td
+                                    a[href=$item.Ticker] #{$item.Descr}
+                                td.text-end #{$item.Yield}
+                                td.text-end #{$item.DSI}
+
+            div.col-12.col-md-6.col-xl-3
+                h2 Дивидендная стабильность
+                table.table.table-sm
+                    thead
+                        tr
+                            th Тикер
+                            th.text-end DSI
+                            th.text-end Yield-5Y
+                    tbody
+                        each $item in TopDSI
+                            tr 
+                                td
+                                    a[href=$item.Ticker] #{$item.Descr}
+                                td.text-end #{$item.DSI}
+                                td.text-end #{$item.Yield}

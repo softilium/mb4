@@ -30,16 +30,6 @@ type Quote struct {
 	L float64 `json:"L,omitempty"`
 	// V holds the value of the "V" field.
 	V float64 `json:"V,omitempty"`
-	// Cap holds the value of the "Cap" field.
-	Cap float64 `json:"Cap,omitempty"`
-	// DivSum5Y holds the value of the "DivSum_5Y" field.
-	DivSum5Y float64 `json:"DivSum_5Y,omitempty"`
-	// DivYield5Y holds the value of the "DivYield_5Y" field.
-	DivYield5Y float64 `json:"DivYield_5Y,omitempty"`
-	// LotSize holds the value of the "LotSize" field.
-	LotSize int `json:"LotSize,omitempty"`
-	// ListLevel holds the value of the "ListLevel" field.
-	ListLevel int `json:"ListLevel,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the QuoteQuery when eager-loading is set.
 	Edges         QuoteEdges `json:"edges"`
@@ -74,10 +64,8 @@ func (*Quote) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case quote.FieldO, quote.FieldC, quote.FieldH, quote.FieldL, quote.FieldV, quote.FieldCap, quote.FieldDivSum5Y, quote.FieldDivYield5Y:
+		case quote.FieldO, quote.FieldC, quote.FieldH, quote.FieldL, quote.FieldV:
 			values[i] = new(sql.NullFloat64)
-		case quote.FieldLotSize, quote.FieldListLevel:
-			values[i] = new(sql.NullInt64)
 		case quote.FieldD:
 			values[i] = new(sql.NullTime)
 		case quote.FieldID:
@@ -141,36 +129,6 @@ func (q *Quote) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				q.V = value.Float64
 			}
-		case quote.FieldCap:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
-				return fmt.Errorf("unexpected type %T for field Cap", values[i])
-			} else if value.Valid {
-				q.Cap = value.Float64
-			}
-		case quote.FieldDivSum5Y:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
-				return fmt.Errorf("unexpected type %T for field DivSum_5Y", values[i])
-			} else if value.Valid {
-				q.DivSum5Y = value.Float64
-			}
-		case quote.FieldDivYield5Y:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
-				return fmt.Errorf("unexpected type %T for field DivYield_5Y", values[i])
-			} else if value.Valid {
-				q.DivYield5Y = value.Float64
-			}
-		case quote.FieldLotSize:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field LotSize", values[i])
-			} else if value.Valid {
-				q.LotSize = int(value.Int64)
-			}
-		case quote.FieldListLevel:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field ListLevel", values[i])
-			} else if value.Valid {
-				q.ListLevel = int(value.Int64)
-			}
 		case quote.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field ticker_quotes", values[i])
@@ -223,16 +181,6 @@ func (q *Quote) String() string {
 	builder.WriteString(fmt.Sprintf("%v", q.L))
 	builder.WriteString(", V=")
 	builder.WriteString(fmt.Sprintf("%v", q.V))
-	builder.WriteString(", Cap=")
-	builder.WriteString(fmt.Sprintf("%v", q.Cap))
-	builder.WriteString(", DivSum_5Y=")
-	builder.WriteString(fmt.Sprintf("%v", q.DivSum5Y))
-	builder.WriteString(", DivYield_5Y=")
-	builder.WriteString(fmt.Sprintf("%v", q.DivYield5Y))
-	builder.WriteString(", LotSize=")
-	builder.WriteString(fmt.Sprintf("%v", q.LotSize))
-	builder.WriteString(", ListLevel=")
-	builder.WriteString(fmt.Sprintf("%v", q.ListLevel))
 	builder.WriteByte(')')
 	return builder.String()
 }

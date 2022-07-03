@@ -58,36 +58,6 @@ func (qc *QuoteCreate) SetV(f float64) *QuoteCreate {
 	return qc
 }
 
-// SetCap sets the "Cap" field.
-func (qc *QuoteCreate) SetCap(f float64) *QuoteCreate {
-	qc.mutation.SetCap(f)
-	return qc
-}
-
-// SetDivSum5Y sets the "DivSum_5Y" field.
-func (qc *QuoteCreate) SetDivSum5Y(f float64) *QuoteCreate {
-	qc.mutation.SetDivSum5Y(f)
-	return qc
-}
-
-// SetDivYield5Y sets the "DivYield_5Y" field.
-func (qc *QuoteCreate) SetDivYield5Y(f float64) *QuoteCreate {
-	qc.mutation.SetDivYield5Y(f)
-	return qc
-}
-
-// SetLotSize sets the "LotSize" field.
-func (qc *QuoteCreate) SetLotSize(i int) *QuoteCreate {
-	qc.mutation.SetLotSize(i)
-	return qc
-}
-
-// SetListLevel sets the "ListLevel" field.
-func (qc *QuoteCreate) SetListLevel(i int) *QuoteCreate {
-	qc.mutation.SetListLevel(i)
-	return qc
-}
-
 // SetID sets the "id" field.
 func (qc *QuoteCreate) SetID(x xid.ID) *QuoteCreate {
 	qc.mutation.SetID(x)
@@ -210,26 +180,6 @@ func (qc *QuoteCreate) check() error {
 	if _, ok := qc.mutation.V(); !ok {
 		return &ValidationError{Name: "V", err: errors.New(`ent: missing required field "Quote.V"`)}
 	}
-	if _, ok := qc.mutation.Cap(); !ok {
-		return &ValidationError{Name: "Cap", err: errors.New(`ent: missing required field "Quote.Cap"`)}
-	}
-	if _, ok := qc.mutation.DivSum5Y(); !ok {
-		return &ValidationError{Name: "DivSum_5Y", err: errors.New(`ent: missing required field "Quote.DivSum_5Y"`)}
-	}
-	if _, ok := qc.mutation.DivYield5Y(); !ok {
-		return &ValidationError{Name: "DivYield_5Y", err: errors.New(`ent: missing required field "Quote.DivYield_5Y"`)}
-	}
-	if _, ok := qc.mutation.LotSize(); !ok {
-		return &ValidationError{Name: "LotSize", err: errors.New(`ent: missing required field "Quote.LotSize"`)}
-	}
-	if v, ok := qc.mutation.LotSize(); ok {
-		if err := quote.LotSizeValidator(v); err != nil {
-			return &ValidationError{Name: "LotSize", err: fmt.Errorf(`ent: validator failed for field "Quote.LotSize": %w`, err)}
-		}
-	}
-	if _, ok := qc.mutation.ListLevel(); !ok {
-		return &ValidationError{Name: "ListLevel", err: errors.New(`ent: missing required field "Quote.ListLevel"`)}
-	}
 	if v, ok := qc.mutation.ID(); ok {
 		if err := quote.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Quote.id": %w`, err)}
@@ -321,46 +271,6 @@ func (qc *QuoteCreate) createSpec() (*Quote, *sqlgraph.CreateSpec) {
 			Column: quote.FieldV,
 		})
 		_node.V = value
-	}
-	if value, ok := qc.mutation.Cap(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
-			Value:  value,
-			Column: quote.FieldCap,
-		})
-		_node.Cap = value
-	}
-	if value, ok := qc.mutation.DivSum5Y(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
-			Value:  value,
-			Column: quote.FieldDivSum5Y,
-		})
-		_node.DivSum5Y = value
-	}
-	if value, ok := qc.mutation.DivYield5Y(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
-			Value:  value,
-			Column: quote.FieldDivYield5Y,
-		})
-		_node.DivYield5Y = value
-	}
-	if value, ok := qc.mutation.LotSize(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: quote.FieldLotSize,
-		})
-		_node.LotSize = value
-	}
-	if value, ok := qc.mutation.ListLevel(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: quote.FieldListLevel,
-		})
-		_node.ListLevel = value
 	}
 	if nodes := qc.mutation.TickerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

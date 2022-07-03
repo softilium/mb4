@@ -23,11 +23,11 @@ func (Quote) Fields() []ent.Field {
 		field.Float("H").Immutable(),
 		field.Float("L").Immutable(),
 		field.Float("V").Immutable(),
-		field.Float("Cap").Immutable(),
-		field.Float("DivSum_5Y").Immutable(),
-		field.Float("DivYield_5Y").Immutable(),
-		field.Int("LotSize").Immutable().Positive(),
-		field.Int("ListLevel").Immutable(),
+		//field.Float("Cap").Immutable(),
+		//field.Float("DivSum_5Y").Immutable(),
+		//field.Float("DivYield_5Y").Immutable(),
+		//field.Int("LotSize").Immutable().Positive(),
+		//field.Int("ListLevel").Immutable(),
 	}
 }
 

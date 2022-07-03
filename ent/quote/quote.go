@@ -23,16 +23,6 @@ const (
 	FieldL = "l"
 	// FieldV holds the string denoting the v field in the database.
 	FieldV = "v"
-	// FieldCap holds the string denoting the cap field in the database.
-	FieldCap = "cap"
-	// FieldDivSum5Y holds the string denoting the divsum_5y field in the database.
-	FieldDivSum5Y = "div_sum_5y"
-	// FieldDivYield5Y holds the string denoting the divyield_5y field in the database.
-	FieldDivYield5Y = "div_yield_5y"
-	// FieldLotSize holds the string denoting the lotsize field in the database.
-	FieldLotSize = "lot_size"
-	// FieldListLevel holds the string denoting the listlevel field in the database.
-	FieldListLevel = "list_level"
 	// EdgeTicker holds the string denoting the ticker edge name in mutations.
 	EdgeTicker = "Ticker"
 	// Table holds the table name of the quote in the database.
@@ -55,11 +45,6 @@ var Columns = []string{
 	FieldH,
 	FieldL,
 	FieldV,
-	FieldCap,
-	FieldDivSum5Y,
-	FieldDivYield5Y,
-	FieldLotSize,
-	FieldListLevel,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "quotes"
@@ -84,8 +69,6 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// LotSizeValidator is a validator for the "LotSize" field. It is called by the builders before save.
-	LotSizeValidator func(int) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.

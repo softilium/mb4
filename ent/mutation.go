@@ -4028,36 +4028,26 @@ func (m *InvestAccountValuationMutation) ResetEdge(name string) error {
 // QuoteMutation represents an operation that mutates the Quote nodes in the graph.
 type QuoteMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *xid.ID
-	_D              *time.Time
-	_O              *float64
-	add_O           *float64
-	_C              *float64
-	add_C           *float64
-	_H              *float64
-	add_H           *float64
-	_L              *float64
-	add_L           *float64
-	_V              *float64
-	add_V           *float64
-	_Cap            *float64
-	add_Cap         *float64
-	_DivSum_5Y      *float64
-	add_DivSum_5Y   *float64
-	_DivYield_5Y    *float64
-	add_DivYield_5Y *float64
-	_LotSize        *int
-	add_LotSize     *int
-	_ListLevel      *int
-	add_ListLevel   *int
-	clearedFields   map[string]struct{}
-	_Ticker         *string
-	cleared_Ticker  bool
-	done            bool
-	oldValue        func(context.Context) (*Quote, error)
-	predicates      []predicate.Quote
+	op             Op
+	typ            string
+	id             *xid.ID
+	_D             *time.Time
+	_O             *float64
+	add_O          *float64
+	_C             *float64
+	add_C          *float64
+	_H             *float64
+	add_H          *float64
+	_L             *float64
+	add_L          *float64
+	_V             *float64
+	add_V          *float64
+	clearedFields  map[string]struct{}
+	_Ticker        *string
+	cleared_Ticker bool
+	done           bool
+	oldValue       func(context.Context) (*Quote, error)
+	predicates     []predicate.Quote
 }
 
 var _ ent.Mutation = (*QuoteMutation)(nil)
@@ -4480,286 +4470,6 @@ func (m *QuoteMutation) ResetV() {
 	m.add_V = nil
 }
 
-// SetCap sets the "Cap" field.
-func (m *QuoteMutation) SetCap(f float64) {
-	m._Cap = &f
-	m.add_Cap = nil
-}
-
-// Cap returns the value of the "Cap" field in the mutation.
-func (m *QuoteMutation) Cap() (r float64, exists bool) {
-	v := m._Cap
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCap returns the old "Cap" field's value of the Quote entity.
-// If the Quote object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *QuoteMutation) OldCap(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCap is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCap requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCap: %w", err)
-	}
-	return oldValue.Cap, nil
-}
-
-// AddCap adds f to the "Cap" field.
-func (m *QuoteMutation) AddCap(f float64) {
-	if m.add_Cap != nil {
-		*m.add_Cap += f
-	} else {
-		m.add_Cap = &f
-	}
-}
-
-// AddedCap returns the value that was added to the "Cap" field in this mutation.
-func (m *QuoteMutation) AddedCap() (r float64, exists bool) {
-	v := m.add_Cap
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetCap resets all changes to the "Cap" field.
-func (m *QuoteMutation) ResetCap() {
-	m._Cap = nil
-	m.add_Cap = nil
-}
-
-// SetDivSum5Y sets the "DivSum_5Y" field.
-func (m *QuoteMutation) SetDivSum5Y(f float64) {
-	m._DivSum_5Y = &f
-	m.add_DivSum_5Y = nil
-}
-
-// DivSum5Y returns the value of the "DivSum_5Y" field in the mutation.
-func (m *QuoteMutation) DivSum5Y() (r float64, exists bool) {
-	v := m._DivSum_5Y
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDivSum5Y returns the old "DivSum_5Y" field's value of the Quote entity.
-// If the Quote object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *QuoteMutation) OldDivSum5Y(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDivSum5Y is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDivSum5Y requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDivSum5Y: %w", err)
-	}
-	return oldValue.DivSum5Y, nil
-}
-
-// AddDivSum5Y adds f to the "DivSum_5Y" field.
-func (m *QuoteMutation) AddDivSum5Y(f float64) {
-	if m.add_DivSum_5Y != nil {
-		*m.add_DivSum_5Y += f
-	} else {
-		m.add_DivSum_5Y = &f
-	}
-}
-
-// AddedDivSum5Y returns the value that was added to the "DivSum_5Y" field in this mutation.
-func (m *QuoteMutation) AddedDivSum5Y() (r float64, exists bool) {
-	v := m.add_DivSum_5Y
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetDivSum5Y resets all changes to the "DivSum_5Y" field.
-func (m *QuoteMutation) ResetDivSum5Y() {
-	m._DivSum_5Y = nil
-	m.add_DivSum_5Y = nil
-}
-
-// SetDivYield5Y sets the "DivYield_5Y" field.
-func (m *QuoteMutation) SetDivYield5Y(f float64) {
-	m._DivYield_5Y = &f
-	m.add_DivYield_5Y = nil
-}
-
-// DivYield5Y returns the value of the "DivYield_5Y" field in the mutation.
-func (m *QuoteMutation) DivYield5Y() (r float64, exists bool) {
-	v := m._DivYield_5Y
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDivYield5Y returns the old "DivYield_5Y" field's value of the Quote entity.
-// If the Quote object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *QuoteMutation) OldDivYield5Y(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDivYield5Y is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDivYield5Y requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDivYield5Y: %w", err)
-	}
-	return oldValue.DivYield5Y, nil
-}
-
-// AddDivYield5Y adds f to the "DivYield_5Y" field.
-func (m *QuoteMutation) AddDivYield5Y(f float64) {
-	if m.add_DivYield_5Y != nil {
-		*m.add_DivYield_5Y += f
-	} else {
-		m.add_DivYield_5Y = &f
-	}
-}
-
-// AddedDivYield5Y returns the value that was added to the "DivYield_5Y" field in this mutation.
-func (m *QuoteMutation) AddedDivYield5Y() (r float64, exists bool) {
-	v := m.add_DivYield_5Y
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetDivYield5Y resets all changes to the "DivYield_5Y" field.
-func (m *QuoteMutation) ResetDivYield5Y() {
-	m._DivYield_5Y = nil
-	m.add_DivYield_5Y = nil
-}
-
-// SetLotSize sets the "LotSize" field.
-func (m *QuoteMutation) SetLotSize(i int) {
-	m._LotSize = &i
-	m.add_LotSize = nil
-}
-
-// LotSize returns the value of the "LotSize" field in the mutation.
-func (m *QuoteMutation) LotSize() (r int, exists bool) {
-	v := m._LotSize
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldLotSize returns the old "LotSize" field's value of the Quote entity.
-// If the Quote object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *QuoteMutation) OldLotSize(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldLotSize is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLotSize requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldLotSize: %w", err)
-	}
-	return oldValue.LotSize, nil
-}
-
-// AddLotSize adds i to the "LotSize" field.
-func (m *QuoteMutation) AddLotSize(i int) {
-	if m.add_LotSize != nil {
-		*m.add_LotSize += i
-	} else {
-		m.add_LotSize = &i
-	}
-}
-
-// AddedLotSize returns the value that was added to the "LotSize" field in this mutation.
-func (m *QuoteMutation) AddedLotSize() (r int, exists bool) {
-	v := m.add_LotSize
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetLotSize resets all changes to the "LotSize" field.
-func (m *QuoteMutation) ResetLotSize() {
-	m._LotSize = nil
-	m.add_LotSize = nil
-}
-
-// SetListLevel sets the "ListLevel" field.
-func (m *QuoteMutation) SetListLevel(i int) {
-	m._ListLevel = &i
-	m.add_ListLevel = nil
-}
-
-// ListLevel returns the value of the "ListLevel" field in the mutation.
-func (m *QuoteMutation) ListLevel() (r int, exists bool) {
-	v := m._ListLevel
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldListLevel returns the old "ListLevel" field's value of the Quote entity.
-// If the Quote object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *QuoteMutation) OldListLevel(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldListLevel is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldListLevel requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldListLevel: %w", err)
-	}
-	return oldValue.ListLevel, nil
-}
-
-// AddListLevel adds i to the "ListLevel" field.
-func (m *QuoteMutation) AddListLevel(i int) {
-	if m.add_ListLevel != nil {
-		*m.add_ListLevel += i
-	} else {
-		m.add_ListLevel = &i
-	}
-}
-
-// AddedListLevel returns the value that was added to the "ListLevel" field in this mutation.
-func (m *QuoteMutation) AddedListLevel() (r int, exists bool) {
-	v := m.add_ListLevel
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetListLevel resets all changes to the "ListLevel" field.
-func (m *QuoteMutation) ResetListLevel() {
-	m._ListLevel = nil
-	m.add_ListLevel = nil
-}
-
 // SetTickerID sets the "Ticker" edge to the Ticker entity by id.
 func (m *QuoteMutation) SetTickerID(id string) {
 	m._Ticker = &id
@@ -4818,7 +4528,7 @@ func (m *QuoteMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *QuoteMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 6)
 	if m._D != nil {
 		fields = append(fields, quote.FieldD)
 	}
@@ -4836,21 +4546,6 @@ func (m *QuoteMutation) Fields() []string {
 	}
 	if m._V != nil {
 		fields = append(fields, quote.FieldV)
-	}
-	if m._Cap != nil {
-		fields = append(fields, quote.FieldCap)
-	}
-	if m._DivSum_5Y != nil {
-		fields = append(fields, quote.FieldDivSum5Y)
-	}
-	if m._DivYield_5Y != nil {
-		fields = append(fields, quote.FieldDivYield5Y)
-	}
-	if m._LotSize != nil {
-		fields = append(fields, quote.FieldLotSize)
-	}
-	if m._ListLevel != nil {
-		fields = append(fields, quote.FieldListLevel)
 	}
 	return fields
 }
@@ -4872,16 +4567,6 @@ func (m *QuoteMutation) Field(name string) (ent.Value, bool) {
 		return m.L()
 	case quote.FieldV:
 		return m.V()
-	case quote.FieldCap:
-		return m.Cap()
-	case quote.FieldDivSum5Y:
-		return m.DivSum5Y()
-	case quote.FieldDivYield5Y:
-		return m.DivYield5Y()
-	case quote.FieldLotSize:
-		return m.LotSize()
-	case quote.FieldListLevel:
-		return m.ListLevel()
 	}
 	return nil, false
 }
@@ -4903,16 +4588,6 @@ func (m *QuoteMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldL(ctx)
 	case quote.FieldV:
 		return m.OldV(ctx)
-	case quote.FieldCap:
-		return m.OldCap(ctx)
-	case quote.FieldDivSum5Y:
-		return m.OldDivSum5Y(ctx)
-	case quote.FieldDivYield5Y:
-		return m.OldDivYield5Y(ctx)
-	case quote.FieldLotSize:
-		return m.OldLotSize(ctx)
-	case quote.FieldListLevel:
-		return m.OldListLevel(ctx)
 	}
 	return nil, fmt.Errorf("unknown Quote field %s", name)
 }
@@ -4964,41 +4639,6 @@ func (m *QuoteMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetV(v)
 		return nil
-	case quote.FieldCap:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCap(v)
-		return nil
-	case quote.FieldDivSum5Y:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDivSum5Y(v)
-		return nil
-	case quote.FieldDivYield5Y:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDivYield5Y(v)
-		return nil
-	case quote.FieldLotSize:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetLotSize(v)
-		return nil
-	case quote.FieldListLevel:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetListLevel(v)
-		return nil
 	}
 	return fmt.Errorf("unknown Quote field %s", name)
 }
@@ -5022,21 +4662,6 @@ func (m *QuoteMutation) AddedFields() []string {
 	if m.add_V != nil {
 		fields = append(fields, quote.FieldV)
 	}
-	if m.add_Cap != nil {
-		fields = append(fields, quote.FieldCap)
-	}
-	if m.add_DivSum_5Y != nil {
-		fields = append(fields, quote.FieldDivSum5Y)
-	}
-	if m.add_DivYield_5Y != nil {
-		fields = append(fields, quote.FieldDivYield5Y)
-	}
-	if m.add_LotSize != nil {
-		fields = append(fields, quote.FieldLotSize)
-	}
-	if m.add_ListLevel != nil {
-		fields = append(fields, quote.FieldListLevel)
-	}
 	return fields
 }
 
@@ -5055,16 +4680,6 @@ func (m *QuoteMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedL()
 	case quote.FieldV:
 		return m.AddedV()
-	case quote.FieldCap:
-		return m.AddedCap()
-	case quote.FieldDivSum5Y:
-		return m.AddedDivSum5Y()
-	case quote.FieldDivYield5Y:
-		return m.AddedDivYield5Y()
-	case quote.FieldLotSize:
-		return m.AddedLotSize()
-	case quote.FieldListLevel:
-		return m.AddedListLevel()
 	}
 	return nil, false
 }
@@ -5108,41 +4723,6 @@ func (m *QuoteMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddV(v)
-		return nil
-	case quote.FieldCap:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddCap(v)
-		return nil
-	case quote.FieldDivSum5Y:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddDivSum5Y(v)
-		return nil
-	case quote.FieldDivYield5Y:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddDivYield5Y(v)
-		return nil
-	case quote.FieldLotSize:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddLotSize(v)
-		return nil
-	case quote.FieldListLevel:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddListLevel(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Quote numeric field %s", name)
@@ -5188,21 +4768,6 @@ func (m *QuoteMutation) ResetField(name string) error {
 		return nil
 	case quote.FieldV:
 		m.ResetV()
-		return nil
-	case quote.FieldCap:
-		m.ResetCap()
-		return nil
-	case quote.FieldDivSum5Y:
-		m.ResetDivSum5Y()
-		return nil
-	case quote.FieldDivYield5Y:
-		m.ResetDivYield5Y()
-		return nil
-	case quote.FieldLotSize:
-		m.ResetLotSize()
-		return nil
-	case quote.FieldListLevel:
-		m.ResetListLevel()
 		return nil
 	}
 	return fmt.Errorf("unknown Quote field %s", name)

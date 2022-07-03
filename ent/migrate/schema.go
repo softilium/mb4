@@ -158,11 +158,6 @@ var (
 		{Name: "h", Type: field.TypeFloat64},
 		{Name: "l", Type: field.TypeFloat64},
 		{Name: "v", Type: field.TypeFloat64},
-		{Name: "cap", Type: field.TypeFloat64},
-		{Name: "div_sum_5y", Type: field.TypeFloat64},
-		{Name: "div_yield_5y", Type: field.TypeFloat64},
-		{Name: "lot_size", Type: field.TypeInt},
-		{Name: "list_level", Type: field.TypeInt},
 		{Name: "ticker_quotes", Type: field.TypeString, Size: 20},
 	}
 	// QuotesTable holds the schema information for the "quotes" table.
@@ -173,7 +168,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "quotes_tickers_Quotes",
-				Columns:    []*schema.Column{QuotesColumns[12]},
+				Columns:    []*schema.Column{QuotesColumns[7]},
 				RefColumns: []*schema.Column{TickersColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -182,7 +177,7 @@ var (
 			{
 				Name:    "quote_d_ticker_quotes",
 				Unique:  true,
-				Columns: []*schema.Column{QuotesColumns[1], QuotesColumns[12]},
+				Columns: []*schema.Column{QuotesColumns[1], QuotesColumns[7]},
 			},
 		},
 	}

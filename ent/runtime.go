@@ -226,10 +226,6 @@ func init() {
 	}()
 	quoteFields := schema.Quote{}.Fields()
 	_ = quoteFields
-	// quoteDescLotSize is the schema descriptor for LotSize field.
-	quoteDescLotSize := quoteFields[10].Descriptor()
-	// quote.LotSizeValidator is a validator for the "LotSize" field. It is called by the builders before save.
-	quote.LotSizeValidator = quoteDescLotSize.Validators[0].(func(int) error)
 	// quoteDescID is the schema descriptor for id field.
 	quoteDescID := quoteFields[0].Descriptor()
 	// quote.DefaultID holds the default value on creation for the id field.
