@@ -7,6 +7,15 @@ extends layout.pug
         div.row
             div.col-12.col-md-6.col-xl-3
                 h2 Дивидендная доходность
+            div.col-12.col-md-6.col-xl-3
+                h2 Дивидендная стабильность
+            div.col-12.col-md-6.col-xl-3
+                h2 Падения месяца
+            div.col-12.col-md-6.col-xl-3
+                h2 Рост месяца
+        
+        div.row
+            div.col-12.col-md-6.col-xl-3
                 table.table.table-sm
                     thead
                         tr
@@ -18,11 +27,10 @@ extends layout.pug
                             tr 
                                 td
                                     a[href=$item.Ticker] #{$item.Descr}
-                                td.text-end #{$item.Yield}
-                                td.text-end #{$item.DSI}
+                                td.text-end #{$item.V}
+                                td.text-end #{$item.V1}
 
             div.col-12.col-md-6.col-xl-3
-                h2 Дивидендная стабильность
                 table.table.table-sm
                     thead
                         tr
@@ -34,5 +42,31 @@ extends layout.pug
                             tr 
                                 td
                                     a[href=$item.Ticker] #{$item.Descr}
-                                td.text-end #{$item.DSI}
-                                td.text-end #{$item.Yield}
+                                td.text-end #{$item.V}
+                                td.text-end #{$item.V1}
+
+            div.col-12.col-md-6.col-xl-3
+                table.table.table-sm
+                    thead
+                        tr
+                            th Тикер
+                            th.text-end % изменения
+                    tbody
+                        each $item in TopFallen
+                            tr 
+                                td
+                                    a[href=$item.Ticker] #{$item.Descr}
+                                td.text-end #{$item.V}
+
+            div.col-12.col-md-6.col-xl-3
+                table.table.table-sm
+                    thead
+                        tr
+                            th Тикер
+                            th.text-end % изменения
+                    tbody
+                        each $item in TopRaise
+                            tr 
+                                td
+                                    a[href=$item.Ticker] #{$item.Descr}
+                                td.text-end #{$item.V}
