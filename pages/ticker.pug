@@ -1,0 +1,21 @@
+extends layout.pug
+
+    block title
+        title Тикер
+
+    block content
+        script[src="/assets/lib/vue/vue.global.prod.js"]
+        script[src="/assets/lib/echarts/echarts.min.js"]
+
+        h1 #{TRI.Cell.Quote.Edges.Ticker.Descr}
+
+        h6 Размер лота : #{TRI.Cell.Emission.LotSize}
+        h6 Отрасль: 
+            a[href="/industry?id="+TRI.Cell.Industry.ID] #{TRI.Cell.Industry.Descr}
+
+        div#vueapp
+            div[ref="candlesref"][style="height:600px;"]
+
+        script window.tickerid = #{TRI.Cell.Quote.Edges.Ticker.ID};
+        script window.tickerDescr = #{TRI.Cell.Quote.Edges.Ticker.Descr};
+        script[src="/assets/js/ticker.js"]

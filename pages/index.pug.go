@@ -38,27 +38,27 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	pd.SessionStruct = LoadSessionStruct(r)
 	pd.TopY = make([]TopItem, len(topYield5Y))
 	for k, v := range topYield5Y {
-		pd.TopY[k].Ticker = "/ticker/" + v.Quote.Edges.Ticker.ID
+		pd.TopY[k].Ticker = "/ticker?id=" + v.Quote.Edges.Ticker.ID
 		pd.TopY[k].Descr = v.Quote.Edges.Ticker.Descr
 		pd.TopY[k].V = fmt.Sprintf("%.1f", v.DivYield5Y)
 		pd.TopY[k].V1 = fmt.Sprintf("%.1f", v.DSI)
 	}
 	pd.TopDSI = make([]TopItem, len(topDSI))
 	for k, v := range topDSI {
-		pd.TopDSI[k].Ticker = "/ticker/" + v.Quote.Edges.Ticker.ID
+		pd.TopDSI[k].Ticker = "/ticker?id=" + v.Quote.Edges.Ticker.ID
 		pd.TopDSI[k].Descr = v.Quote.Edges.Ticker.Descr
 		pd.TopDSI[k].V = fmt.Sprintf("%.1f", v.DivYield5Y)
 		pd.TopDSI[k].V1 = fmt.Sprintf("%.1f", v.DSI)
 	}
 	pd.TopFallen = make([]TopItem, len(topFallen))
 	for k, v := range topFallen {
-		pd.TopFallen[k].Ticker = "/ticker/" + v.Cell.Quote.Edges.Ticker.ID
+		pd.TopFallen[k].Ticker = "/ticker?id=" + v.Cell.Quote.Edges.Ticker.ID
 		pd.TopFallen[k].Descr = v.Cell.Quote.Edges.Ticker.Descr
 		pd.TopFallen[k].V = fmt.Sprintf("%.1f", -v.PercentPriceChange)
 	}
 	pd.TopRaise = make([]TopItem, len(topRaise))
 	for k, v := range topRaise {
-		pd.TopRaise[k].Ticker = "/ticker/" + v.Cell.Quote.Edges.Ticker.ID
+		pd.TopRaise[k].Ticker = "/ticker?id=" + v.Cell.Quote.Edges.Ticker.ID
 		pd.TopRaise[k].Descr = v.Cell.Quote.Edges.Ticker.Descr
 		pd.TopRaise[k].V = fmt.Sprintf("%.1f", v.PercentPriceChange)
 	}

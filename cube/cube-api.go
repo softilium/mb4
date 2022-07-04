@@ -60,3 +60,36 @@ func (c *Cube) TopFallenRaise(HowMany int, Raise bool) []ItemPriceChange {
 	return changes[:HowMany]
 
 }
+
+type TickerRenderInfo struct {
+	Cell          *Cell
+	CandleDates   []string
+	CandleOCLH    [][4]float64
+	CandleVolumes []float64
+}
+
+func (c *Cube) GetTickerRenderInfo(ticker string, loadQ bool) *TickerRenderInfo {
+
+	c.l.Lock()
+	defer c.l.Unlock()
+
+	result := &TickerRenderInfo{}
+	result.Cell = c.cellsByTickerByDate[ticker][c.allDays[len(c.allDays)-1]]
+
+	if !loadQ {
+		return result
+	}
+
+	quotes := c.getSortedCellsForTicker(ticker)
+	result.CandleDates = make([]string, len(quotes))
+	result.CandleOCLH = make([][4]float64, len(quotes))
+	result.CandleVolumes = make([]float64, len(quotes))
+	for idx, v := range quotes {
+		result.CandleDates[idx] = v.D.Format("2006-01-02")
+		result.CandleOCLH[idx] = [4]float64{v.Quote.O, v.Quote.C, v.Quote.L, v.Quote.H}
+		result.CandleVolumes[idx] = v.Quote.V
+	}
+
+	return result
+
+}

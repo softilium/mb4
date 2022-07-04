@@ -24,6 +24,8 @@ type Cell struct {
 	Emission *ent.Emission
 	Report   *ent.Report
 
+	Industry *ent.Industry // flat quote
+
 	// loadDivsAndCaps
 	Cap          float64
 	DivSum5Y     float64
@@ -79,6 +81,7 @@ func (c *Cube) LoadCube() (err error) {
 		}
 
 		oneCell := &Cell{Quote: v, D: v.D}
+		oneCell.Industry = v.Edges.Ticker.Edges.Emitent.Edges.Industry
 
 		tdm[v.D] = oneCell
 
@@ -314,6 +317,19 @@ func (c *Cube) addMissingCells() error {
 		}
 	}
 	return nil
+}
+
+func (c *Cube) getSortedCellsForTicker(ticker string) []*Cell {
+
+	qm := c.cellsByTickerByDate[ticker]
+	quotes := make([]*Cell, len(qm))
+	idx := 0
+	for _, v := range qm {
+		quotes[idx] = v
+		idx++
+	}
+	sort.Slice(quotes, func(i, j int) bool { return quotes[i].D.Before(quotes[j].D) })
+	return quotes
 }
 
 var Market *Cube = &Cube{l: &sync.Mutex{}}
