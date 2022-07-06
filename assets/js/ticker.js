@@ -2,12 +2,14 @@ const App = {
     data() {
         return {
             tri: {},
+            pnl: {}
         }
     },
     async mounted() {
-        await this.getTRI();
+        await this.getTickerData();
     },
     methods: {
+
         async createCandlesChart(element, tickerName, dates, candles, volumes, deals) {
 
             var upColor = '#00da3c';
@@ -197,23 +199,124 @@ const App = {
             myChart.setOption(option);
 
         },
-        async getTRI() {
-            let response = await fetch(`/ticker?id=${window.tickerid}&mode=json`, { method: "GET" });
+        async PnlView(element, dates, revenues, interestIncomes, ebitdas, ammortizations, interestExpenses, taxes, incomes) {
+
+            var myChart = echarts.init(element);
+
+            option = {
+                animation: false,
+                legend: { left: 10 },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'cross' },
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: dates,
+                        axisLabel: {
+                            interval: 0,
+                            rotate: 90
+                        },
+                    }
+                ],
+                yAxis: [
+                    { type: 'value' }
+                ],
+                series: [
+                    {
+                        name: 'Выручка',
+                        type: 'line',
+                        stack: 'Доходы',
+                        smooth: true,
+                        emphasis: { focus: 'series' }, areaStyle: {}, symbol: 'none',
+                        data: revenues
+                    },
+                    {
+                        name: 'Финансовые доходы',
+                        type: 'line',
+                        stack: 'Доходы',
+                        smooth: true,
+                        emphasis: { focus: 'series' }, areaStyle: {}, symbol: 'none',
+                        data: interestIncomes
+                    },
+                    {
+                        name: 'Амортизация',
+                        type: 'line',
+                        stack: 'Расходы',
+                        smooth: true,
+                        emphasis: { focus: 'series' }, areaStyle: {}, symbol: 'none',
+                        data: ammortizations
+                    },
+                    {
+                        name: 'Финансовые расходы',
+                        type: 'line',
+                        stack: 'Расходы',
+                        smooth: true,
+                        emphasis: { focus: 'series' }, areaStyle: {}, symbol: 'none',
+                        data: interestExpenses
+                    },
+                    {
+                        name: 'Налог с прибыли',
+                        type: 'line',
+                        stack: 'Расходы',
+                        smooth: true,
+                        emphasis: { focus: 'series' }, areaStyle: {}, symbol: 'none',
+                        data: taxes
+                    },
+                    {
+                        name: 'Прибыль',
+                        type: 'bar',
+                        stack: 'Прибыль',
+                        smooth: true,
+                        emphasis: { focus: 'series' }, symbol: 'none',
+                        data: incomes
+                    },
+                    {
+                        name: 'EBITDA',
+                        type: 'line',
+                        smooth: true,
+                        emphasis: { focus: 'series' }, symbol: 'none',
+                        data: ebitdas
+                    },
+
+                ]
+            };
+
+            myChart.setOption(option);
+
+        },
+
+        async getTickerData() {
+            let response = await fetch(`/ticker?id=${window.tickerid}&mode=candles`, { method: "GET" });
             if (response.ok) {
                 this.tri = await response.json();
                 this.createCandlesChart(
-                    this.$refs.candlesref, 
-                    window.tickerDescr, 
-                    this.tri.CandleDates, 
+                    this.$refs.candlesref,
+                    window.tickerDescr,
+                    this.tri.CandleDates,
                     this.tri.CandleOCLH,
                     this.tri.CandleVolumes,
                     []
                 );
-            } else {
-                alert("Проблема при получении данных");
-            }
-        },
-    }
+                let r2 = await fetch(`/ticker?id=${window.tickerid}&mode=pnl`, { method: "GET" });
+                if (r2.ok) {
+                    this.pnl = await r2.json();
+                    this.PnlView(
+                        this.$refs.pnlView,
+                        this.pnl.Dates,
+                        this.pnl.Revenues,
+                        this.pnl.InterestIncomes,
+                        this.pnl.Ebitdas,
+                        this.pnl.Ammortizations,
+                        this.pnl.InterestExpenses,
+                        this.pnl.Taxes,
+                        this.pnl.Incomes
+                    );
+                } else alert("Проблема при получении данных PNL");
+            } else alert("Проблема при получении данных Candles");
+        }
+    },
 };
 
 let app = Vue.createApp(App)

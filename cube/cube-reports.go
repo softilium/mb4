@@ -9,36 +9,36 @@ import (
 
 const (
 	//Pnl src
-	rk2Revenue          = 100
-	rk2Amortization     = 110
-	rk2OperatingIncome  = 120
-	rk2InterestIncome   = 130
-	rk2InterestExpenses = 140
-	rk2IncomeTax        = 150
-	rk2NetIncome        = 160
+	RK2Revenue          = 100
+	RK2Amortization     = 110
+	RK2OperatingIncome  = 120
+	RK2InterestIncome   = 130
+	RK2InterestExpenses = 140
+	RK2IncomeTax        = 150
+	RK2NetIncome        = 160
 
 	//Pnl calculated
-	rk2OIBDA             = 200
-	rk2EBITDA            = 210
-	rk2OIBDAMargin       = 220
-	rk2EBITDAMargin      = 230
-	rk2OperationalMargin = 240
-	rk2NetMargin         = 250
-	rk2Debt_On_EBITDA    = 260
-	rk2EV_On_EBITDA      = 270
-	rk2ROE               = 280
+	RK2OIBDA             = 200
+	RK2EBITDA            = 210
+	RK2OIBDAMargin       = 220
+	RK2EBITDAMargin      = 230
+	RK2OperationalMargin = 240
+	RK2NetMargin         = 250
+	RK2Debt_On_EBITDA    = 260
+	RK2EV_On_EBITDA      = 270
+	RK2ROE               = 280
 
 	// CF src
-	rk2Cash                  = 300
-	rk2NonCurrentLiabilities = 305
-	rk2CurrentLiabilities    = 310
-	rk2NonControlling        = 315
-	rk2Equity                = 320
-	rk2Total                 = 325
+	RK2Cash                  = 300
+	RK2NonCurrentLiabilities = 305
+	RK2CurrentLiabilities    = 310
+	RK2NonControlling        = 315
+	RK2Equity                = 320
+	RK2Total                 = 325
 
 	// CF calculated
-	rk2NetDebt = 400
-	rk2EV      = 410
+	RK2NetDebt = 400
+	RK2EV      = 410
 )
 
 type PnlValue struct {
@@ -97,8 +97,8 @@ type Report2 struct { // enriched report with calculated fields
 	prevYear    *Report2
 	prevQuarter *Report2
 
-	YV map[int]*PnlValue // year-based values
-	SV map[int]*CfValue  // saldo-based values
+	YV map[int]*PnlValue // year-based values (PNL, ...)
+	SV map[int]*CfValue  // saldo-based values (CF, ...)
 
 }
 
@@ -114,79 +114,79 @@ func (r *Report2) Load(s *ent.Report, prevY, prevQ *Report2) {
 	r.prevYear = prevY
 
 	// Pnl src
-	r.YV[rk2Revenue] = &PnlValue{RK: rk2Revenue, Ytd: s.PnlRevenueYtd}
-	r.YV[rk2Amortization] = &PnlValue{RK: rk2Amortization, Ytd: s.PnlAmortizationYtd}
-	r.YV[rk2OperatingIncome] = &PnlValue{RK: rk2OperatingIncome, Ytd: s.PnlOperatingIncomeYtd}
-	r.YV[rk2InterestIncome] = &PnlValue{RK: rk2InterestIncome, Ytd: s.PnlInterestIncomeYtd}
-	r.YV[rk2InterestExpenses] = &PnlValue{RK: rk2InterestExpenses, Ytd: s.PnlInterestExpensesYtd}
-	r.YV[rk2IncomeTax] = &PnlValue{RK: rk2IncomeTax, Ytd: s.PnlIncomeTaxYtd}
-	r.YV[rk2NetIncome] = &PnlValue{RK: rk2NetIncome, Ytd: s.PnlNetIncomeYtd}
+	r.YV[RK2Revenue] = &PnlValue{RK: RK2Revenue, Ytd: s.PnlRevenueYtd}
+	r.YV[RK2Amortization] = &PnlValue{RK: RK2Amortization, Ytd: s.PnlAmortizationYtd}
+	r.YV[RK2OperatingIncome] = &PnlValue{RK: RK2OperatingIncome, Ytd: s.PnlOperatingIncomeYtd}
+	r.YV[RK2InterestIncome] = &PnlValue{RK: RK2InterestIncome, Ytd: s.PnlInterestIncomeYtd}
+	r.YV[RK2InterestExpenses] = &PnlValue{RK: RK2InterestExpenses, Ytd: s.PnlInterestExpensesYtd}
+	r.YV[RK2IncomeTax] = &PnlValue{RK: RK2IncomeTax, Ytd: s.PnlIncomeTaxYtd}
+	r.YV[RK2NetIncome] = &PnlValue{RK: RK2NetIncome, Ytd: s.PnlNetIncomeYtd}
 	for _, v := range r.YV {
 		v.Calc(r, r.prevQuarter, r.prevYear)
 	}
 
 	// CF src
-	r.SV[rk2Cash] = &CfValue{Sld: s.CfCashSld}
-	r.SV[rk2NonCurrentLiabilities] = &CfValue{Sld: s.CfNonCurrentLiabilitiesSld}
-	r.SV[rk2CurrentLiabilities] = &CfValue{Sld: s.CfCurrentLiabilitesSld}
-	r.SV[rk2NonControlling] = &CfValue{Sld: s.CfNonControllingSld}
-	r.SV[rk2Equity] = &CfValue{Sld: s.CfEquitySld}
-	r.SV[rk2Total] = &CfValue{Sld: s.CfTotalSld}
+	r.SV[RK2Cash] = &CfValue{Sld: s.CfCashSld}
+	r.SV[RK2NonCurrentLiabilities] = &CfValue{Sld: s.CfNonCurrentLiabilitiesSld}
+	r.SV[RK2CurrentLiabilities] = &CfValue{Sld: s.CfCurrentLiabilitesSld}
+	r.SV[RK2NonControlling] = &CfValue{Sld: s.CfNonControllingSld}
+	r.SV[RK2Equity] = &CfValue{Sld: s.CfEquitySld}
+	r.SV[RK2Total] = &CfValue{Sld: s.CfTotalSld}
 
 	// CF calculated
-	r.SV[rk2NetDebt] = &CfValue{
-		RK:  rk2NetDebt,
-		Sld: r.SV[rk2NonCurrentLiabilities].Sld + r.SV[rk2CurrentLiabilities].Sld - r.SV[rk2Cash].Sld,
+	r.SV[RK2NetDebt] = &CfValue{
+		RK:  RK2NetDebt,
+		Sld: r.SV[RK2NonCurrentLiabilities].Sld + r.SV[RK2CurrentLiabilities].Sld - r.SV[RK2Cash].Sld,
 	}
-	r.SV[rk2EV] = &CfValue{
-		RK:  rk2EV,
-		Sld: r.SV[rk2Cash].Sld + r.SV[rk2NonControlling].Sld + r.SV[rk2NonCurrentLiabilities].Sld + r.SV[rk2CurrentLiabilities].Sld,
+	r.SV[RK2EV] = &CfValue{
+		RK:  RK2EV,
+		Sld: r.SV[RK2Cash].Sld + r.SV[RK2NonControlling].Sld + r.SV[RK2NonCurrentLiabilities].Sld + r.SV[RK2CurrentLiabilities].Sld,
 	}
 
 	// Pnl calculated
 
-	r.YV[rk2OIBDA] = &PnlValue{
-		RK:  rk2OIBDA,
-		Ytd: r.YV[rk2Revenue].Ytd - r.YV[rk2Amortization].Ytd,
-		Ltm: r.YV[rk2Revenue].Ltm - r.YV[rk2Amortization].Ltm,
+	r.YV[RK2OIBDA] = &PnlValue{
+		RK:  RK2OIBDA,
+		Ytd: r.YV[RK2Revenue].Ytd - r.YV[RK2Amortization].Ytd,
+		Ltm: r.YV[RK2Revenue].Ltm - r.YV[RK2Amortization].Ltm,
 	}
-	r.YV[rk2EBITDA] = &PnlValue{
-		RK:  rk2EBITDA,
-		Ytd: r.YV[rk2NetIncome].Ytd - r.YV[rk2Amortization].Ytd - r.YV[rk2InterestIncome].Ytd - r.YV[rk2InterestExpenses].Ytd - r.YV[rk2IncomeTax].Ytd,
-		Ltm: r.YV[rk2NetIncome].Ltm - r.YV[rk2Amortization].Ltm - r.YV[rk2InterestIncome].Ltm - r.YV[rk2InterestExpenses].Ltm - r.YV[rk2IncomeTax].Ltm,
+	r.YV[RK2EBITDA] = &PnlValue{
+		RK:  RK2EBITDA,
+		Ytd: r.YV[RK2NetIncome].Ytd - r.YV[RK2Amortization].Ytd - r.YV[RK2InterestIncome].Ytd - r.YV[RK2InterestExpenses].Ytd - r.YV[RK2IncomeTax].Ytd,
+		Ltm: r.YV[RK2NetIncome].Ltm - r.YV[RK2Amortization].Ltm - r.YV[RK2InterestIncome].Ltm - r.YV[RK2InterestExpenses].Ltm - r.YV[RK2IncomeTax].Ltm,
 	}
 
-	r.YV[rk2OIBDAMargin] = &PnlValue{RK: rk2OIBDAMargin}
-	r.YV[rk2EBITDAMargin] = &PnlValue{RK: rk2EBITDAMargin}
-	r.YV[rk2OperationalMargin] = &PnlValue{RK: rk2OperationalMargin}
-	r.YV[rk2NetMargin] = &PnlValue{RK: rk2NetMargin}
+	r.YV[RK2OIBDAMargin] = &PnlValue{RK: RK2OIBDAMargin}
+	r.YV[RK2EBITDAMargin] = &PnlValue{RK: RK2EBITDAMargin}
+	r.YV[RK2OperationalMargin] = &PnlValue{RK: RK2OperationalMargin}
+	r.YV[RK2NetMargin] = &PnlValue{RK: RK2NetMargin}
 	if math.Abs(s.PnlRevenueYtd) >= 0.01 {
 
-		r.YV[rk2OIBDAMargin].Ytd = RoundX(r.YV[rk2OIBDA].Ytd/r.YV[rk2Revenue].Ytd*100, 1)
-		r.YV[rk2OIBDAMargin].Ltm = RoundX(r.YV[rk2OIBDA].Ltm/r.YV[rk2Revenue].Ltm*100, 1)
+		r.YV[RK2OIBDAMargin].Ytd = RoundX(r.YV[RK2OIBDA].Ytd/r.YV[RK2Revenue].Ytd*100, 1)
+		r.YV[RK2OIBDAMargin].Ltm = RoundX(r.YV[RK2OIBDA].Ltm/r.YV[RK2Revenue].Ltm*100, 1)
 
-		r.YV[rk2EBITDAMargin].Ytd = RoundX(r.YV[rk2EBITDA].Ytd/r.YV[rk2Revenue].Ytd*100, 1)
-		r.YV[rk2EBITDAMargin].Ltm = RoundX(r.YV[rk2EBITDA].Ltm/r.YV[rk2Revenue].Ltm*100, 1)
+		r.YV[RK2EBITDAMargin].Ytd = RoundX(r.YV[RK2EBITDA].Ytd/r.YV[RK2Revenue].Ytd*100, 1)
+		r.YV[RK2EBITDAMargin].Ltm = RoundX(r.YV[RK2EBITDA].Ltm/r.YV[RK2Revenue].Ltm*100, 1)
 
-		r.YV[rk2OperationalMargin].Ytd = RoundX(r.YV[rk2OperatingIncome].Ytd/r.YV[rk2Revenue].Ytd*100, 1)
-		r.YV[rk2OperationalMargin].Ltm = RoundX(r.YV[rk2OperatingIncome].Ltm/r.YV[rk2Revenue].Ltm*100, 1)
+		r.YV[RK2OperationalMargin].Ytd = RoundX(r.YV[RK2OperatingIncome].Ytd/r.YV[RK2Revenue].Ytd*100, 1)
+		r.YV[RK2OperationalMargin].Ltm = RoundX(r.YV[RK2OperatingIncome].Ltm/r.YV[RK2Revenue].Ltm*100, 1)
 
-		r.YV[rk2NetMargin].Ytd = RoundX(r.YV[rk2NetIncome].Ytd/r.YV[rk2Revenue].Ytd*100, 1)
-		r.YV[rk2NetMargin].Ltm = RoundX(r.YV[rk2NetIncome].Ltm/r.YV[rk2Revenue].Ltm*100, 1)
+		r.YV[RK2NetMargin].Ytd = RoundX(r.YV[RK2NetIncome].Ytd/r.YV[RK2Revenue].Ytd*100, 1)
+		r.YV[RK2NetMargin].Ltm = RoundX(r.YV[RK2NetIncome].Ltm/r.YV[RK2Revenue].Ltm*100, 1)
 	}
 
-	r.YV[rk2ROE] = &PnlValue{RK: rk2ROE}
-	if math.Abs(r.SV[rk2Total].Sld) >= 0.01 {
-		r.YV[rk2ROE].Ytd = RoundX(r.YV[rk2NetIncome].Ytd/r.SV[rk2Total].Sld*100, 1)
-		r.YV[rk2ROE].Ltm = RoundX(r.YV[rk2NetIncome].Ltm/r.SV[rk2Total].Sld*100, 1)
+	r.YV[RK2ROE] = &PnlValue{RK: RK2ROE}
+	if math.Abs(r.SV[RK2Total].Sld) >= 0.01 {
+		r.YV[RK2ROE].Ytd = RoundX(r.YV[RK2NetIncome].Ytd/r.SV[RK2Total].Sld*100, 1)
+		r.YV[RK2ROE].Ltm = RoundX(r.YV[RK2NetIncome].Ltm/r.SV[RK2Total].Sld*100, 1)
 	}
-	r.YV[rk2Debt_On_EBITDA] = &PnlValue{RK: rk2Debt_On_EBITDA}
-	r.YV[rk2EV_On_EBITDA] = &PnlValue{RK: rk2EV_On_EBITDA}
-	if math.Abs(r.YV[rk2EBITDA].Ytd) >= 0.01 {
-		r.YV[rk2Debt_On_EBITDA].Ytd = r.SV[rk2NetDebt].Sld / r.YV[rk2EBITDA].Ytd
-		r.YV[rk2Debt_On_EBITDA].Ltm = r.SV[rk2NetDebt].Sld / r.YV[rk2EBITDA].Ltm
-		r.YV[rk2EV_On_EBITDA].Ytd = r.SV[rk2EV].Sld / r.YV[rk2EBITDA].Ytd
-		r.YV[rk2EV_On_EBITDA].Ltm = r.SV[rk2EV].Sld / r.YV[rk2EBITDA].Ltm
+	r.YV[RK2Debt_On_EBITDA] = &PnlValue{RK: RK2Debt_On_EBITDA}
+	r.YV[RK2EV_On_EBITDA] = &PnlValue{RK: RK2EV_On_EBITDA}
+	if math.Abs(r.YV[RK2EBITDA].Ytd) >= 0.01 {
+		r.YV[RK2Debt_On_EBITDA].Ytd = r.SV[RK2NetDebt].Sld / r.YV[RK2EBITDA].Ytd
+		r.YV[RK2Debt_On_EBITDA].Ltm = r.SV[RK2NetDebt].Sld / r.YV[RK2EBITDA].Ltm
+		r.YV[RK2EV_On_EBITDA].Ytd = r.SV[RK2EV].Sld / r.YV[RK2EBITDA].Ytd
+		r.YV[RK2EV_On_EBITDA].Ltm = r.SV[RK2EV].Sld / r.YV[RK2EBITDA].Ltm
 	}
 
 	for _, v := range r.YV {
@@ -199,10 +199,10 @@ func (r *Report2) Load(s *ent.Report, prevY, prevQ *Report2) {
 }
 
 const (
-	rk3BookValue = 1010
-	rk3P_On_E    = 1030
-	rk3P_On_S    = 1040
-	rk3P_On_BV   = 1050
+	RK3BookValue = 1010
+	RK3P_On_E    = 1030
+	RK3P_On_S    = 1040
+	RK3P_On_BV   = 1050
 )
 
 type CellReport struct { // enriched cell with calculated fields for day (from Cell.D)

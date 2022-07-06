@@ -93,3 +93,17 @@ func (c *Cube) GetTickerRenderInfo(ticker string, loadQ bool) *TickerRenderInfo 
 	return result
 
 }
+
+func (c *Cube) GetReports2(ticker string) []*Report2 {
+
+	c.l.Lock()
+	defer c.l.Unlock()
+
+	tobj, ok := c.allTickets[ticker]
+	if !ok {
+		return []*Report2{}
+	}
+
+	return c.repsByEmitent[tobj.Edges.Emitent.ID]
+
+}
