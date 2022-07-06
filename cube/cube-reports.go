@@ -132,9 +132,6 @@ func (r *Report2) Load(s *ent.Report, prevY, prevQ *Report2) {
 	r.SV[rk2NonControlling] = &CfValue{Sld: s.CfNonControllingSld}
 	r.SV[rk2Equity] = &CfValue{Sld: s.CfEquitySld}
 	r.SV[rk2Total] = &CfValue{Sld: s.CfTotalSld}
-	for _, v := range r.SV {
-		v.Calc(r.prevYear)
-	}
 
 	// CF calculated
 	r.SV[rk2NetDebt] = &CfValue{
@@ -194,6 +191,9 @@ func (r *Report2) Load(s *ent.Report, prevY, prevQ *Report2) {
 
 	for _, v := range r.YV {
 		v.Calc(r, r.prevQuarter, r.prevYear)
+	}
+	for _, v := range r.SV {
+		v.Calc(r.prevYear)
 	}
 
 }
