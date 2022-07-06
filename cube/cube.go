@@ -359,6 +359,7 @@ func (c *Cube) loadReports() error {
 			for _, r := range r2reports {
 				if D.Unix() >= r.ReportDate.Unix() {
 					cell.Report = &CellReport{R2: r}
+					cell.Report.Calc(cell)
 					break
 				}
 			}

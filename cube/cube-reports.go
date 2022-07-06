@@ -25,7 +25,8 @@ const (
 	rk2OperationalMargin = 240
 	rk2NetMargin         = 250
 	rk2Debt_On_EBITDA    = 260
-	rk2ROE               = 270
+	rk2EV_On_EBITDA      = 270
+	rk2ROE               = 280
 
 	// CF src
 	rk2Cash                  = 300
@@ -37,6 +38,7 @@ const (
 
 	// CF calculated
 	rk2NetDebt = 400
+	rk2EV      = 410
 )
 
 type PnlValue struct {
@@ -139,6 +141,10 @@ func (r *Report2) Load(s *ent.Report, prevY, prevQ *Report2) {
 		RK:  rk2NetDebt,
 		Sld: r.SV[rk2NonCurrentLiabilities].Sld + r.SV[rk2CurrentLiabilities].Sld - r.SV[rk2Cash].Sld,
 	}
+	r.SV[rk2EV] = &CfValue{
+		RK:  rk2EV,
+		Sld: r.SV[rk2Cash].Sld + r.SV[rk2NonControlling].Sld + r.SV[rk2NonCurrentLiabilities].Sld + r.SV[rk2CurrentLiabilities].Sld,
+	}
 
 	// Pnl calculated
 
@@ -178,9 +184,12 @@ func (r *Report2) Load(s *ent.Report, prevY, prevQ *Report2) {
 		r.YV[rk2ROE].Ltm = RoundX(r.YV[rk2NetIncome].Ltm/r.SV[rk2Total].Sld*100, 1)
 	}
 	r.YV[rk2Debt_On_EBITDA] = &PnlValue{RK: rk2Debt_On_EBITDA}
+	r.YV[rk2EV_On_EBITDA] = &PnlValue{RK: rk2EV_On_EBITDA}
 	if math.Abs(r.YV[rk2EBITDA].Ytd) >= 0.01 {
 		r.YV[rk2Debt_On_EBITDA].Ytd = r.SV[rk2NetDebt].Sld / r.YV[rk2EBITDA].Ytd
 		r.YV[rk2Debt_On_EBITDA].Ltm = r.SV[rk2NetDebt].Sld / r.YV[rk2EBITDA].Ltm
+		r.YV[rk2EV_On_EBITDA].Ytd = r.SV[rk2EV].Sld / r.YV[rk2EBITDA].Ytd
+		r.YV[rk2EV_On_EBITDA].Ltm = r.SV[rk2EV].Sld / r.YV[rk2EBITDA].Ltm
 	}
 
 	for _, v := range r.YV {
@@ -189,16 +198,20 @@ func (r *Report2) Load(s *ent.Report, prevY, prevQ *Report2) {
 
 }
 
+const (
+	rk3BookValue = 1010
+	rk3P_On_E    = 1030
+	rk3P_On_S    = 1040
+	rk3P_On_BV   = 1050
+)
+
 type CellReport struct { // enriched cell with calculated fields for day (from Cell.D)
-	R2           *Report2
-	EV           float64
-	BookValue    float64
-	EV_On_EBITDA float64
-	P_On_E       float64
-	P_On_S       float64
-	P_On_BV      float64
+	R2 *Report2
+	V  map[int]*CfValue
 }
 
 func (r *CellReport) Calc(c *Cell) {
+
+	r.V = make(map[int]*CfValue, 4)
 
 }
