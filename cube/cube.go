@@ -22,7 +22,7 @@ type Cell struct {
 	D        time.Time
 	Quote    *ent.Quote
 	Emission *ent.Emission
-	Report   *ent.Report
+	Report   *CellReport
 
 	Industry *ent.Industry // flat quote
 
@@ -118,8 +118,7 @@ func (c *Cube) LoadCube() (err error) {
 		return err
 	}
 
-	//статические поля отчета  в отчет++
-	//Расставить отчеты++
+	c.loadReports()
 	//досчитать динамику по дням в отчеты++++
 	//досчитать рост
 	//досчитать отраслевые отчеты++ и отчеты++++
@@ -317,6 +316,59 @@ func (c *Cube) addMissingCells() error {
 		}
 	}
 	return nil
+}
+
+func (c *Cube) loadReports() error {
+
+	rd, err := db.DB.Report.Query().WithEmitent().All(context.Background())
+	if err != nil {
+		return err
+	}
+
+	for _, ticker := range c.allTickets {
+
+		treps := make([]*ent.Report, 0, 10)
+		for _, r := range rd {
+			if r.Edges.Emitent.ID == ticker.Edges.Emitent.ID {
+				treps = append(treps, r)
+			}
+		}
+		//sort desc by reportdate
+		sort.Slice(treps, func(i, j int) bool { return treps[i].ReportDate.Before(treps[j].ReportDate) })
+
+		// convert reports to reports2
+		r2reports := make([]*Report2, 0, 10)
+		prevMaps := make(map[int]map[int]*Report2) // Year - Quarter - Report
+		for _, r := range treps {
+			r2 := Report2{}
+
+			var prevY *Report2 = nil
+			if _, ok := prevMaps[r.ReportYear-1]; ok {
+				prevY = prevMaps[r.ReportYear-1][4]
+			}
+			var prevQ *Report2 = nil
+			if _, ok := prevMaps[r.ReportYear-1]; ok {
+				prevQ = prevMaps[r.ReportYear-1][r.ReportQuarter]
+			}
+			r2.Load(r, prevY, prevQ)
+			r2reports = append(r2reports, &r2)
+		}
+
+		for D, cell := range c.cellsByTickerByDate[ticker.ID] {
+
+			for _, r := range r2reports {
+				if D.Unix() >= r.ReportDate.Unix() {
+					cell.Report = &CellReport{R2: r}
+					break
+				}
+			}
+
+		}
+
+	}
+
+	return nil
+
 }
 
 func (c *Cube) getSortedCellsForTicker(ticker string) []*Cell {
