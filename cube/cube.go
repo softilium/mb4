@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/rs/xid"
 	"github.com/softilium/mb4/db"
 	"github.com/softilium/mb4/ent"
 	"github.com/softilium/mb4/ent/schema"
@@ -24,7 +25,7 @@ type Cell struct {
 	Emission *ent.Emission
 	Report   *CellReport
 
-	Industry *ent.Industry // flat quote
+	Industry *ent.Industry // flat industry from quote
 
 	// loadDivsAndCaps
 	Cap          float64
@@ -46,6 +47,7 @@ type Cube struct {
 	//allReports          map[*ent.Emitent][]*ent.Report // slice sorted by Year, Quarter
 	cellsByTickerByDate map[string]map[time.Time]*Cell // cell by ticker
 	cellsByDate         map[time.Time][]*Cell          // cell by date
+	repsByEmitent       map[xid.ID][]*Report2          // map by Emitent.ID sorted by reportdate
 }
 
 func (c *Cube) LoadCube() (err error) {
@@ -57,6 +59,7 @@ func (c *Cube) LoadCube() (err error) {
 	c.cellsByDate = make(map[time.Time][]*Cell)
 	c.allTickets = make(map[string]*ent.Ticker)
 	allDaysMap := make(map[time.Time]bool)
+	c.repsByEmitent = make(map[xid.ID][]*Report2)
 
 	q, err := db.DB.Quote.Query().WithTicker(
 		func(q *ent.TickerQuery) {
@@ -354,8 +357,8 @@ func (c *Cube) loadReports() error {
 			r2reports = append(r2reports, &r2)
 		}
 
-		for D, cell := range c.cellsByTickerByDate[ticker.ID] {
-
+		c.repsByEmitent[ticker.Edges.Emitent.ID] = r2reports
+		for D, cell := range c.cellsByTickerByDate[ticker.ID] { // make report view for each day/quote
 			for _, r := range r2reports {
 				if D.Unix() >= r.ReportDate.Unix() {
 					cell.Report = &CellReport{R2: r}
@@ -363,7 +366,6 @@ func (c *Cube) loadReports() error {
 					break
 				}
 			}
-
 		}
 
 	}
