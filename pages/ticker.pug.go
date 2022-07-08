@@ -35,7 +35,7 @@ func Ticker(w http.ResponseWriter, r *http.Request) {
 
 	if mode == "pnl" {
 
-		pnlResult := struct {
+		pnlres := struct {
 			Dates            []string
 			Revenues         []float64
 			InterestIncomes  []float64
@@ -45,46 +45,91 @@ func Ticker(w http.ResponseWriter, r *http.Request) {
 			Taxes            []float64
 			Incomes          []float64
 		}{}
-		allreps := cube.Market.GetReports2(tickerId)
-		reps := make([]*cube.Report2, 0, len(allreps)/3)
-		for _, rep := range allreps {
-			if rep.ReportQuarter == 4 {
-				reps = append(reps, rep)
-			}
-		}
-		if allreps[len(allreps)-1].ReportQuarter != 4 {
-			reps = append(reps, allreps[len(allreps)-1])
-		}
-		pnlResult.Dates = make([]string, len(reps))
-		pnlResult.Revenues = make([]float64, len(reps))
-		pnlResult.InterestIncomes = make([]float64, len(reps))
-		pnlResult.Ebitdas = make([]float64, len(reps))
-		pnlResult.Amortizations = make([]float64, len(reps))
-		pnlResult.InterestExpenses = make([]float64, len(reps))
-		pnlResult.Taxes = make([]float64, len(reps))
-		pnlResult.Incomes = make([]float64, len(reps))
+
+		reps := GetYearReports(tickerId)
+		pnlres.Dates = make([]string, len(reps))
+		pnlres.Revenues = make([]float64, len(reps))
+		pnlres.InterestIncomes = make([]float64, len(reps))
+		pnlres.Ebitdas = make([]float64, len(reps))
+		pnlres.Amortizations = make([]float64, len(reps))
+		pnlres.InterestExpenses = make([]float64, len(reps))
+		pnlres.Taxes = make([]float64, len(reps))
+		pnlres.Incomes = make([]float64, len(reps))
 		for idx, rep := range reps {
 
 			if rep.ReportQuarter == 4 {
-				pnlResult.Dates[idx] = fmt.Sprintf("%v.Q%v", rep.ReportDate.Year(), rep.ReportQuarter)
+				pnlres.Dates[idx] = fmt.Sprintf("%v.Q%v", rep.ReportDate.Year(), rep.ReportQuarter)
 			} else {
-				pnlResult.Dates[idx] = "LTM"
+				pnlres.Dates[idx] = "LTM"
 			}
-			pnlResult.Revenues[idx] = rep.YV[cube.RK2Revenue].Ytd
-			pnlResult.InterestIncomes[idx] = rep.YV[cube.RK2InterestIncome].Ytd
-			pnlResult.Ebitdas[idx] = rep.YV[cube.RK2EBITDA].Ytd
-			pnlResult.Amortizations[idx] = rep.YV[cube.RK2Amortization].Ytd
-			pnlResult.InterestExpenses[idx] = rep.YV[cube.RK2InterestExpenses].Ytd
-			pnlResult.Taxes[idx] = rep.YV[cube.RK2IncomeTax].Ytd
-			pnlResult.Incomes[idx] = rep.YV[cube.RK2NetIncome].Ytd
+			pnlres.Revenues[idx] = rep.YV[cube.RK2Revenue].Ytd
+			pnlres.InterestIncomes[idx] = rep.YV[cube.RK2InterestIncome].Ytd
+			pnlres.Ebitdas[idx] = rep.YV[cube.RK2EBITDA].Ytd
+			pnlres.Amortizations[idx] = rep.YV[cube.RK2Amortization].Ytd
+			pnlres.InterestExpenses[idx] = rep.YV[cube.RK2InterestExpenses].Ytd
+			pnlres.Taxes[idx] = rep.YV[cube.RK2IncomeTax].Ytd
+			pnlres.Incomes[idx] = rep.YV[cube.RK2NetIncome].Ytd
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(pnlResult)
+		json.NewEncoder(w).Encode(pnlres)
+		return
+
+	}
+
+	if mode == "cf" {
+
+		cfres := struct {
+			Dates     []string
+			Cash      []float64
+			Debt      []float64
+			Equity    []float64
+			MCap      []float64
+			BookValue []float64
+		}{}
+
+		reps := GetYearReports(tickerId)
+		cfres.Dates = make([]string, len(reps))
+		cfres.Cash = make([]float64, len(reps))
+		cfres.Debt = make([]float64, len(reps))
+		cfres.Equity = make([]float64, len(reps))
+		cfres.MCap = make([]float64, len(reps))
+		cfres.BookValue = make([]float64, len(reps))
+		for idx, rep := range reps {
+
+			if rep.ReportQuarter == 4 {
+				cfres.Dates[idx] = fmt.Sprintf("%v.Q%v", rep.ReportDate.Year(), rep.ReportQuarter)
+			} else {
+				cfres.Dates[idx] = "LTM"
+			}
+			cfres.Cash[idx] = rep.SV[cube.RK2Cash].Sld
+			cfres.Debt[idx] = rep.SV[cube.RK2NetDebt].Sld
+			cfres.Equity[idx] = rep.SV[cube.RK2Equity].Sld
+			cfres.MCap[idx] = cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate).Cap
+			cfres.BookValue[idx] = cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate).BookValue
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(cfres)
 		return
 
 	}
 
 	http.Error(w, "", http.StatusBadRequest)
 
+}
+
+func GetYearReports(tickerId string) []*cube.Report2 {
+
+	allreps := cube.Market.GetReports2(tickerId)
+	reps := make([]*cube.Report2, 0, len(allreps)/3)
+	for _, rep := range allreps {
+		if rep.ReportQuarter == 4 {
+			reps = append(reps, rep)
+		}
+	}
+	if allreps[len(allreps)-1].ReportQuarter != 4 {
+		reps = append(reps, allreps[len(allreps)-1])
+	}
+	return reps
 }

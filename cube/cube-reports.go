@@ -199,19 +199,13 @@ func (r *Report2) Load(s *ent.Report, prevY, prevQ *Report2) {
 }
 
 const (
-	RK3BookValue = 1010
-	RK3P_On_E    = 1030
-	RK3P_On_S    = 1040
-	RK3P_On_BV   = 1050
+	//	RK3BookValue = 1010
+	RK3P_On_E  = 1030
+	RK3P_On_S  = 1040
+	RK3P_On_BV = 1050
 )
 
-type CellReport struct { // enriched cell with calculated fields for day (from Cell.D)
+type Report3 struct { // enriched cell with calculated fields for day (from Cell.D)
 	R2 *Report2
 	V  map[int]*CfValue
-}
-
-func (r *CellReport) Calc(c *Cell) {
-
-	r.V = make(map[int]*CfValue, 4)
-
 }

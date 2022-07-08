@@ -2,7 +2,8 @@ const App = {
     data() {
         return {
             tri: {},
-            pnl: {}
+            pnl: {},
+            cf: {}
         }
     },
     async mounted() {
@@ -286,8 +287,87 @@ const App = {
             myChart.setOption(option);
 
         },
+        async CfView(element, dates, cash, debt, equity, mcap, bookValue) {
+
+            var myChart = echarts.init(element);
+
+            option = {
+                animation: false,
+                legend: { left: 10 },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'cross' },
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: dates,
+                        axisLabel: {
+                            interval: 0,
+                            rotate: 90
+                        },
+                    }
+                ],
+                yAxis: [
+                    { type: 'value' }
+                ],
+                series: [
+                    {
+                        name: 'Денежные средства',
+                        type: 'line',
+                        emphasis: { focus: 'series' },
+                        symbol: 'none',
+                        smooth: true,
+                        data: cash
+                    },
+                    {
+                        name: 'Акционерный капитал',
+                        type: 'line',
+                        stack: 'Total',
+                        emphasis: { focus: 'series' },
+                        areaStyle: {},
+                        symbol: 'none',
+                        smooth: true,
+                        data: equity
+                    },
+                    {
+                        name: 'Обязательства',
+                        type: 'line',
+                        stack: 'Total',
+                        emphasis: { focus: 'series' },
+                        areaStyle: {},
+                        symbol: 'none',
+                        smooth: true,
+                        data: debt
+                    },
+                    {
+                        name: 'Балансовая стоимость',
+                        type: 'line',
+                        //stack: 'Total',
+                        emphasis: { focus: 'series' },
+                        //areaStyle: {},
+                        symbol: 'none',
+                        smooth: true,
+                        data: bookValue
+                    },
+                    {
+                        name: 'Капитализация',
+                        type: 'line',
+                        emphasis: { focus: 'series' },
+                        symbol: 'none',
+                        smooth: true,
+                        data: mcap
+                    },
+
+                ]
+            };
+
+            myChart.setOption(option);
+
+        },
 
         async getTickerData() {
+
             let response = await fetch(`/ticker?id=${window.tickerid}&mode=candles`, { method: "GET" });
             if (response.ok) {
                 this.tri = await response.json();
@@ -299,22 +379,44 @@ const App = {
                     this.tri.CandleVolumes,
                     []
                 );
-                let r2 = await fetch(`/ticker?id=${window.tickerid}&mode=pnl`, { method: "GET" });
-                if (r2.ok) {
-                    this.pnl = await r2.json();
-                    this.PnlView(
-                        this.$refs.pnlView,
-                        this.pnl.Dates,
-                        this.pnl.Revenues,
-                        this.pnl.InterestIncomes,
-                        this.pnl.Ebitdas,
-                        this.pnl.Ammortizations,
-                        this.pnl.InterestExpenses,
-                        this.pnl.Taxes,
-                        this.pnl.Incomes
-                    );
-                } else alert("Проблема при получении данных PNL");
-            } else alert("Проблема при получении данных Candles");
+            } else {
+                alert("Проблема при получении данных Candles");
+                return;
+            }
+
+            response = await fetch(`/ticker?id=${window.tickerid}&mode=pnl`, { method: "GET" });
+            if (response.ok) {
+                this.pnl = await response.json();
+                this.PnlView(
+                    this.$refs.pnlView,
+                    this.pnl.Dates,
+                    this.pnl.Revenues,
+                    this.pnl.InterestIncomes,
+                    this.pnl.Ebitdas,
+                    this.pnl.Ammortizations,
+                    this.pnl.InterestExpenses,
+                    this.pnl.Taxes,
+                    this.pnl.Incomes
+                );
+            } else {
+                alert("Проблема при получении данных PNL");
+            }
+
+            response = await fetch(`/ticker?id=${window.tickerid}&mode=cf`, { method: "GET" });
+            if (response.ok) {
+                this.cf = await response.json();
+                this.CfView(
+                    this.$refs.cfView,
+                    this.cf.Dates,
+                    this.cf.Cash,
+                    this.cf.Debt,
+                    this.cf.Equity,
+                    this.cf.MCap,
+                    this.cf.BookValue
+                );
+            } else {
+                alert("Проблема при получении данных CF");
+            }
         }
     },
 };

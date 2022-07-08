@@ -12,6 +12,7 @@ import (
 	"github.com/softilium/mb4/db"
 	"github.com/softilium/mb4/ent"
 	"github.com/softilium/mb4/ent/schema"
+	"github.com/softilium/mb4/ent/ticker"
 )
 
 func RoundX(x float64, dec int) float64 {
@@ -23,11 +24,11 @@ type Cell struct {
 	D        time.Time
 	Quote    *ent.Quote
 	Emission *ent.Emission
-	Report   *CellReport
+	R2       *Report2
 
 	Industry *ent.Industry // flat industry from quote
 
-	// loadDivsAndCaps
+	// calc from quotes and divs
 	Cap          float64
 	DivSum5Y     float64
 	DivSum3Y     float64
@@ -37,14 +38,32 @@ type Cell struct {
 	DSIStability byte
 	DSIGrowth    byte
 
+	// calc from reports
+	BookValue float64
+
 	IsMissed bool //indicates than cell was copied for missing quotes from prevous days
 }
 
+func (r *Cell) Calc(cb *Cube) {
+
+	r.BookValue = 0
+	prefCap := 0.0
+	if prefTicker, ok := cb.prefTickers[r.Quote.Edges.Ticker.Edges.Emitent.ID]; ok {
+		if prefCells, ok := cb.cellsByTickerByDate[prefTicker.ID]; ok {
+			if prefcell, ok := prefCells[r.D]; ok {
+				prefCap = prefcell.Cap
+			}
+		}
+	}
+	r.BookValue = r.R2.SV[RK2Total].Sld - r.R2.SV[RK2CurrentLiabilities].Sld - r.R2.SV[RK2NonCurrentLiabilities].Sld - r.R2.SV[RK2NonControlling].Sld - prefCap
+
+}
+
 type Cube struct {
-	l          *sync.Mutex
-	allDays    []time.Time // sorted
-	allTickets map[string]*ent.Ticker
-	//allReports          map[*ent.Emitent][]*ent.Report // slice sorted by Year, Quarter
+	l                   *sync.Mutex
+	allDays             []time.Time // sorted
+	allTickets          map[string]*ent.Ticker
+	prefTickers         map[xid.ID]*ent.Ticker         // prefered tickers by emitents
 	cellsByTickerByDate map[string]map[time.Time]*Cell // cell by ticker
 	cellsByDate         map[time.Time][]*Cell          // cell by date
 	repsByEmitent       map[xid.ID][]*Report2          // map by Emitent.ID sorted by reportdate
@@ -60,6 +79,18 @@ func (c *Cube) LoadCube() (err error) {
 	c.allTickets = make(map[string]*ent.Ticker)
 	allDaysMap := make(map[time.Time]bool)
 	c.repsByEmitent = make(map[xid.ID][]*Report2)
+
+	// for quick book value calc in reports we need emitent-pref map
+	c.prefTickers = make(map[xid.ID]*ent.Ticker)
+	prefraw, err := db.DB.Ticker.Query().WithEmitent().
+		Where(ticker.KindEQ(schema.TickerKind_StockPref)).
+		All(context.Background())
+	if err != nil {
+		return err
+	}
+	for _, pref := range prefraw {
+		c.prefTickers[pref.Edges.Emitent.ID] = pref
+	}
 
 	q, err := db.DB.Quote.Query().WithTicker(
 		func(q *ent.TickerQuery) {
@@ -285,7 +316,7 @@ func (c *Cube) loadDivsAndCaps() error {
 	for _, day := range c.allDays {
 		for _, cell := range c.cellsByDate[day] {
 			if cell.Quote != nil && cell.Emission != nil {
-				cell.Cap = cell.Quote.C * float64(cell.Emission.Size)
+				cell.Cap = cell.Quote.C * float64(cell.Emission.Size) / 1000000 // in mln. according to report values
 			}
 			if _, ok := dsimap[cell.Quote.Edges.Ticker.ID]; ok {
 				if dsi, ok := dsimap[cell.Quote.Edges.Ticker.ID][day.Year()-1]; ok {
@@ -312,7 +343,7 @@ func (c *Cube) addMissingCells() error {
 				sc := lk[ticker.ID]
 				c.cellsByDate[day] = append(
 					c.cellsByDate[day],
-					&Cell{D: day, Quote: sc.Quote, Emission: sc.Emission, Report: sc.Report, IsMissed: true})
+					&Cell{D: day, Quote: sc.Quote, Emission: sc.Emission, R2: sc.R2, IsMissed: true})
 				c.cellsByTickerByDate[ticker.ID][day] = sc
 			}
 			lk[ticker.ID] = c.cellsByTickerByDate[ticker.ID][day]
@@ -354,15 +385,25 @@ func (c *Cube) loadReports() error {
 				prevQ = prevMaps[r.ReportYear-1][r.ReportQuarter]
 			}
 			r2.Load(r, prevY, prevQ)
+
+			// bind report dates to quote dates for cube purposes.
+			// Because we fild quotes by report dates later (see tickers page)
+			for i := len(c.allDays) - 1; i >= 0; i-- {
+				if c.allDays[i].Before(r2.ReportDate) {
+					r2.ReportDate = c.allDays[i]
+					break
+				}
+			}
+
 			r2reports = append(r2reports, &r2)
 		}
 
 		c.repsByEmitent[ticker.Edges.Emitent.ID] = r2reports
 		for D, cell := range c.cellsByTickerByDate[ticker.ID] { // make report view for each day/quote
-			for _, r := range r2reports {
-				if D.Unix() >= r.ReportDate.Unix() {
-					cell.Report = &CellReport{R2: r}
-					cell.Report.Calc(cell)
+			for i := len(r2reports) - 1; i >= 0; i-- {
+				if D.Unix() >= r2reports[i].ReportDate.Unix() {
+					cell.R2 = r2reports[i]
+					cell.Calc(c)
 					break
 				}
 			}

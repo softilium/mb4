@@ -107,3 +107,12 @@ func (c *Cube) GetReports2(ticker string) []*Report2 {
 	return c.repsByEmitent[tobj.Edges.Emitent.ID]
 
 }
+
+func (c *Cube) CellsByTickerByDate(ticker string, d time.Time) *Cell {
+
+	c.l.Lock()
+	defer c.l.Unlock()
+
+	return c.cellsByTickerByDate[ticker][d]
+
+}
