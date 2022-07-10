@@ -245,6 +245,7 @@ var (
 		{Name: "password_hash", Type: field.TypeString},
 		{Name: "admin", Type: field.TypeBool, Default: false},
 		{Name: "start_invest_accounts_flow", Type: field.TypeTime, Nullable: true},
+		{Name: "how_many_tickers_on_homepage", Type: field.TypeInt, Default: 20},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{

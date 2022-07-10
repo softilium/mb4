@@ -76,6 +76,27 @@ func (uu *UserUpdate) ClearStartInvestAccountsFlow() *UserUpdate {
 	return uu
 }
 
+// SetHowManyTickersOnHomepage sets the "HowManyTickersOnHomepage" field.
+func (uu *UserUpdate) SetHowManyTickersOnHomepage(i int) *UserUpdate {
+	uu.mutation.ResetHowManyTickersOnHomepage()
+	uu.mutation.SetHowManyTickersOnHomepage(i)
+	return uu
+}
+
+// SetNillableHowManyTickersOnHomepage sets the "HowManyTickersOnHomepage" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableHowManyTickersOnHomepage(i *int) *UserUpdate {
+	if i != nil {
+		uu.SetHowManyTickersOnHomepage(*i)
+	}
+	return uu
+}
+
+// AddHowManyTickersOnHomepage adds i to the "HowManyTickersOnHomepage" field.
+func (uu *UserUpdate) AddHowManyTickersOnHomepage(i int) *UserUpdate {
+	uu.mutation.AddHowManyTickersOnHomepage(i)
+	return uu
+}
+
 // AddInvestAccountIDs adds the "InvestAccounts" edge to the InvestAccount entity by IDs.
 func (uu *UserUpdate) AddInvestAccountIDs(ids ...xid.ID) *UserUpdate {
 	uu.mutation.AddInvestAccountIDs(ids...)
@@ -184,6 +205,11 @@ func (uu *UserUpdate) check() error {
 			return &ValidationError{Name: "UserName", err: fmt.Errorf(`ent: validator failed for field "User.UserName": %w`, err)}
 		}
 	}
+	if v, ok := uu.mutation.HowManyTickersOnHomepage(); ok {
+		if err := user.HowManyTickersOnHomepageValidator(v); err != nil {
+			return &ValidationError{Name: "HowManyTickersOnHomepage", err: fmt.Errorf(`ent: validator failed for field "User.HowManyTickersOnHomepage": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -237,6 +263,20 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Column: user.FieldStartInvestAccountsFlow,
+		})
+	}
+	if value, ok := uu.mutation.HowManyTickersOnHomepage(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: user.FieldHowManyTickersOnHomepage,
+		})
+	}
+	if value, ok := uu.mutation.AddedHowManyTickersOnHomepage(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: user.FieldHowManyTickersOnHomepage,
 		})
 	}
 	if uu.mutation.InvestAccountsCleared() {
@@ -358,6 +398,27 @@ func (uuo *UserUpdateOne) ClearStartInvestAccountsFlow() *UserUpdateOne {
 	return uuo
 }
 
+// SetHowManyTickersOnHomepage sets the "HowManyTickersOnHomepage" field.
+func (uuo *UserUpdateOne) SetHowManyTickersOnHomepage(i int) *UserUpdateOne {
+	uuo.mutation.ResetHowManyTickersOnHomepage()
+	uuo.mutation.SetHowManyTickersOnHomepage(i)
+	return uuo
+}
+
+// SetNillableHowManyTickersOnHomepage sets the "HowManyTickersOnHomepage" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableHowManyTickersOnHomepage(i *int) *UserUpdateOne {
+	if i != nil {
+		uuo.SetHowManyTickersOnHomepage(*i)
+	}
+	return uuo
+}
+
+// AddHowManyTickersOnHomepage adds i to the "HowManyTickersOnHomepage" field.
+func (uuo *UserUpdateOne) AddHowManyTickersOnHomepage(i int) *UserUpdateOne {
+	uuo.mutation.AddHowManyTickersOnHomepage(i)
+	return uuo
+}
+
 // AddInvestAccountIDs adds the "InvestAccounts" edge to the InvestAccount entity by IDs.
 func (uuo *UserUpdateOne) AddInvestAccountIDs(ids ...xid.ID) *UserUpdateOne {
 	uuo.mutation.AddInvestAccountIDs(ids...)
@@ -473,6 +534,11 @@ func (uuo *UserUpdateOne) check() error {
 			return &ValidationError{Name: "UserName", err: fmt.Errorf(`ent: validator failed for field "User.UserName": %w`, err)}
 		}
 	}
+	if v, ok := uuo.mutation.HowManyTickersOnHomepage(); ok {
+		if err := user.HowManyTickersOnHomepageValidator(v); err != nil {
+			return &ValidationError{Name: "HowManyTickersOnHomepage", err: fmt.Errorf(`ent: validator failed for field "User.HowManyTickersOnHomepage": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -543,6 +609,20 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Column: user.FieldStartInvestAccountsFlow,
+		})
+	}
+	if value, ok := uuo.mutation.HowManyTickersOnHomepage(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: user.FieldHowManyTickersOnHomepage,
+		})
+	}
+	if value, ok := uuo.mutation.AddedHowManyTickersOnHomepage(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: user.FieldHowManyTickersOnHomepage,
 		})
 	}
 	if uuo.mutation.InvestAccountsCleared() {

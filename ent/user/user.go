@@ -19,6 +19,8 @@ const (
 	FieldAdmin = "admin"
 	// FieldStartInvestAccountsFlow holds the string denoting the startinvestaccountsflow field in the database.
 	FieldStartInvestAccountsFlow = "start_invest_accounts_flow"
+	// FieldHowManyTickersOnHomepage holds the string denoting the howmanytickersonhomepage field in the database.
+	FieldHowManyTickersOnHomepage = "how_many_tickers_on_homepage"
 	// EdgeInvestAccounts holds the string denoting the investaccounts edge name in mutations.
 	EdgeInvestAccounts = "InvestAccounts"
 	// Table holds the table name of the user in the database.
@@ -39,6 +41,7 @@ var Columns = []string{
 	FieldPasswordHash,
 	FieldAdmin,
 	FieldStartInvestAccountsFlow,
+	FieldHowManyTickersOnHomepage,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -56,6 +59,10 @@ var (
 	UserNameValidator func(string) error
 	// DefaultAdmin holds the default value on creation for the "Admin" field.
 	DefaultAdmin bool
+	// DefaultHowManyTickersOnHomepage holds the default value on creation for the "HowManyTickersOnHomepage" field.
+	DefaultHowManyTickersOnHomepage int
+	// HowManyTickersOnHomepageValidator is a validator for the "HowManyTickersOnHomepage" field. It is called by the builders before save.
+	HowManyTickersOnHomepageValidator func(int) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.

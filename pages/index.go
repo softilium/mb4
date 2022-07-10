@@ -1,11 +1,14 @@
 package pages
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/flosch/pongo2/v6"
 	"github.com/softilium/mb4/cube"
+	"github.com/softilium/mb4/db"
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
@@ -15,7 +18,28 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	topxx := 25
+	auth := LoadSessionStruct(r)
+
+	topxx := 20
+	if auth.Authenticated {
+		topxx = auth.user.HowManyTickersOnHomepage
+	}
+
+	qhm := r.URL.Query().Get("hm")
+	if qhm != "" {
+		t, err := strconv.ParseInt(qhm, 10, 64)
+		if err == nil {
+			topxx = int(t)
+
+			if auth.Authenticated {
+				_, err := db.DB.User.UpdateOneID(auth.UserID).SetHowManyTickersOnHomepage(topxx).Save(context.Background())
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+			}
+		}
+	}
 
 	topYield5Y := cube.Market.TopDivYields5Y(topxx)
 	topDSI := cube.Market.TopDSI(topxx)
@@ -36,9 +60,10 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		TopDSI    []*TopItem
 		TopFallen []*TopItem
 		TopRaise  []*TopItem
+		HM        int
 	}
 
-	pd := pageDataStruct{SessionStruct: LoadSessionStruct(r)}
+	pd := pageDataStruct{SessionStruct: auth, HM: topxx}
 	pd.TopY = make([]*TopItem, len(topYield5Y))
 	for k, v := range topYield5Y {
 		pd.TopY[k] = &TopItem{

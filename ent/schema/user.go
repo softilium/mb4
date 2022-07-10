@@ -19,6 +19,7 @@ func (User) Fields() []ent.Field {
 		field.String("PasswordHash"),
 		field.Bool("Admin").Default(false),
 		field.Time("StartInvestAccountsFlow").Optional(),
+		field.Int("HowManyTickersOnHomepage").Range(10, 100).Default(20),
 	}
 }
 

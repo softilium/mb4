@@ -7347,20 +7347,22 @@ func (m *TickerMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op                       Op
-	typ                      string
-	id                       *xid.ID
-	_UserName                *string
-	_PasswordHash            *string
-	_Admin                   *bool
-	_StartInvestAccountsFlow *time.Time
-	clearedFields            map[string]struct{}
-	_InvestAccounts          map[xid.ID]struct{}
-	removed_InvestAccounts   map[xid.ID]struct{}
-	cleared_InvestAccounts   bool
-	done                     bool
-	oldValue                 func(context.Context) (*User, error)
-	predicates               []predicate.User
+	op                           Op
+	typ                          string
+	id                           *xid.ID
+	_UserName                    *string
+	_PasswordHash                *string
+	_Admin                       *bool
+	_StartInvestAccountsFlow     *time.Time
+	_HowManyTickersOnHomepage    *int
+	add_HowManyTickersOnHomepage *int
+	clearedFields                map[string]struct{}
+	_InvestAccounts              map[xid.ID]struct{}
+	removed_InvestAccounts       map[xid.ID]struct{}
+	cleared_InvestAccounts       bool
+	done                         bool
+	oldValue                     func(context.Context) (*User, error)
+	predicates                   []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -7624,6 +7626,62 @@ func (m *UserMutation) ResetStartInvestAccountsFlow() {
 	delete(m.clearedFields, user.FieldStartInvestAccountsFlow)
 }
 
+// SetHowManyTickersOnHomepage sets the "HowManyTickersOnHomepage" field.
+func (m *UserMutation) SetHowManyTickersOnHomepage(i int) {
+	m._HowManyTickersOnHomepage = &i
+	m.add_HowManyTickersOnHomepage = nil
+}
+
+// HowManyTickersOnHomepage returns the value of the "HowManyTickersOnHomepage" field in the mutation.
+func (m *UserMutation) HowManyTickersOnHomepage() (r int, exists bool) {
+	v := m._HowManyTickersOnHomepage
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHowManyTickersOnHomepage returns the old "HowManyTickersOnHomepage" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldHowManyTickersOnHomepage(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHowManyTickersOnHomepage is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHowManyTickersOnHomepage requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHowManyTickersOnHomepage: %w", err)
+	}
+	return oldValue.HowManyTickersOnHomepage, nil
+}
+
+// AddHowManyTickersOnHomepage adds i to the "HowManyTickersOnHomepage" field.
+func (m *UserMutation) AddHowManyTickersOnHomepage(i int) {
+	if m.add_HowManyTickersOnHomepage != nil {
+		*m.add_HowManyTickersOnHomepage += i
+	} else {
+		m.add_HowManyTickersOnHomepage = &i
+	}
+}
+
+// AddedHowManyTickersOnHomepage returns the value that was added to the "HowManyTickersOnHomepage" field in this mutation.
+func (m *UserMutation) AddedHowManyTickersOnHomepage() (r int, exists bool) {
+	v := m.add_HowManyTickersOnHomepage
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetHowManyTickersOnHomepage resets all changes to the "HowManyTickersOnHomepage" field.
+func (m *UserMutation) ResetHowManyTickersOnHomepage() {
+	m._HowManyTickersOnHomepage = nil
+	m.add_HowManyTickersOnHomepage = nil
+}
+
 // AddInvestAccountIDs adds the "InvestAccounts" edge to the InvestAccount entity by ids.
 func (m *UserMutation) AddInvestAccountIDs(ids ...xid.ID) {
 	if m._InvestAccounts == nil {
@@ -7697,7 +7755,7 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m._UserName != nil {
 		fields = append(fields, user.FieldUserName)
 	}
@@ -7709,6 +7767,9 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m._StartInvestAccountsFlow != nil {
 		fields = append(fields, user.FieldStartInvestAccountsFlow)
+	}
+	if m._HowManyTickersOnHomepage != nil {
+		fields = append(fields, user.FieldHowManyTickersOnHomepage)
 	}
 	return fields
 }
@@ -7726,6 +7787,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.Admin()
 	case user.FieldStartInvestAccountsFlow:
 		return m.StartInvestAccountsFlow()
+	case user.FieldHowManyTickersOnHomepage:
+		return m.HowManyTickersOnHomepage()
 	}
 	return nil, false
 }
@@ -7743,6 +7806,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldAdmin(ctx)
 	case user.FieldStartInvestAccountsFlow:
 		return m.OldStartInvestAccountsFlow(ctx)
+	case user.FieldHowManyTickersOnHomepage:
+		return m.OldHowManyTickersOnHomepage(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -7780,6 +7845,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetStartInvestAccountsFlow(v)
 		return nil
+	case user.FieldHowManyTickersOnHomepage:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHowManyTickersOnHomepage(v)
+		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
 }
@@ -7787,13 +7859,21 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *UserMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.add_HowManyTickersOnHomepage != nil {
+		fields = append(fields, user.FieldHowManyTickersOnHomepage)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *UserMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case user.FieldHowManyTickersOnHomepage:
+		return m.AddedHowManyTickersOnHomepage()
+	}
 	return nil, false
 }
 
@@ -7802,6 +7882,13 @@ func (m *UserMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *UserMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case user.FieldHowManyTickersOnHomepage:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddHowManyTickersOnHomepage(v)
+		return nil
 	}
 	return fmt.Errorf("unknown User numeric field %s", name)
 }
@@ -7849,6 +7936,9 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldStartInvestAccountsFlow:
 		m.ResetStartInvestAccountsFlow()
+		return nil
+	case user.FieldHowManyTickersOnHomepage:
+		m.ResetHowManyTickersOnHomepage()
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)

@@ -122,6 +122,13 @@ func StartInvestAccountsFlow(v time.Time) predicate.User {
 	})
 }
 
+// HowManyTickersOnHomepage applies equality check predicate on the "HowManyTickersOnHomepage" field. It's identical to HowManyTickersOnHomepageEQ.
+func HowManyTickersOnHomepage(v int) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldHowManyTickersOnHomepage), v))
+	})
+}
+
 // UserNameEQ applies the EQ predicate on the "UserName" field.
 func UserNameEQ(v string) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
@@ -445,6 +452,82 @@ func StartInvestAccountsFlowIsNil() predicate.User {
 func StartInvestAccountsFlowNotNil() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.NotNull(s.C(FieldStartInvestAccountsFlow)))
+	})
+}
+
+// HowManyTickersOnHomepageEQ applies the EQ predicate on the "HowManyTickersOnHomepage" field.
+func HowManyTickersOnHomepageEQ(v int) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldHowManyTickersOnHomepage), v))
+	})
+}
+
+// HowManyTickersOnHomepageNEQ applies the NEQ predicate on the "HowManyTickersOnHomepage" field.
+func HowManyTickersOnHomepageNEQ(v int) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldHowManyTickersOnHomepage), v))
+	})
+}
+
+// HowManyTickersOnHomepageIn applies the In predicate on the "HowManyTickersOnHomepage" field.
+func HowManyTickersOnHomepageIn(vs ...int) predicate.User {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.User(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldHowManyTickersOnHomepage), v...))
+	})
+}
+
+// HowManyTickersOnHomepageNotIn applies the NotIn predicate on the "HowManyTickersOnHomepage" field.
+func HowManyTickersOnHomepageNotIn(vs ...int) predicate.User {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.User(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldHowManyTickersOnHomepage), v...))
+	})
+}
+
+// HowManyTickersOnHomepageGT applies the GT predicate on the "HowManyTickersOnHomepage" field.
+func HowManyTickersOnHomepageGT(v int) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldHowManyTickersOnHomepage), v))
+	})
+}
+
+// HowManyTickersOnHomepageGTE applies the GTE predicate on the "HowManyTickersOnHomepage" field.
+func HowManyTickersOnHomepageGTE(v int) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldHowManyTickersOnHomepage), v))
+	})
+}
+
+// HowManyTickersOnHomepageLT applies the LT predicate on the "HowManyTickersOnHomepage" field.
+func HowManyTickersOnHomepageLT(v int) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldHowManyTickersOnHomepage), v))
+	})
+}
+
+// HowManyTickersOnHomepageLTE applies the LTE predicate on the "HowManyTickersOnHomepage" field.
+func HowManyTickersOnHomepageLTE(v int) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldHowManyTickersOnHomepage), v))
 	})
 }
 

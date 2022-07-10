@@ -349,6 +349,12 @@ func init() {
 	userDescAdmin := userFields[3].Descriptor()
 	// user.DefaultAdmin holds the default value on creation for the Admin field.
 	user.DefaultAdmin = userDescAdmin.Default.(bool)
+	// userDescHowManyTickersOnHomepage is the schema descriptor for HowManyTickersOnHomepage field.
+	userDescHowManyTickersOnHomepage := userFields[5].Descriptor()
+	// user.DefaultHowManyTickersOnHomepage holds the default value on creation for the HowManyTickersOnHomepage field.
+	user.DefaultHowManyTickersOnHomepage = userDescHowManyTickersOnHomepage.Default.(int)
+	// user.HowManyTickersOnHomepageValidator is a validator for the "HowManyTickersOnHomepage" field. It is called by the builders before save.
+	user.HowManyTickersOnHomepageValidator = userDescHowManyTickersOnHomepage.Validators[0].(func(int) error)
 	// userDescID is the schema descriptor for id field.
 	userDescID := userFields[0].Descriptor()
 	// user.DefaultID holds the default value on creation for the id field.

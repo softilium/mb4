@@ -62,6 +62,20 @@ func (uc *UserCreate) SetNillableStartInvestAccountsFlow(t *time.Time) *UserCrea
 	return uc
 }
 
+// SetHowManyTickersOnHomepage sets the "HowManyTickersOnHomepage" field.
+func (uc *UserCreate) SetHowManyTickersOnHomepage(i int) *UserCreate {
+	uc.mutation.SetHowManyTickersOnHomepage(i)
+	return uc
+}
+
+// SetNillableHowManyTickersOnHomepage sets the "HowManyTickersOnHomepage" field if the given value is not nil.
+func (uc *UserCreate) SetNillableHowManyTickersOnHomepage(i *int) *UserCreate {
+	if i != nil {
+		uc.SetHowManyTickersOnHomepage(*i)
+	}
+	return uc
+}
+
 // SetID sets the "id" field.
 func (uc *UserCreate) SetID(x xid.ID) *UserCreate {
 	uc.mutation.SetID(x)
@@ -166,6 +180,10 @@ func (uc *UserCreate) defaults() {
 		v := user.DefaultAdmin
 		uc.mutation.SetAdmin(v)
 	}
+	if _, ok := uc.mutation.HowManyTickersOnHomepage(); !ok {
+		v := user.DefaultHowManyTickersOnHomepage
+		uc.mutation.SetHowManyTickersOnHomepage(v)
+	}
 	if _, ok := uc.mutation.ID(); !ok {
 		v := user.DefaultID()
 		uc.mutation.SetID(v)
@@ -187,6 +205,14 @@ func (uc *UserCreate) check() error {
 	}
 	if _, ok := uc.mutation.Admin(); !ok {
 		return &ValidationError{Name: "Admin", err: errors.New(`ent: missing required field "User.Admin"`)}
+	}
+	if _, ok := uc.mutation.HowManyTickersOnHomepage(); !ok {
+		return &ValidationError{Name: "HowManyTickersOnHomepage", err: errors.New(`ent: missing required field "User.HowManyTickersOnHomepage"`)}
+	}
+	if v, ok := uc.mutation.HowManyTickersOnHomepage(); ok {
+		if err := user.HowManyTickersOnHomepageValidator(v); err != nil {
+			return &ValidationError{Name: "HowManyTickersOnHomepage", err: fmt.Errorf(`ent: validator failed for field "User.HowManyTickersOnHomepage": %w`, err)}
+		}
 	}
 	if v, ok := uc.mutation.ID(); ok {
 		if err := user.IDValidator(v.String()); err != nil {
@@ -260,6 +286,14 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldStartInvestAccountsFlow,
 		})
 		_node.StartInvestAccountsFlow = value
+	}
+	if value, ok := uc.mutation.HowManyTickersOnHomepage(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: user.FieldHowManyTickersOnHomepage,
+		})
+		_node.HowManyTickersOnHomepage = value
 	}
 	if nodes := uc.mutation.InvestAccountsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
