@@ -1,0 +1,180 @@
+{% extends "layout.html" %}
+
+{% block title %}Инвестиционные счета{% endblock %}
+
+{% block content %}
+
+<script src="/assets/lib/vue/vue.global.prod.js"></script>
+<script src="/assets/lib/echarts/echarts.min.js"></script>
+<div id="vueapp">
+    <h1> Инвестиционные счета</h1>
+    <div class="row">
+        <div class="col-4">
+            <div class="form-group.row">
+                <label class="col-sm-6 col-form-label" for="startSimulation">Стартовая дата расчета</label>
+                <div class="col-sm-6">
+                    <input class="form-control form-control-sm" type="date" v-model="startInvestAccountsFlow"
+                        v-on:change="startInvestAccountsFlowChanged()" />
+                </div>
+            </div>
+            <table class="table sm">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Наименование счета</th>
+                        <th class="text-end"> Оценка активов, руб.</th>
+                        <th class="text-end">Дата последней оценки</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in accList">
+                        <td><input type="checkbox" v-model="item.selected" v-on:change="showContent()" /></td>
+                        <td><a v-bind:href="'/invest-edit-account?id=' + item.id">${item.descr }</a></td>
+                        <td class="text-end">${ $prnCurrency(item.value) }</td>
+                        <td class="text-end">${ $prnDate(item.rec_date) }</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-8">
+            <h3 class="text-center">Абсолютный доход</h3>
+            <div ref="totalYield" style="height:400px;width:100%"></div>
+            <p>&nbsp;</p>
+            <h3 class="text-center">Понедельная динамика</h3>
+            <table class="table table-hover table-responsive table-sm">
+                <thead style="position: sticky; top: 0; z-index: 1; background-color: white;">
+                    <tr>
+                        <th class="text-end">#</th>
+                        <th>Дата</th>
+                        <th class="text-end">Портфель</th>
+                        <th class="text-end">Пополнений</th>
+                        <th class="text-end">Пополнение нед.</th>
+                        <th class="text-end">Абс.доход</th>
+                        <th class="text-end">Доход нед.</th>
+                        <th class="text-end">Доходность абс, %</th>
+                        <th class="text-end">Доходность годовая, %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in weekflow">
+                        <td class="text-end">${ item.wNum }</td>
+                        <td class="text-nowrap">${ $prnDate(item.eow) }</td>
+                        <td class="text-end">${ $prnCurrency(item.eval) }</td>
+                        <td class="text-end">${ $prnCurrency(item.totalCashflow) }</td>
+                        <td class="text-end">${ $prnCurrency(item.weekCashflow) }</td>
+                        <td class="text-end">${ $prnCurrency(item.totalProfit) }</td>
+                        <td class="text-end">${ $prnCurrency(item.weekProfit) }</td>
+                        <td class="text-end">${ $prnPercent1(item.totalYield) }</td>
+                        <td class="text-end">${ $prnPercent1(item.yearYield) }</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    const App = {
+        delimiters: ['${', '}'],
+        data() {
+            return {
+                accList: {},
+                weekflow: [],
+                startInvestAccountsFlow: ""
+            }
+        },
+        async mounted() {
+            await this.getAccList();
+        },
+        methods: {
+            async getAccList() {
+                let response = await fetch("/api/users/start-invest-accounts-flow", { method: "GET" });
+                if (response.ok) {
+                    const lDate = await response.text();
+                    if (lDate != "")
+                        this.startInvestAccountsFlow = lDate;
+                    else
+                        this.startInvestAccountsFlow = "2017-01-01";
+                    response = await fetch('/api/invest-accounts', { method: 'GET' });
+                    if (response.ok) this.accList = await response.json();
+                    else alert("Проблема с получением списка брокерских счетов");
+                } else {
+                    alert("Проблема при получении стартовой даты расчета");
+                }
+            },
+            async startInvestAccountsFlowChanged() {
+                let response = await fetch(
+                    `/api/users/start-invest-accounts-flow?newdate=${this.startInvestAccountsFlow}`,
+                    { method: 'POST' }
+                );
+                if (response.ok) {
+                    this.showContent();
+                }
+                else alert("Проблема при установке стартовой даты расчета");
+            },
+            async applyTotalYieldChart(domref) {
+                var myChart = echarts.init(domref);
+
+                if (this.weekflow.length < 1) {
+                    myChart.clear();
+                    return;
+                }
+                dates = [];
+                yields = [];
+                this.weekflow.forEach(function (el) {
+                    dates.push(el.eow.split('T')[0]);
+                    yields.push(el.totalProfit);
+                });
+                option = {
+                    animation: false,
+                    xAxis: {
+                        name: 'Недели',
+                        type: 'category',
+                        data: dates,
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: { type: 'cross' },
+                    },
+                    series: [
+                        {
+                            name: 'Результат',
+                            type: 'line',
+                            data: yields,
+                            smooth: true,
+                            showSymbol: false
+                        }
+                    ]
+                };
+                myChart.setOption(option);
+
+            },
+            async showContent() {
+                let idsArr = [];
+                this.accList.forEach(function (el) { if (el.selected) idsArr.push(el.id); }
+                );
+                if (idsArr.length == 0) {
+                    this.weekflow = [];
+                    this.applyTotalYieldChart(this.$refs.totalYield);
+                    return;
+                }
+                let ids = idsArr.join(',');
+                let response = await fetch(`/api/invest-accounts?mode=weekflow&ids=${ids}`, { method: 'GET' });
+                if (response.ok) {
+                    this.weekflow = await response.json();
+                    this.applyTotalYieldChart(this.$refs.totalYield);
+                }
+                else alert("Проблема с получением списка брокерских счетов");
+            }
+        }
+    };
+
+    let app = Vue.createApp(App)
+    applyVueFuncs(app);
+    app.mount('#vueapp')
+
+</script>
+
+{% endblock %}

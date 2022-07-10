@@ -1,5 +1,7 @@
 ariga.io/atlas v0.4.2 h1:6p4jRJq0mmm2LfaY9y5H4/hI4D/wtCVv1UrFylTwSqg=
 ariga.io/atlas v0.4.2/go.mod h1:0eSMrFg/pqF2qZ+bjM3yRvlzKROYaLbKbSVaU0RKr5g=
+ariga.io/atlas v0.4.3 h1:X1XC6P5myi7BxWKkmhJf4LsIcmXhkGoymI+GOELb/3s=
+ariga.io/atlas v0.4.3/go.mod h1:ofVetkJqlaWle3mvYmaS2uyFGFcc7dSq436tmxa/Mzk=
 entgo.io/ent v0.10.2-0.20220502113020-4ac82f5bb3f0 h1:qHA4+ANAzDj6BcDLxNgZuzKxFre/RI9r5wwsI2O+1M4=
 entgo.io/ent v0.10.2-0.20220502113020-4ac82f5bb3f0/go.mod h1:Zh61BPvB+cL6VWEyN8f1YoDacrMjQf2KDlDeX26xq2k=
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
@@ -9,8 +11,6 @@ github.com/apparentlymart/go-textseg/v13 v13.0.0 h1:Y+KvPE1NYz0xl601PVImeQfFyEy6
 github.com/apparentlymart/go-textseg/v13 v13.0.0/go.mod h1:ZK2fH7c4NqDTLtiYLvIkEghdlcqw7yxLeM89kiTRPUo=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/eknkc/amber v0.0.0-20171010120322-cdade1c07385 h1:clC1lXBpe2kTj2VHdaIu9ajZQe4kcEY9j0NsnDDBZ3o=
-github.com/eknkc/amber v0.0.0-20171010120322-cdade1c07385/go.mod h1:0vRUJqYpeSZifjYj7uP3BG/gKcuzL9xWVV/Y+cK33KM=
 github.com/felixge/httpsnoop v1.0.1/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
 github.com/felixge/httpsnoop v1.0.3 h1:s/nj+GCswXYzN5v2DpNMuMQYe+0DDwt5WVCU6CWBdXk=
 github.com/felixge/httpsnoop v1.0.3/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=

@@ -1,0 +1,201 @@
+{% extends "layout.html" %}
+
+{% block title %}Инвестиционный счет{% endblock %}
+
+{% block content %}
+
+<script src="/assets/lib/vue/vue.global.prod.js"></script>
+<h1>Инвестиционный счет</h1>
+
+<div id="vueapp">
+    <div class="row">
+        <div class="form-group row">
+            <div class="col-sm-2">
+                <label class="col-form-label" for="descr">Наименование</label>
+            </div>
+            <div class="col-sm-4">
+                <input class="form-control form-control-sm" type="text" v-model="obj.Descr" />
+            </div>
+            <div class="col-sm-2">
+                <button class="btn btn-primary btn-sm" v-on:click="setDescr()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <p>&nbsp;</p>
+    </div>
+    <div class="row">
+        <div class="col-3">
+            <h3>Оценки портфеля</h3>
+            <table class="table table-hover table-responsive table-sm">
+                <thead>
+                    <tr>
+                        <th class="text-end">Дата оценки</th>
+                        <th class="text-end">Руб.</th>
+                        <th>
+                            <button class="btn" data-bs-toggle="modal" data-bs-target="#valModal"
+                                v-on:click="setNewSelectedVal()">
+                                <i class="bi bi-file-earmark-plus"></i>
+                            </button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in obj.edges.Valuations">
+                        <td class="text-end">${ $prnDate(item.RecDate) }</td>
+                        <td class="text-end">${ $prnCurrency(item.Value) }</td>
+                        <td>
+                            <button class="btn" data-bs-toggle="modal" data-bs-target="#valModal"
+                                v-on:click="setSelectedVal(item)">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <button class="btn">
+                                <i class="bi bi-trash3" v-on:click="deleteValuation(item.id)"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="modal" id="valModal" tabindex="-1" aria-labelledby="valModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="valModalLabel">Редактор оценки</h5>
+                            <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3.row">
+                                <label class="col-sm-3 col-form-label">Дата оценки</label>
+                                <div class="col-sm-9">
+                                    <input class="form-control form-control-sm" type="date"
+                                        v-model="selectedVal.RecDate" />
+                                </div>
+                            </div>
+                            <div class="mb-3.row">
+                                <label class="col-sm-3 col-form-label">Оценка, руб.</label>
+                                <div class="col-sm-9">
+                                    <input class="form-control form-control-sm" type="number"
+                                        v-model="selectedVal.Value" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" type="button" v-on:click="saveSelectedVal()"
+                                data-bs-dismiss="modal">Сохранить и закрыть</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-3">
+            <h3>Ввод-вывод</h3>
+            <table class="table table-hover table-responsive .table-sm">
+                <thead>
+                    <tr>
+                        <th class="text-end">Дата операции</th>
+                        <th class="text-end">Руб.</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in obj.edges.Cashflows">
+                        <td class="text-end"> ${ $prnDate(item.RecDate) }</td>
+                        <td class="text-end"> ${ $prnCurrency(item.Qty) }</td>
+                        <td>
+                            <button class="btn" data-bs-toggle="modal" data-bs-target="#filterModal">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <button class="btn">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.accid = '{{ pd.AccId }}'
+
+    const App = {
+        delimiters: ['${', '}'],
+        data() {
+            return {
+                // stubs for initial rendering
+                obj: {
+                    edges: {
+                        Valuations: []
+                    }
+                },
+                selectedVal: {
+                    id: null,
+                    RecDate: null,
+                    Value: null
+                }
+            }
+        },
+        async mounted() {
+            await this.getList();
+        },
+        methods: {
+            async setNewSelectedVal() {
+                this.selectedVal.id = null;
+                this.selectedVal.Value = 0;
+                this.selectedVal.RecDate = new Date().toISOString().split('T')[0]; // strip time
+            },
+            async setSelectedVal(item) {
+                this.selectedVal.id = item.id;
+                this.selectedVal.Value = item.Value;
+                this.selectedVal.RecDate = item.RecDate.split('T')[0]; // strip time
+            },
+            async saveSelectedVal() {
+                let res = null;
+                this.selectedVal.RecDate += "T00:00:00+03:00"; // add time
+                if (this.selectedVal.id == null) {
+                    res = await fetch(`/api/invest-account-valuations?id=${this.selectedVal.id}&owner=${window.accid}`,
+                        { method: 'POST', body: JSON.stringify(this.selectedVal) }
+                    );
+                } else {
+                    res = await fetch(`/api/invest-account-valuations?id=${this.selectedVal.id}`,
+                        { method: 'PUT', body: JSON.stringify(this.selectedVal) }
+                    );
+                }
+                if (res.ok) this.getList(); else alert(`Ошибка при сохранении значения: ${res.text()}`);
+            },
+            async getList() {
+                let response = await fetch(`/api/invest-accounts?id=${window.accid}`, { method: 'GET' });
+                if (response.ok) {
+                    this.obj = await response.json();
+                }
+                else alert("Проблема с получением брокерского счета");
+            },
+            async deleteValuation(id) {
+                if (confirm("Удалить указанную строку оценки?")) {
+
+                    let response = await fetch(`/api/invest-account-valuations?id=${id}`, { method: 'DELETE' });
+                    if (response.ok) {
+                        await this.getList();
+                    } else {
+                        alert("Ошибка удаления строки оценки")
+                    }
+                }
+            },
+            async setDescr() {
+                let response = await fetch(
+                    `/api/invest-accounts?id=${window.accid}&newdescr=${this.obj.Descr}`,
+                    { method: 'PUT' }
+                );
+                if (!response.ok) alert("Проблема с установкой наименования брокерского счета");
+            }
+        }
+    };
+
+    let app = Vue.createApp(App)
+    applyVueFuncs(app);
+    app.mount('#vueapp')
+
+</script>
+
+{% endblock %}

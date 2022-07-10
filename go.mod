@@ -13,10 +13,9 @@ require (
 require github.com/gorilla/securecookie v1.1.1 // indirect
 
 require (
-	ariga.io/atlas v0.4.2 // indirect
+	ariga.io/atlas v0.4.3 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
-	github.com/eknkc/amber v0.0.0-20171010120322-cdade1c07385
 	github.com/felixge/httpsnoop v1.0.3 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
 	github.com/google/go-cmp v0.5.8 // indirect

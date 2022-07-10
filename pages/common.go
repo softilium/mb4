@@ -2,11 +2,9 @@ package pages
 
 import (
 	"context"
-	"html/template"
 	"log"
 	"net/http"
 
-	"github.com/eknkc/amber"
 	"github.com/flosch/pongo2/v6"
 	"github.com/gorilla/sessions"
 	"github.com/rs/xid"
@@ -18,7 +16,6 @@ import (
 )
 
 var (
-	templates     map[string]*template.Template
 	SessionsStore *sessions.CookieStore
 )
 
@@ -113,12 +110,6 @@ func LoadSessionStruct(r *http.Request) SessionStruct {
 func init() {
 
 	pongo2.DefaultSet.Debug = config.C.Debug
-
-	var err error
-	templates, err = amber.CompileDir("pages/", amber.DirOptions{Ext: ".pug"}, amber.DefaultOptions)
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	sessionkey := []byte(config.C.SessionCryptKey)
 	SessionsStore = sessions.NewCookieStore(sessionkey)
