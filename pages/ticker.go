@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/flosch/pongo2/v6"
 	"github.com/softilium/mb4/cube"
 )
 
@@ -22,7 +23,13 @@ func Ticker(w http.ResponseWriter, r *http.Request) {
 			TRI *cube.TickerRenderInfo
 		}{SessionStruct: si, TRI: cube.Market.GetTickerRenderInfo(tickerId, false)}
 
-		templates["ticker"].Execute(w, pageData)
+		tmpl, err := pongo2.FromCache("pages/ticker.html")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		tmpl.ExecuteWriter(pongo2.Context{"pd": pageData}, w)
+
 		return
 	}
 

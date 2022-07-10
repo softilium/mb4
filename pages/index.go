@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/flosch/pongo2/v6"
 	"github.com/softilium/mb4/cube"
 )
 
@@ -34,8 +35,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		TopRaise  []TopItem
 	}
 
-	pd := pageDataStruct{}
-	pd.SessionStruct = LoadSessionStruct(r)
+	pd := pageDataStruct{SessionStruct: LoadSessionStruct(r)}
 	pd.TopY = make([]TopItem, len(topYield5Y))
 	for k, v := range topYield5Y {
 		pd.TopY[k].Ticker = "/ticker?id=" + v.Quote.Edges.Ticker.ID
@@ -63,6 +63,11 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		pd.TopRaise[k].V = fmt.Sprintf("%.1f", v.PercentPriceChange)
 	}
 
-	templates["index"].Execute(w, pd)
+	tmpl, err := pongo2.FromCache("pages/index.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	tmpl.ExecuteWriter(pongo2.Context{"pd": pd}, w)
 
 }

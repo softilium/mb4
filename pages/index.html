@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+
+{% block title %}Moneybox{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-12 col-md-6 col-xl-3">
+        <h2>Дивидендная доходность</h2>
+    </div>
+    <div class="div col-12 col-md-6 col-xl-3">
+        <h2>Дивидендная стабильность</h2>
+    </div>
+    <div class="div col-12 col-md-6 col-xl-3">
+        <h2>Падения месяца</h2>
+    </div>
+    <div class="div col-12 col-md-6 col-xl-3">
+        <h2>Рост месяца</h2>
+    </div>
+</div>
+
+<div class="row"></div>
+
+<div class="row">
+    <div class="col-12 col-md-6 col-xl-3">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Тикер</th>
+                    <th class="text-end">Yield-5Y</th>
+                    <th class="text-end ">DSI</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in pd.TopY %}
+                <tr>
+                    <td><a href="{{ item.Ticker }}">{{ item.Descr }}</a></td>
+                    <td class="text-end">{{ item.V }}</td>
+                    <td class="text-end">{{ item.V1 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Тикер</th>
+                    <th class="text-end">Yield-5Y</th>
+                    <th class="text-end ">DSI</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in pd.TopDSI %}
+                <tr>
+                    <td><a href="{{ item.Ticker }}">{{ item.Descr }}</a></td>
+                    <td class="text-end">{{ item.V }}</td>
+                    <td class="text-end">{{ item.V1 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Тикер</th>
+                    <th class="text-end">Падение, %</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in pd.TopFallen %}
+                <tr>
+                    <td><a href="{{ item.Ticker }}">{{ item.Descr }}</a></td>
+                    <td class="text-end">{{ item.V }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Тикер</th>
+                    <th class="text-end">Рост, %</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in pd.TopRaise %}
+                <tr>
+                    <td><a href="{{ item.Ticker }}">{{ item.Descr }}</a></td>
+                    <td class="text-end">{{ item.V }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

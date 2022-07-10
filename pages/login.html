@@ -1,0 +1,108 @@
+{% extends "layout.html" %}
+
+{% block title %}Вход{% endblock %}
+
+{% block content %}
+<script src="/assets/lib/vue/vue.global.prod.js"></script>
+
+<div id="vueapp">
+    <div class="row"></div>
+    <div class="col-6">
+        <h1>Вход</h1>
+        <form>
+            <div class="mb-3">
+                <label class="form-label">Email address</label>
+                <input id="email" class="form-control" type="email" v-model="userName" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input id="password" class="form-control" type="password" v-model="password" />
+            </div>
+            <div>
+                <button class="btn btn-primary" v-on:click.prevent="login()">Вход</button>
+                <span>&nbsp;</span>
+                <span class="alert" v-show="showAlert">{{ alertText }}</span>
+            </div>
+        </form>
+    </div>
+    <div class="col-6">
+        <h1>Регистрация</h1>
+        <form>
+            <div class="mb-3">
+                <label class="form-label">Email address</label>
+                <input class="form-control" type="email" v-model="userNameReg" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Пароль</label>
+                <input class="form-control" type="password" v-model="passwordReg" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Повторите пароль</label>
+                <input class="form-control" type="password" v-model="passwordReg1" required />
+            </div>
+            <div>
+                <button class="btn btn-primary" v-on:click.prevent="register()">Регистрация</button>
+                <span>&nbsp;</span>
+                <span class="alert" v-show="showAlertReg">{{ alertTextReg }}</span>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+<script>
+    const App = {
+        data() {
+            return {
+
+                userName: "",
+                password: "",
+                showAlert: false,
+                alertText: "",
+
+                userNameReg: "",
+                passwordReg: "",
+                passwordReg1: "",
+                showAlertReg: false,
+                alertTextReg: ""
+            }
+        },
+        methods: {
+            async login() {
+                let res = await fetch(
+                    "/api/users/login?username=" + this.userName + "&password=" + this.password,
+                    { method: 'POST' }
+                );
+                if (res.ok)
+                    window.location.href = '/'
+                else {
+                    this.showAlert = true;
+                    this.alertText = await res.text();
+                    //TODO Не выводится сообщение об ошибке
+                }
+            },
+            async register() {
+                if (this.passwordReg != this.passwordReg1) {
+                    this.showAlertReg = true;
+                    this.alertTextReg = "Пароли не совпадают";
+                    return;
+                }
+                let res = await fetch(
+                    `/api/users/register?username=${this.userNameReg}&password=${this.passwordReg}`,
+                    { method: 'POST' }
+                );
+                if (res.ok)
+                    window.location.href = '/'
+                else {
+                    this.showAlertReg = true;
+                    this.alertTextReg = await res.text();
+                }
+
+            }
+        }
+    };
+
+    Vue.createApp(App).mount('#vueapp')
+
+</script>
+
+{% endblock %}

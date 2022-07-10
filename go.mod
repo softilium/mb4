@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	entgo.io/ent v0.10.2-0.20220502113020-4ac82f5bb3f0
+	github.com/flosch/pongo2/v6 v6.0.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/joho/godotenv v1.4.0
 	github.com/lib/pq v1.10.6

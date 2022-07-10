@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/eknkc/amber"
+	"github.com/flosch/pongo2/v6"
 	"github.com/gorilla/sessions"
 	"github.com/rs/xid"
 	"github.com/softilium/mb4/config"
@@ -110,6 +111,9 @@ func LoadSessionStruct(r *http.Request) SessionStruct {
 }
 
 func init() {
+
+	pongo2.DefaultSet.Debug = config.C.Debug
+
 	var err error
 	templates, err = amber.CompileDir("pages/", amber.DirOptions{Ext: ".pug"}, amber.DefaultOptions)
 	if err != nil {
