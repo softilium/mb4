@@ -34,7 +34,7 @@
             <tbody>
                 {% for item in pd.TopY %}
                 <tr>
-                    <td><a href="{{ item.Ticker }}">{{ item.Descr }}</a></td>
+                    <td {% if item.Star %} class="table-primary" {% endif %}><a href="{{ item.Ticker }}">{{ item.Descr }}</a></td>
                     <td class="text-end">{{ item.V }}</td>
                     <td class="text-end">{{ item.V1 }}</td>
                 </tr>
@@ -54,7 +54,7 @@
             <tbody>
                 {% for item in pd.TopDSI %}
                 <tr>
-                    <td><a href="{{ item.Ticker }}">{{ item.Descr }}</a></td>
+                    <td {% if item.Star %} class="table-primary" {% endif %}><a href="{{ item.Ticker }}">{{ item.Descr }}</a></td>
                     <td class="text-end">{{ item.V }}</td>
                     <td class="text-end">{{ item.V1 }}</td>
                 </tr>
@@ -73,7 +73,7 @@
             <tbody>
                 {% for item in pd.TopFallen %}
                 <tr>
-                    <td><a href="{{ item.Ticker }}">{{ item.Descr }}</a></td>
+                    <td {% if item.Star %} class="table-primary" {% endif %}><a href="{{ item.Ticker }}">{{ item.Descr }}</a></td>
                     <td class="text-end">{{ item.V }}</td>
                 </tr>
                 {% endfor %}
@@ -91,7 +91,7 @@
             <tbody>
                 {% for item in pd.TopRaise %}
                 <tr>
-                    <td><a href="{{ item.Ticker }}">{{ item.Descr }}</a></td>
+                    <td {% if item.Star %} class="table-primary" {% endif %}><a href="{{ item.Ticker }}">{{ item.Descr }}</a></td>
                     <td class="text-end">{{ item.V }}</td>
                 </tr>
                 {% endfor %}
