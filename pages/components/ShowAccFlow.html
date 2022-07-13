@@ -45,10 +45,9 @@
         watch: {
             weekflow:
             {
-                handler(newVal, oldVal) {
-                    this.$nextTick(function () {
-                        this.applyTotalYieldChart(this.$refs.totalYield);
-                    });
+                async handler(newVal, oldVal) {
+                    await this.$nextTick();
+                    this.applyTotalYieldChart(this.$refs.totalYield);
                 },
                 immediate: true
             }
