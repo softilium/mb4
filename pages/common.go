@@ -26,6 +26,7 @@ type SessionStruct struct {
 	UserIDStr     string
 	UserName      string
 	UserIsAdmin   bool
+	Debug         bool
 }
 
 func (session *SessionStruct) GetUser() *ent.User {
@@ -69,7 +70,7 @@ func (session *SessionStruct) GetInvestAccountXidsMap() (map[xid.ID]bool, error)
 
 func LoadSessionStruct(r *http.Request) SessionStruct {
 
-	data := SessionStruct{user: nil, Authenticated: false, UserName: "", UserIsAdmin: false}
+	data := SessionStruct{user: nil, Authenticated: false, UserName: "", UserIsAdmin: false, Debug: config.C.Debug}
 
 	session, err := SessionsStore.Get(r, config.C.SessionCookieName)
 	if err != nil {

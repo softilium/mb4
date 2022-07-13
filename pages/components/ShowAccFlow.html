@@ -1,0 +1,99 @@
+﻿<template id="show-acc-flow">
+    <h3 class="text-center">Абсолютный доход</h3>
+    <div ref="totalYield" style="height:400px;width:100%"></div>
+    <p>&nbsp;</p>
+    <h3 class="text-center">Понедельная динамика</h3>
+    <table class="table table-hover table-responsive table-sm">
+        <thead style="position: sticky; top: 0; z-index: 1; background-color: white;">
+            <tr>
+                <th class="text-end">#</th>
+                <th>Дата</th>
+                <th class="text-end">Портфель</th>
+                <th class="text-end">Пополнений</th>
+                <th class="text-end">Пополнение нед.</th>
+                <th class="text-end">Абс.доход</th>
+                <th class="text-end">Доход нед.</th>
+                <th class="text-end">Доходность абс, %</th>
+                <th class="text-end">Доходность годовая, %</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="item in weekflow">
+                <td class="text-end">${ item.wNum }</td>
+                <td class="text-nowrap">${ $prnDate(item.eow) }</td>
+                <td class="text-end">${ $prnCurrency(item.eval) }</td>
+                <td class="text-end">${ $prnCurrency(item.totalCashflow) }</td>
+                <td class="text-end">${ $prnCurrency(item.weekCashflow) }</td>
+                <td class="text-end">${ $prnCurrency(item.totalProfit) }</td>
+                <td class="text-end">${ $prnCurrency(item.weekProfit) }</td>
+                <td class="text-end">${ $prnPercent1(item.totalYield) }</td>
+                <td class="text-end">${ $prnPercent1(item.yearYield) }</td>
+            </tr>
+        </tbody>
+    </table>
+</template>
+
+<script type="text/javascript">
+    ShowAccFlow =
+    {
+        delimiters: ['${', '}'],
+        template: "#show-acc-flow",
+        props: { weekflow: [] },
+        data() {
+            return {}
+        },
+        watch: {
+            weekflow:
+            {
+                handler(newVal, oldVal) {
+                    this.$nextTick(function () {
+                        this.applyTotalYieldChart(this.$refs.totalYield);
+                    });
+                },
+                immediate: true
+            }
+        },
+        methods: {
+            async applyTotalYieldChart(domref) {
+                var myChart = echarts.init(domref);
+
+                if (this.weekflow.length < 1) {
+                    myChart.clear();
+                    return;
+                }
+                dates = [];
+                yields = [];
+                this.weekflow.forEach(function (el) {
+                    dates.push(el.eow.split('T')[0]);
+                    yields.push(el.totalProfit);
+                });
+                option = {
+                    animation: false,
+                    xAxis: {
+                        name: 'Недели',
+                        type: 'category',
+                        data: dates,
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: { type: 'cross' },
+                    },
+                    series: [
+                        {
+                            name: 'Результат',
+                            type: 'line',
+                            data: yields,
+                            smooth: true,
+                            showSymbol: false
+                        }
+                    ]
+                };
+                myChart.setOption(option);
+
+            },
+        }
+    };
+</script>
