@@ -4,7 +4,6 @@
 
 {% block content %}
 
-<script src="/assets/lib/vue/vue.global.prod.js"></script>
 <h1>Инвестиционный счет</h1>
 
 <div id="vueapp">
@@ -113,14 +112,19 @@
                 </tbody>
             </table>
         </div>
+        <div class="col-6">
+            <show-acc-flow :weekflow="weekflow"></show-acc-flow>
+        </div>
     </div>
 </div>
 
+{% include "components/ShowAccFlow.html" %}
 <script>
     window.accid = '{{ pd.AccId }}'
 
     const App = {
         delimiters: ['${', '}'],
+        components: { ShowAccFlow: ShowAccFlow },
         data() {
             return {
                 // stubs for initial rendering
@@ -133,7 +137,8 @@
                     id: null,
                     RecDate: null,
                     Value: null
-                }
+                },
+                weekflow: []
             }
         },
         async mounted() {
@@ -165,9 +170,16 @@
                 if (res.ok) this.getList(); else alert(`Ошибка при сохранении значения: ${res.text()}`);
             },
             async getList() {
-                let response = await fetch(`/api/invest-accounts?id=${window.accid}`, { method: 'GET' });
+                const response = await fetch(`/api/invest-accounts?id=${window.accid}`, { method: 'GET' });
                 if (response.ok) {
                     this.obj = await response.json();
+
+                    const r2 = await fetch(`/api/invest-accounts?mode=weekflow&ids=${window.accid}`, { method: 'GET' });
+                    if (r2.ok) {
+                        this.weekflow = await r2.json();
+                    }
+                    else alert("Проблема с получением списка брокерских счетов");
+
                 }
                 else alert("Проблема с получением брокерского счета");
             },

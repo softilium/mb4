@@ -18,6 +18,8 @@ func InvestAccount(w http.ResponseWriter, r *http.Request) {
 		SessionStruct
 		AccId string
 	}{SessionStruct: s, AccId: r.URL.Query().Get("id")}
+	pd.Vue = true
+	pd.Echarts = true
 
 	tmpl, err := pongo2.FromCache("pages/invest-edit-account.html")
 	if err != nil {

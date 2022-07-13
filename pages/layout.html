@@ -30,6 +30,23 @@
             };
         }
     </script>
+
+    {% if pd.Debug %}
+    {% if pd.Vue %}
+    <script src="/assets/lib/vue/vue.global.js"></script>
+    {% endif %}
+    {%  if pd.Echarts %}
+    <script src="/assets/lib/echarts/echarts.js"></script>
+    {% endif %}
+    {% else %}
+    {% if pd.Vue %}
+    <script src="/assets/lib/vue/vue.global.prod.js"></script>
+    {% endif %}
+    {%  if pd.Echarts %}
+    <script src="/assets/lib/echarts/echarts.min.js"></script>
+    {% endif %}
+    {% endif %}
+
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow.mb-3">
             <div class="container">

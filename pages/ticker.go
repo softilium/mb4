@@ -22,6 +22,8 @@ func Ticker(w http.ResponseWriter, r *http.Request) {
 			SessionStruct
 			TRI *cube.TickerRenderInfo
 		}{SessionStruct: si, TRI: cube.Market.GetTickerRenderInfo(tickerId, false)}
+		pageData.Vue = true
+		pageData.Echarts = true
 
 		tmpl, err := pongo2.FromCache("pages/ticker.html")
 		if err != nil {

@@ -13,6 +13,8 @@ func InvestAccounts(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
+	pd.Vue = true
+	pd.Echarts = true
 
 	tmpl, err := pongo2.FromCache("pages/invest-accounts.html")
 	if err != nil {

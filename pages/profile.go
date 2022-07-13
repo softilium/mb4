@@ -9,6 +9,7 @@ import (
 func Profile(w http.ResponseWriter, r *http.Request) {
 
 	pd := LoadSessionStruct(r)
+	pd.Vue = true
 	if !pd.Authenticated {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return
