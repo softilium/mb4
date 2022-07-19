@@ -6,7 +6,7 @@ import (
 	"github.com/flosch/pongo2/v6"
 )
 
-func Login(w http.ResponseWriter, r *http.Request) {
+func Login(w http.ResponseWriter, _ *http.Request) {
 
 	tmpl, err := pongo2.FromCache("pages/login.html")
 	if err != nil {

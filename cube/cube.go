@@ -38,7 +38,7 @@ type Cell struct {
 	DSIStability byte
 	DSIGrowth    byte
 
-	// calc from reports
+	// from reports
 	BookValue float64
 
 	IsMissed bool //indicates than cell was copied for missing quotes from prevous days

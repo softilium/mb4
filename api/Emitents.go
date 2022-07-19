@@ -19,7 +19,7 @@ func Emitents(w http.ResponseWriter, r *http.Request) {
 	deleteOne := func(id xid.ID, w http.ResponseWriter) {
 
 		_, err := db.DB.Emitent.Delete().Where(emitent.IDEQ(id)).Exec(context.Background())
-		handleErr(err, w)
+		pages.HandleErr(err, w)
 	}
 
 	id := r.URL.Query().Get("id")
@@ -28,19 +28,19 @@ func Emitents(w http.ResponseWriter, r *http.Request) {
 		if len(id) == 0 {
 
 			res, err := db.DB.Emitent.Query().All(context.Background())
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 
 			w.Header().Set("Content-Type", "application/json")
 			err = json.NewEncoder(w).Encode(res)
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 			return
 
 		} else {
 
 			xid, err := xid.FromString(id)
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 			res, err := db.DB.Emitent.Query().Where(emitent.IDEQ(xid)).All(context.Background())
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 
 			if len(res) == 0 {
 				w.WriteHeader(http.StatusNotFound)
@@ -49,7 +49,7 @@ func Emitents(w http.ResponseWriter, r *http.Request) {
 
 			w.Header().Set("Content-Type", "application/json")
 			err = json.NewEncoder(w).Encode(res[0])
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 			return
 
 		}
@@ -65,12 +65,12 @@ func Emitents(w http.ResponseWriter, r *http.Request) {
 
 		buf := ent.Emitent{ID: xid.New()}
 		err := json.NewDecoder(r.Body).Decode(&buf)
-		handleErr(err, w)
+		pages.HandleErr(err, w)
 
 		//deleteOne(buf.ID, w)
 
 		tx, err := db.DB.Tx(context.Background())
-		handleErr(err, w)
+		pages.HandleErr(err, w)
 		defer tx.Rollback()
 
 		newdata, err := tx.Emitent.Create().
@@ -78,7 +78,7 @@ func Emitents(w http.ResponseWriter, r *http.Request) {
 			SetDescr(buf.Descr).
 			SetIndustryID(buf.Edges.Industry.ID).
 			Save(context.Background())
-		handleErr(err, w)
+		pages.HandleErr(err, w)
 
 		for _, v := range buf.Edges.Reports {
 			_, err := tx.Report.Create().
@@ -100,7 +100,7 @@ func Emitents(w http.ResponseWriter, r *http.Request) {
 				SetCfEquitySld(v.CfEquitySld).
 				SetCfTotalSld(v.CfTotalSld).
 				Save(context.Background())
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 
 		}
 
@@ -119,7 +119,7 @@ func Emitents(w http.ResponseWriter, r *http.Request) {
 		}
 
 		xid, err := xid.FromString(id)
-		handleErr(err, w)
+		pages.HandleErr(err, w)
 		if len(id) == 0 {
 			w.WriteHeader(http.StatusBadRequest)
 			return

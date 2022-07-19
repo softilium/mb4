@@ -21,17 +21,17 @@ func Industries(w http.ResponseWriter, r *http.Request) {
 		if len(id) == 0 {
 
 			res, err := db.DB.Industry.Query().All(context.Background())
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 
 			w.Header().Set("Content-Type", "application/json")
 			err = json.NewEncoder(w).Encode(res)
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 			return
 
 		} else {
 
 			res, err := db.DB.Industry.Query().Where(industry.IDEQ(id)).All(context.Background())
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 
 			if len(res) == 0 {
 				w.WriteHeader(http.StatusNotFound)
@@ -40,7 +40,7 @@ func Industries(w http.ResponseWriter, r *http.Request) {
 
 			w.Header().Set("Content-Type", "application/json")
 			err = json.NewEncoder(w).Encode(res[0])
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 			return
 
 		}
@@ -56,12 +56,10 @@ func Industries(w http.ResponseWriter, r *http.Request) {
 
 		buf := ent.Industry{}
 		err := json.NewDecoder(r.Body).Decode(&buf)
-		handleErr(err, w)
-
-		//deleteIndustry(buf.ID, w)
+		pages.HandleErr(err, w)
 
 		_, err = db.DB.Industry.Create().SetID(buf.ID).SetDescr(buf.Descr).Save(context.Background())
-		handleErr(err, w)
+		pages.HandleErr(err, w)
 		return
 
 	}
@@ -88,6 +86,6 @@ func Industries(w http.ResponseWriter, r *http.Request) {
 func deleteIndustry(id string, w http.ResponseWriter) {
 
 	_, err := db.DB.Industry.Delete().Where(industry.IDEQ(id)).Exec(context.Background())
-	handleErr(err, w)
+	pages.HandleErr(err, w)
 
 }

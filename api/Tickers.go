@@ -17,7 +17,7 @@ func Tickers(w http.ResponseWriter, r *http.Request) {
 
 	deleteOne := func(id string, w http.ResponseWriter) {
 		_, err := db.DB.Ticker.Delete().Where(ticker.IDEQ(id)).Exec(context.Background())
-		handleErr(err, w)
+		pages.HandleErr(err, w)
 	}
 
 	id := r.URL.Query().Get("id")
@@ -26,17 +26,17 @@ func Tickers(w http.ResponseWriter, r *http.Request) {
 		if len(id) == 0 {
 
 			res, err := db.DB.Ticker.Query().All(context.Background())
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 
 			w.Header().Set("Content-Type", "application/json")
 			err = json.NewEncoder(w).Encode(res)
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 			return
 
 		} else {
 
 			res, err := db.DB.Ticker.Query().Where(ticker.IDEQ(id)).All(context.Background())
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 
 			if len(res) == 0 {
 				w.WriteHeader(http.StatusNotFound)
@@ -45,7 +45,7 @@ func Tickers(w http.ResponseWriter, r *http.Request) {
 
 			w.Header().Set("Content-Type", "application/json")
 			err = json.NewEncoder(w).Encode(res[0])
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 			return
 
 		}
@@ -61,12 +61,12 @@ func Tickers(w http.ResponseWriter, r *http.Request) {
 
 		buf := ent.Ticker{}
 		err := json.NewDecoder(r.Body).Decode(&buf)
-		handleErr(err, w)
+		pages.HandleErr(err, w)
 
 		//deleteOne(buf.ID, w)
 
 		tx, err := db.DB.Tx(context.Background())
-		handleErr(err, w)
+		pages.HandleErr(err, w)
 		defer tx.Rollback()
 
 		_, err = db.DB.Ticker.Create().
@@ -75,7 +75,7 @@ func Tickers(w http.ResponseWriter, r *http.Request) {
 			SetKind(buf.Kind).
 			SetEmitentID(buf.Edges.Emitent.ID).
 			Save(context.Background())
-		handleErr(err, w)
+		pages.HandleErr(err, w)
 
 		for _, v := range buf.Edges.Emissions {
 			_, err := db.DB.Emission.Create().
@@ -86,7 +86,7 @@ func Tickers(w http.ResponseWriter, r *http.Request) {
 				SetSize(v.Size).
 				SetTickerID(buf.ID).
 				Save(context.Background())
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 		}
 
 		for _, v := range buf.Edges.DivPayouts {
@@ -98,11 +98,11 @@ func Tickers(w http.ResponseWriter, r *http.Request) {
 				SetStatus(v.Status).
 				SetDPS(v.DPS).
 				Save(context.Background())
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 		}
 
 		err = tx.Commit()
-		handleErr(err, w)
+		pages.HandleErr(err, w)
 
 		return
 

@@ -110,6 +110,14 @@ func LoadSessionStruct(r *http.Request) SessionStruct {
 
 }
 
+func HandleErr(err error, w http.ResponseWriter) {
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		panic(err)
+	}
+}
+
 func init() {
 
 	pongo2.DefaultSet.Debug = config.C.Debug

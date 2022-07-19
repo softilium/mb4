@@ -18,7 +18,7 @@ func Quotes(w http.ResponseWriter, r *http.Request) {
 
 	deleteOne := func(id xid.ID, w http.ResponseWriter) {
 		_, err := db.DB.Quote.Delete().Where(quote.IDEQ(id)).Exec(context.Background())
-		handleErr(err, w)
+		pages.HandleErr(err, w)
 	}
 
 	id := r.URL.Query().Get("id")
@@ -27,19 +27,19 @@ func Quotes(w http.ResponseWriter, r *http.Request) {
 		if len(id) == 0 {
 
 			res, err := db.DB.Quote.Query().All(context.Background())
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 
 			w.Header().Set("Content-Type", "application/json")
 			err = json.NewEncoder(w).Encode(res)
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 			return
 
 		} else {
 
 			xid, err := xid.FromString(id)
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 			res, err := db.DB.Quote.Query().Where(quote.IDEQ(xid)).All(context.Background())
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 
 			if len(res) == 0 {
 				w.WriteHeader(http.StatusNotFound)
@@ -48,7 +48,7 @@ func Quotes(w http.ResponseWriter, r *http.Request) {
 
 			w.Header().Set("Content-Type", "application/json")
 			err = json.NewEncoder(w).Encode(res[0])
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 			return
 
 		}
@@ -64,7 +64,7 @@ func Quotes(w http.ResponseWriter, r *http.Request) {
 
 		buf := []ent.Quote{}
 		err := json.NewDecoder(r.Body).Decode(&buf)
-		handleErr(err, w)
+		pages.HandleErr(err, w)
 
 		for _, v := range buf {
 			v.ID = xid.New()
@@ -78,13 +78,8 @@ func Quotes(w http.ResponseWriter, r *http.Request) {
 				SetH(v.H).
 				SetL(v.L).
 				SetV(v.V).
-				//SetCap(v.Cap).
-				//SetLotSize(v.LotSize).
-				//SetListLevel(v.ListLevel).
-				//SetDivSum5Y(v.DivSum5Y).
-				//SetDivYield5Y(v.DivYield5Y).
 				Save(context.Background())
-			handleErr(err, w)
+			pages.HandleErr(err, w)
 		}
 
 		return
@@ -103,7 +98,7 @@ func Quotes(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		xid, err := xid.FromString(id)
-		handleErr(err, w)
+		pages.HandleErr(err, w)
 		deleteOne(xid, w)
 		return
 

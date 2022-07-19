@@ -53,7 +53,7 @@ func UsersLogin(w http.ResponseWriter, r *http.Request) {
 		Limit(1).
 		Where(user.And(user.UserNameEQ(userName), user.PasswordHashEQ(db.PasswordHash(password)))).
 		All(context.Background())
-	handleErr(err, w)
+	pages.HandleErr(err, w)
 	if len(u) == 1 {
 
 		session, _ := pages.SessionsStore.Get(r, config.C.SessionCookieName)
@@ -111,7 +111,7 @@ func UsersRegister(w http.ResponseWriter, r *http.Request) {
 		SetUserName(strings.TrimSpace(strings.ToLower(userName))).
 		SetPasswordHash(db.PasswordHash(password)).
 		Save(context.Background())
-	handleErr(err, w)
+	pages.HandleErr(err, w)
 
 	session, _ := pages.SessionsStore.Get(r, config.C.SessionCookieName)
 	session.Values["userId"] = nu.ID.String()
@@ -135,10 +135,10 @@ func UsersStartInvestAccountsFlow(w http.ResponseWriter, r *http.Request) {
 
 		parNewdate := r.URL.Query().Get("newdate")
 		newValue, err := time.Parse("2006-01-02", parNewdate)
-		handleErr(err, w)
+		pages.HandleErr(err, w)
 
 		_, err = db.DB.User.UpdateOneID(session.UserID).SetStartInvestAccountsFlow(newValue).Save(context.Background())
-		handleErr(err, w)
+		pages.HandleErr(err, w)
 	}
 
 	if r.Method == http.MethodGet {

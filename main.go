@@ -50,7 +50,6 @@ func initServer(listenAddr string) *http.Server {
 	router.HandleFunc("/api/users/logout", api.UsersLogout)
 	router.HandleFunc("/api/users/start-invest-accounts-flow", api.UsersStartInvestAccountsFlow)
 	router.HandleFunc("/api/invest-accounts", api.InvestAccounts)
-	router.HandleFunc("/api/invest-account-valuations", api.InvestAccountValuations)
 	router.HandleFunc("/api/industries", api.Industries)
 	router.HandleFunc("/api/emitents", api.Emitents)
 	router.HandleFunc("/api/tickers", api.Tickers)

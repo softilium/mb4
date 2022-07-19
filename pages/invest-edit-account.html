@@ -29,7 +29,7 @@
             <table class="table table-hover table-responsive table-sm">
                 <thead>
                     <tr>
-                        <th class="text-end">Дата оценки</th>
+                        <th class="text-end">Дата</th>
                         <th class="text-end">Руб.</th>
                         <th>
                             <button class="btn" data-bs-toggle="modal" data-bs-target="#valModal"
@@ -91,26 +91,64 @@
             <table class="table table-hover table-responsive .table-sm">
                 <thead>
                     <tr>
-                        <th class="text-end">Дата операции</th>
+                        <th class="text-end">Дата</th>
                         <th class="text-end">Руб.</th>
-                        <th></th>
+                        <th>
+                            <button class="btn" data-bs-toggle="modal" data-bs-target="#cfModal"
+                                v-on:click="setNewSelectedCF()">
+                                <i class="bi bi-file-earmark-plus"></i>
+                            </button>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="item in obj.edges.Cashflows">
                         <td class="text-end"> ${ $prnDate(item.RecDate) }</td>
                         <td class="text-end"> ${ $prnCurrency(item.Qty) }</td>
-                        <td>
-                            <button class="btn" data-bs-toggle="modal" data-bs-target="#filterModal">
-                                <i class="bi bi-pencil-square"></i>
+                        <td class="text-nowrap">
+                            <button class="btn" data-bs-toggle="modal" data-bs-target="#cfModal">
+                                <i class="bi bi-pencil-square" v-on:click="setSelectedCF(item)"></i>
                             </button>
                             <button class="btn">
-                                <i class="bi bi-trash3"></i>
+                                <i class="bi bi-trash3" v-on:click="deleteCF(item.id)"></i>
                             </button>
                         </td>
                     </tr>
                 </tbody>
             </table>
+            <div class="modal" id="cfModal" tabindex="-1" aria-labelledby="cfModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="cfModalLabel">Редактор движения ДС</h5>
+                            <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3.row">
+                                <label class="col-sm-3 col-form-label">Дата движения</label>
+                                <div class="col-sm-9">
+                                    <input class="form-control form-control-sm" type="date"
+                                        v-model="selectedCF.RecDate" />
+                                </div>
+                            </div>
+                            <div class="mb-3.row">
+                                <label class="col-sm-3 col-form-label">Движение, руб.</label>
+                                <div class="col-sm-9">
+                                    <input class="form-control form-control-sm" type="number" v-model="selectedCF.Qty" />
+                                </div>
+                                <div class="form-text">
+                                    Положительные значения - пополнения, отрицательные - вывод средств.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" type="button" v-on:click="saveSelectedCF()"
+                                data-bs-dismiss="modal">Сохранить и закрыть</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
         <div class="col-6">
             <show-acc-flow :weekflow="weekflow"></show-acc-flow>
@@ -138,11 +176,16 @@
                     RecDate: null,
                     Value: null
                 },
+                selectedCF: {
+                    id: null,
+                    RecDate: null,
+                    Qty: null
+                },
                 weekflow: []
             }
         },
         async mounted() {
-            await this.getList();
+            await this.getObj();
         },
         methods: {
             async setNewSelectedVal() {
@@ -150,56 +193,103 @@
                 this.selectedVal.Value = 0;
                 this.selectedVal.RecDate = new Date().toISOString().split('T')[0]; // strip time
             },
+            async setNewSelectedCF() {
+                this.selectedCF.id = null;
+                this.selectedCF.Qty = 0;
+                this.selectedCF.RecDate = new Date().toISOString().split('T')[0]; // strip time
+            },
             async setSelectedVal(item) {
                 this.selectedVal.id = item.id;
                 this.selectedVal.Value = item.Value;
                 this.selectedVal.RecDate = item.RecDate.split('T')[0]; // strip time
             },
+            async setSelectedCF(item) {
+                this.selectedCF.id = item.id;
+                this.selectedCF.Qty = item.Qty;
+                this.selectedCF.RecDate = item.RecDate.split('T')[0]; // strip time
+            },
             async saveSelectedVal() {
                 let res = null;
                 this.selectedVal.RecDate += "T00:00:00+03:00"; // add time
                 if (this.selectedVal.id == null) {
-                    res = await fetch(`/api/invest-account-valuations?id=${this.selectedVal.id}&owner=${window.accid}`,
+                    res = await fetch(`?id=${this.selectedVal.id}&owner=${window.accid}&mode=val`,
                         { method: 'POST', body: JSON.stringify(this.selectedVal) }
                     );
                 } else {
-                    res = await fetch(`/api/invest-account-valuations?id=${this.selectedVal.id}`,
+                    res = await fetch(`?id=${this.selectedVal.id}&mode=val`,
                         { method: 'PUT', body: JSON.stringify(this.selectedVal) }
                     );
                 }
-                if (res.ok) this.getList(); else alert(`Ошибка при сохранении значения: ${res.text()}`);
-            },
-            async getList() {
-                const response = await fetch(`/api/invest-accounts?id=${window.accid}`, { method: 'GET' });
-                if (response.ok) {
-                    this.obj = await response.json();
-
-                    const r2 = await fetch(`/api/invest-accounts?mode=weekflow&ids=${window.accid}`, { method: 'GET' });
-                    if (r2.ok) {
-                        this.weekflow = await r2.json();
-                    }
-                    else alert("Проблема с получением списка брокерских счетов");
-
+                if (!res.ok) {
+                    alert(`Ошибка при сохранении значения: ${res.text()}`);
+                    return;
                 }
-                else alert("Проблема с получением брокерского счета");
+
+                this.getObj();
+            },
+            async saveSelectedCF() {
+                let res = null;
+                this.selectedCF.RecDate += "T00:00:00+03:00"; // add time
+                if (this.selectedCF.id == null) {
+                    res = await fetch(`?id=${this.selectedCF.id}&owner=${window.accid}&mode=cf`,
+                        { method: 'POST', body: JSON.stringify(this.selectedCF) }
+                    );
+                } else {
+                    res = await fetch(`?id=${this.selectedCF.id}&mode=cf`,
+                        { method: 'PUT', body: JSON.stringify(this.selectedCF) }
+                    );
+                }
+                if (!res.ok) {
+                    alert(`Ошибка при сохранении значения: ${res.text()}`);
+                    return;
+                }
+
+                this.getObj();
+            },
+            async getObj() {
+                const response = await fetch(`/api/invest-accounts?id=${window.accid}`, { method: 'GET' });
+                if (!response.ok) {
+                    alert("Проблема с получением брокерского счета");
+                    return;
+                }
+                this.obj = await response.json();
+
+                const r2 = await fetch(`/api/invest-accounts?mode=weekflow&ids=${window.accid}`, { method: 'GET' });
+                if (!r2.ok) {
+                    alert("Проблема с получением аналитических данных по брокерскому счету");
+                    return;
+                }
+                this.weekflow = await r2.json();
+
             },
             async deleteValuation(id) {
-                if (confirm("Удалить указанную строку оценки?")) {
+                if (!confirm("Удалить указанную строку оценки?")) return;
 
-                    let response = await fetch(`/api/invest-account-valuations?id=${id}`, { method: 'DELETE' });
-                    if (response.ok) {
-                        await this.getList();
-                    } else {
-                        alert("Ошибка удаления строки оценки")
-                    }
+                let res = await fetch(`?id=${id}&mode=val`, { method: 'DELETE' });
+                if (!res.ok) {
+                    alert("Ошибка удаления строки оценки");
+                    return;
                 }
+                await this.getObj();
+
+            },
+            async deleteCF(id) {
+                if (!confirm("Удалить указанную строку движения ДС?")) return;
+
+                let res = await fetch(`?id=${id}&mode=cf`, { method: 'DELETE' });
+                if (!res.ok) {
+                    alert("Ошибка удаления строки движения ДС");
+                    return;
+                }
+                await this.getObj();
+
             },
             async setDescr() {
-                let response = await fetch(
-                    `/api/invest-accounts?id=${window.accid}&newdescr=${this.obj.Descr}`,
-                    { method: 'PUT' }
-                );
-                if (!response.ok) alert("Проблема с установкой наименования брокерского счета");
+                let response = await fetch(`/api/invest-accounts?id=${window.accid}&newdescr=${this.obj.Descr}`, { method: 'PUT' });
+                if (!response.ok) {
+                    alert("Проблема с установкой наименования брокерского счета");
+                    return;
+                }
             }
         }
     };
