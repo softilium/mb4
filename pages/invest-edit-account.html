@@ -134,7 +134,8 @@
                             <div class="mb-3.row">
                                 <label class="col-sm-3 col-form-label">Движение, руб.</label>
                                 <div class="col-sm-9">
-                                    <input class="form-control form-control-sm" type="number" v-model="selectedCF.Qty" />
+                                    <input class="form-control form-control-sm" type="number"
+                                        v-model="selectedCF.Qty" />
                                 </div>
                                 <div class="form-text">
                                     Положительные значения - пополнения, отрицательные - вывод средств.
@@ -212,13 +213,9 @@
                 let res = null;
                 this.selectedVal.RecDate += "T00:00:00+03:00"; // add time
                 if (this.selectedVal.id == null) {
-                    res = await fetch(`?id=${this.selectedVal.id}&owner=${window.accid}&mode=val`,
-                        { method: 'POST', body: JSON.stringify(this.selectedVal) }
-                    );
+                    res = await fetch(`?id=${this.selectedVal.id}&owner=${window.accid}&mode=val`, { method: 'POST', body: JSON.stringify(this.selectedVal) });
                 } else {
-                    res = await fetch(`?id=${this.selectedVal.id}&mode=val`,
-                        { method: 'PUT', body: JSON.stringify(this.selectedVal) }
-                    );
+                    res = await fetch(`?id=${this.selectedVal.id}&mode=val`, { method: 'PUT', body: JSON.stringify(this.selectedVal) });
                 }
                 if (!res.ok) {
                     alert(`Ошибка при сохранении значения: ${res.text()}`);
@@ -231,9 +228,7 @@
                 let res = null;
                 this.selectedCF.RecDate += "T00:00:00+03:00"; // add time
                 if (this.selectedCF.id == null) {
-                    res = await fetch(`?id=${this.selectedCF.id}&owner=${window.accid}&mode=cf`,
-                        { method: 'POST', body: JSON.stringify(this.selectedCF) }
-                    );
+                    res = await fetch(`?id=${this.selectedCF.id}&owner=${window.accid}&mode=cf`, { method: 'POST', body: JSON.stringify(this.selectedCF) });
                 } else {
                     res = await fetch(`?id=${this.selectedCF.id}&mode=cf`,
                         { method: 'PUT', body: JSON.stringify(this.selectedCF) }
