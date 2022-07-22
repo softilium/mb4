@@ -65,7 +65,9 @@ func initServer(listenAddr string) *http.Server {
 		server.IdleTimeout = 15 * time.Second
 	}
 
-	server.Handler = gh.RecoveryHandler()(server.Handler)
+	if !config.C.Debug {
+		server.Handler = gh.RecoveryHandler()(server.Handler)
+	}
 	server.Handler = gh.LoggingHandler(os.Stdout, server.Handler)
 
 	return server
@@ -110,3 +112,4 @@ func main() {
 //TODO Отдельная страница "Компании роста"
 //TODO Маркер "Недооцененная компания" и "Компания роста" в тикерах (включать, отключать в настройках для пользователя)
 //TODO Часовой пояс в настройках
+//TODO Генерировать ID для сессий, а сами сессии хранить в БД, это дает возможность мульти-логина с просмотром остальных сеансов и короткую куку для авторизации

@@ -71,13 +71,13 @@ func Ticker(w http.ResponseWriter, r *http.Request) {
 			} else {
 				pnlres.Dates[idx] = "LTM"
 			}
-			pnlres.Revenues[idx] = rep.YV[cube.RK2Revenue].Ytd
-			pnlres.InterestIncomes[idx] = rep.YV[cube.RK2InterestIncome].Ytd
-			pnlres.Ebitdas[idx] = rep.YV[cube.RK2EBITDA].Ytd
-			pnlres.Amortizations[idx] = rep.YV[cube.RK2Amortization].Ytd
-			pnlres.InterestExpenses[idx] = rep.YV[cube.RK2InterestExpenses].Ytd
-			pnlres.Taxes[idx] = rep.YV[cube.RK2IncomeTax].Ytd
-			pnlres.Incomes[idx] = rep.YV[cube.RK2NetIncome].Ytd
+			pnlres.Revenues[idx] = rep.YV[cube.RK2Revenue].V
+			pnlres.InterestIncomes[idx] = rep.YV[cube.RK2InterestIncome].V
+			pnlres.Ebitdas[idx] = rep.YV[cube.RK2EBITDA].V
+			pnlres.Amortizations[idx] = rep.YV[cube.RK2Amortization].V
+			pnlres.InterestExpenses[idx] = rep.YV[cube.RK2InterestExpenses].V
+			pnlres.Taxes[idx] = rep.YV[cube.RK2IncomeTax].V
+			pnlres.Incomes[idx] = rep.YV[cube.RK2NetIncome].V
 		}
 
 		w.Header().Set("Content-Type", "application/json")
@@ -111,11 +111,11 @@ func Ticker(w http.ResponseWriter, r *http.Request) {
 			} else {
 				cfres.Dates[idx] = "LTM"
 			}
-			cfres.Cash[idx] = rep.SV[cube.RK2Cash].Sld
-			cfres.Debt[idx] = rep.SV[cube.RK2NetDebt].Sld
-			cfres.Equity[idx] = rep.SV[cube.RK2Equity].Sld
-			cfres.MCap[idx] = cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate).Cap
-			cfres.BookValue[idx] = cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate).BookValue
+			cfres.Cash[idx] = rep.SV[cube.RK2Cash].V
+			cfres.Debt[idx] = rep.SV[cube.RK2NetDebt].V
+			cfres.Equity[idx] = rep.SV[cube.RK2Equity].V
+			cfres.MCap[idx] = cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate).R3[cube.RK3Cap].V
+			cfres.BookValue[idx] = cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate).R3[cube.RK3BookValue].V
 		}
 
 		w.Header().Set("Content-Type", "application/json")
