@@ -24,38 +24,47 @@ type Cell struct {
 	D        time.Time
 	Quote    *ent.Quote
 	Emission *ent.Emission
-	R2       *Report2          //same report for all cells between published IFRS reports
-	R3       map[int]*Cf3Value //daily values for reporting
-	Industry *ent.Industry     // flat industry from quote
-	IsMissed bool              //indicates than cell was copied for missing quotes from prevous days
+	R2       *Report2      //same report for all cells between published IFRS reports
+	Industry *ent.Industry // flat industry from quote
+	IsMissed bool          //indicates than cell was copied for missing quotes from prevous days
+
+	//R3
+	BookValue  RepV
+	P_on_E     RepV
+	P_on_BV    RepV
+	Cap        RepV
+	P_on_S     RepV
+	DivSum5Y   RepV
+	DivSum3Y   RepV
+	DivYield5Y RepV
+	DivYield3Y RepV
+	DSI        RepV
 }
 
-func (r *Cell) MakeR3() {
-	r.R3 = make(map[int]*Cf3Value, 10)
-	r.R3[RK3BookValue] = &Cf3Value{RK: RK3BookValue, V: 0.0}
-	r.R3[RK3P_On_E] = &Cf3Value{RK: RK3P_On_E, V: 0.0}
-	r.R3[RK3P_On_S] = &Cf3Value{RK: RK3P_On_S, V: 0.0}
-	r.R3[RK3P_On_BV] = &Cf3Value{RK: RK3P_On_BV, V: 0.0}
-	r.R3[RK3Cap] = &Cf3Value{RK: RK3Cap, V: 0.0}
-	r.R3[RK3DivSum5Y] = &Cf3Value{RK: RK3DivSum5Y, V: 0.0}
-	r.R3[RK3DivSum3Y] = &Cf3Value{RK: RK3DivSum3Y, V: 0.0}
-	r.R3[RK3DivYield5Y] = &Cf3Value{RK: RK3DivYield5Y, V: 0.0}
-	r.R3[RK3DivYield3Y] = &Cf3Value{RK: RK3DivYield3Y, V: 0.0}
-	r.R3[RK3DSI] = &Cf3Value{RK: RK3DSI, V: 0.0}
-}
+func (r *Cell) CalcAfterLoad(cb *Cube) {
 
-func (r *Cell) CalcBV(cb *Cube) {
-
-	r.R3[RK3BookValue].V = 0
+	r.BookValue.V = 0
 	prefCap := 0.0
 	if prefTicker, ok := cb.prefTickers[r.Quote.Edges.Ticker.Edges.Emitent.ID]; ok {
 		if prefCells, ok := cb.cellsByTickerByDate[prefTicker.ID]; ok {
 			if prefcell, ok := prefCells[r.D]; ok {
-				prefCap = prefcell.R3[RK3Cap].V
+				prefCap = prefcell.Cap.V
 			}
 		}
 	}
-	r.R3[RK3BookValue].V = r.R2.SV[RK2Total].V - r.R2.SV[RK2CurrentLiabilities].V - r.R2.SV[RK2NonCurrentLiabilities].V - r.R2.SV[RK2NonControlling].V - prefCap
+	r.BookValue.V = r.R2.Total.V - r.R2.CurrentLiabilities.V - r.R2.NonCurrentLiabilities.V - r.R2.NonControlling.V - prefCap
+
+	if r.BookValue.V != 0 {
+		r.P_on_BV.V = r.Cap.V / r.BookValue.V
+	}
+
+	if r.R2.NetIncome.V != 0 {
+		r.P_on_E.V = r.Cap.V / r.R2.NetIncome.V
+		r.P_on_E.Ltm = r.Cap.V / r.R2.NetIncome.Ltm
+	}
+
+	r.P_on_S.V = r.Cap.V / r.R2.Revenue.V
+	r.P_on_S.Ltm = r.Cap.V / r.R2.Revenue.Ltm
 
 }
 
@@ -114,8 +123,8 @@ func (c *Cube) LoadCube() (err error) {
 			c.cellsByTickerByDate[v.Edges.Ticker.ID] = tdm
 		}
 
-		oneCell := &Cell{Quote: v, D: v.D, R3: make(map[int]*Cf3Value, 10)}
-		oneCell.MakeR3()
+		oneCell := &Cell{Quote: v, D: v.D}
+		//oneCell.MakeR3()
 		oneCell.Industry = v.Edges.Ticker.Edges.Emitent.Edges.Industry
 
 		tdm[v.D] = oneCell
@@ -308,21 +317,21 @@ func (c *Cube) loadDivsAndCaps() error {
 
 			cl := c.cellsByTickerByDate[ticker][day]
 
-			cl.R3[RK3DivSum5Y].V = lastDivSum5
-			cl.R3[RK3DivSum3Y].V = lastDivSum3
-			cl.R3[RK3DivYield5Y].V = RoundX(lastDivSum5/cl.Quote.C*100, 1)
-			cl.R3[RK3DivYield3Y].V = RoundX(lastDivSum3/cl.Quote.C*100, 1)
+			cl.DivSum5Y.V = lastDivSum5
+			cl.DivSum3Y.V = lastDivSum3
+			cl.DivYield5Y.V = RoundX(lastDivSum5/cl.Quote.C*100, 1)
+			cl.DivYield3Y.V = RoundX(lastDivSum3/cl.Quote.C*100, 1)
 		} //day
 	} //ticker
 
 	for _, day := range c.allDays {
 		for _, cell := range c.cellsByDate[day] {
 			if cell.Quote != nil && cell.Emission != nil {
-				cell.R3[RK3Cap].V = cell.Quote.C * float64(cell.Emission.Size) / 1000000 // in mln. according to report values
+				cell.Cap.V = cell.Quote.C * float64(cell.Emission.Size) / 1000000 // in mln. according to report values
 			}
 			if _, ok := dsimap[cell.Quote.Edges.Ticker.ID]; ok {
 				if dsi, ok := dsimap[cell.Quote.Edges.Ticker.ID][day.Year()-1]; ok {
-					cell.R3[RK3DSI].V = RoundX(dsi.dsi, 1)
+					cell.DSI.V = RoundX(dsi.dsi, 1)
 				}
 			}
 		}
@@ -342,8 +351,7 @@ func (c *Cube) addMissingCells() error {
 			if !ok && lk[ticker.ID] != nil {
 				sc := lk[ticker.ID]
 
-				newCell := &Cell{D: day, Quote: sc.Quote, Emission: sc.Emission, R2: sc.R2, IsMissed: true, R3: make(map[int]*Cf3Value, 10)}
-				newCell.MakeR3()
+				newCell := &Cell{D: day, Quote: sc.Quote, Emission: sc.Emission, R2: sc.R2, IsMissed: true}
 
 				c.cellsByDate[day] = append(c.cellsByDate[day], newCell)
 				c.cellsByTickerByDate[ticker.ID][day] = sc
@@ -405,7 +413,7 @@ func (c *Cube) loadReports() error {
 			for i := len(r2reports) - 1; i >= 0; i-- {
 				if D.Unix() >= r2reports[i].ReportDate.Unix() {
 					cell.R2 = r2reports[i]
-					cell.CalcBV(c)
+					cell.CalcAfterLoad(c)
 					break
 				}
 			}

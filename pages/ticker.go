@@ -37,8 +37,12 @@ func Ticker(w http.ResponseWriter, r *http.Request) {
 
 	if mode == "candles" {
 		tri := cube.Market.GetTickerRenderInfo(tickerId, true)
+
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(tri)
+		err := json.NewEncoder(w).Encode(tri)
+		if err != nil {
+			HandleErr(err, w)
+		}
 		return
 	}
 
@@ -71,17 +75,20 @@ func Ticker(w http.ResponseWriter, r *http.Request) {
 			} else {
 				pnlres.Dates[idx] = "LTM"
 			}
-			pnlres.Revenues[idx] = rep.YV[cube.RK2Revenue].V
-			pnlres.InterestIncomes[idx] = rep.YV[cube.RK2InterestIncome].V
-			pnlres.Ebitdas[idx] = rep.YV[cube.RK2EBITDA].V
-			pnlres.Amortizations[idx] = rep.YV[cube.RK2Amortization].V
-			pnlres.InterestExpenses[idx] = rep.YV[cube.RK2InterestExpenses].V
-			pnlres.Taxes[idx] = rep.YV[cube.RK2IncomeTax].V
-			pnlres.Incomes[idx] = rep.YV[cube.RK2NetIncome].V
+			pnlres.Revenues[idx] = rep.Revenue.V
+			pnlres.InterestIncomes[idx] = rep.InterestIncome.V
+			pnlres.Ebitdas[idx] = rep.EBITDA.V
+			pnlres.Amortizations[idx] = rep.Amortization.V
+			pnlres.InterestExpenses[idx] = rep.InterestExpenses.V
+			pnlres.Taxes[idx] = rep.IncomeTax.V
+			pnlres.Incomes[idx] = rep.NetIncome.V
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(pnlres)
+		err := json.NewEncoder(w).Encode(pnlres)
+		if err != nil {
+			HandleErr(err, w)
+		}
 		return
 
 	}
@@ -111,15 +118,18 @@ func Ticker(w http.ResponseWriter, r *http.Request) {
 			} else {
 				cfres.Dates[idx] = "LTM"
 			}
-			cfres.Cash[idx] = rep.SV[cube.RK2Cash].V
-			cfres.Debt[idx] = rep.SV[cube.RK2NetDebt].V
-			cfres.Equity[idx] = rep.SV[cube.RK2Equity].V
-			cfres.MCap[idx] = cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate).R3[cube.RK3Cap].V
-			cfres.BookValue[idx] = cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate).R3[cube.RK3BookValue].V
+			cfres.Cash[idx] = rep.Cash.V
+			cfres.Debt[idx] = rep.NetDebt.V
+			cfres.Equity[idx] = rep.Equity.V
+			cfres.MCap[idx] = cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate).Cap.V
+			cfres.BookValue[idx] = cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate).BookValue.V
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(cfres)
+		err := json.NewEncoder(w).Encode(cfres)
+		if err != nil {
+			HandleErr(err, w)
+		}
 		return
 
 	}
