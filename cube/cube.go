@@ -20,9 +20,17 @@ func RoundX(x float64, dec int) float64 {
 	return math.Round(x*mul) / mul
 }
 
+func Avg(arr []float64) float64 {
+	var sum float64
+	for _, v := range arr {
+		sum += v
+	}
+	return sum / float64(len(arr))
+}
+
 type Cell struct {
 	D        time.Time
-	Quote    *ent.Quote
+	Quote    *ent.Quote //nil means industry card for day
 	Emission *ent.Emission
 	R2       *Report2      //same report for all cells between published IFRS reports
 	Industry *ent.Industry // flat industry from quote
@@ -76,6 +84,8 @@ type Cube struct {
 	cellsByTickerByDate map[string]map[time.Time]*Cell // cell by ticker
 	cellsByDate         map[time.Time][]*Cell          // cell by date
 	repsByEmitent       map[xid.ID][]*Report2          // map by Emitent.ID sorted by reportdate
+
+	cellsByIndustryByDate map[string]map[time.Time]*Cell // cell by industry
 }
 
 func (c *Cube) LoadCube() (err error) {
@@ -163,6 +173,9 @@ func (c *Cube) LoadCube() (err error) {
 	}
 
 	c.loadReports()
+
+	c.loadIndustries()
+
 	//TODO досчитать динамику по дням в отчеты++++
 	//TODO досчитать рост
 	//TODO досчитать отраслевые отчеты++ и отчеты++++
@@ -394,7 +407,7 @@ func (c *Cube) loadReports() error {
 			if _, ok := prevMaps[r.ReportYear-1]; ok {
 				prevQ = prevMaps[r.ReportYear-1][r.ReportQuarter]
 			}
-			r2.Load(r, prevY, prevQ)
+			r2.LoadFromRawReport(r, prevY, prevQ)
 
 			// bind report dates to quote dates for cube purposes.
 			// Because we fild quotes by report dates later (see tickers page)
@@ -416,6 +429,85 @@ func (c *Cube) loadReports() error {
 					cell.CalcAfterLoad(c)
 					break
 				}
+			}
+		}
+
+	}
+
+	return nil
+
+}
+
+func (c *Cube) loadIndustries() error {
+
+	c.cellsByIndustryByDate = make(map[string]map[time.Time]*Cell) // slice of dsi by industry for date
+
+	for _, day := range c.allDays {
+
+		dsiArr := make(map[string][]float64)
+		repsArr := make(map[string]*Cell)
+
+		for _, cell := range c.cellsByDate[day] {
+			if cell.Industry == nil || cell.R2 == nil {
+				continue
+			}
+			indMap, ok := c.cellsByIndustryByDate[cell.Industry.ID]
+			if !ok {
+				indMap = make(map[time.Time]*Cell)
+				c.cellsByIndustryByDate[cell.Industry.ID] = indMap
+			}
+			ir, ok := indMap[day]
+			if !ok {
+				ir = &Cell{D: day, Industry: cell.Industry}
+				indMap[day] = ir
+			}
+			repsArr[cell.Industry.ID] = ir
+
+			ir.Cap.V += cell.Cap.V
+			ir.DivSum3Y.V += cell.DivSum3Y.V
+			ir.DivSum5Y.V += cell.DivSum5Y.V
+
+			ir.R2 = &Report2{ReportQuarter: 4}
+			ir.R2.Init()
+
+			ir.R2.Revenue.V += cell.R2.Revenue.V
+			ir.R2.Revenue.Ltm += cell.R2.Revenue.Ltm
+
+			ir.R2.Amortization.V += cell.R2.Amortization.V
+			ir.R2.Amortization.Ltm += cell.R2.Amortization.Ltm
+
+			ir.R2.OperatingIncome.V += cell.R2.OperatingIncome.V
+			ir.R2.OperatingIncome.Ltm += cell.R2.OperatingIncome.Ltm
+
+			ir.R2.InterestIncome.V += cell.R2.InterestIncome.V
+			ir.R2.InterestIncome.Ltm += cell.R2.InterestIncome.Ltm
+
+			ir.R2.InterestExpenses.V += cell.R2.InterestExpenses.V
+			ir.R2.InterestExpenses.Ltm += cell.R2.InterestExpenses.Ltm
+
+			ir.R2.IncomeTax.V += cell.R2.IncomeTax.V
+			ir.R2.IncomeTax.Ltm += cell.R2.IncomeTax.Ltm
+
+			ir.R2.Cash.V += cell.R2.Cash.V
+			ir.R2.NonCurrentLiabilities.V += cell.R2.NonCurrentLiabilities.V
+			ir.R2.CurrentLiabilities.V += cell.R2.CurrentLiabilities.V
+			ir.R2.NonControlling.V += cell.R2.NonControlling.V
+			ir.R2.Equity.V += cell.R2.Equity.V
+			ir.R2.Total.V += cell.R2.Total.V
+
+			ir.R2.Calc(nil, nil) //TODO calc previous reports
+
+			_, ok = dsiArr[cell.Industry.ID]
+			if !ok {
+				dsiArr[cell.Industry.ID] = make([]float64, 0)
+			}
+			dsiArr[cell.Industry.ID] = append(dsiArr[cell.Industry.ID], cell.DSI.V)
+
+		}
+		for _, ir := range repsArr {
+			dsiSlice, ok := dsiArr[ir.Industry.ID]
+			if ok {
+				ir.DSI.V = Avg(dsiSlice)
 			}
 		}
 
