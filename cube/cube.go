@@ -488,6 +488,9 @@ func (c *Cube) loadIndustries() error {
 			ir.R2.IncomeTax.V += cell.R2.IncomeTax.V
 			ir.R2.IncomeTax.Ltm += cell.R2.IncomeTax.Ltm
 
+			ir.R2.NetIncome.V += cell.R2.NetIncome.V
+			ir.R2.NetIncome.Ltm += cell.R2.NetIncome.Ltm
+
 			ir.R2.Cash.V += cell.R2.Cash.V
 			ir.R2.NonCurrentLiabilities.V += cell.R2.NonCurrentLiabilities.V
 			ir.R2.CurrentLiabilities.V += cell.R2.CurrentLiabilities.V

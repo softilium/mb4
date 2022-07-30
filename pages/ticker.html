@@ -26,6 +26,7 @@
         </div>
         <div class="col-12 col-xl-4">
             <h4>Аналитика</h4>
+            <div ref="multView" style="height:400px;"></div>
         </div>
     </div>
 </div>
@@ -38,7 +39,8 @@
             return {
                 tri: {},
                 pnl: {},
-                cf: {}
+                cf: {},
+                mult: {}
             }
         },
         async mounted() {
@@ -400,7 +402,75 @@
                 myChart.setOption(option);
 
             },
+            async multView(element) {
+                var myChart = echarts.init(element);
 
+                option = {
+                    animation: false,
+                    legend: { left: 10 },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: { type: 'cross' },
+                    },
+                    xAxis: [
+                        {
+                            type: 'category',
+                            data: this.mult.Dates,
+                            axisLabel: {
+                                interval: 0,
+                                rotate: 90
+                            },
+                        }
+                    ],
+                    yAxis: [
+                        { type: 'value' }
+                    ],
+                    series: [
+                        {
+                            name: 'Чистая рентабельность',
+                            type: 'line',
+                            symbol: 'none',
+                            smooth: true,
+                            data: this.mult.NetMargin,
+                            lineStyle: { color: '#5470c6', type: 'solid' },
+                            itemStyle: { color: '#5470c6' }
+                        },
+                        {
+                            name: 'Чистая рентабельность (отрасль)',
+                            type: 'line',
+                            symbol: 'none',
+                            smooth: true,
+                            data: this.mult.NetMarginInd,
+                            lineStyle: { color: '#5470c6', type: 'dotted' },
+                            itemStyle: { color: '#5470c6' }
+
+                        },
+                        {
+                            name: 'Рентабельность EBITDA',
+                            type: 'line',
+                            symbol: 'none',
+                            smooth: true,
+                            data: this.mult.EBITDAMargin,
+                            lineStyle: { color: '#91cc75', type: 'solid' },
+                            itemStyle: { color: '#91cc75' }
+                        },
+                        {
+                            name: 'Рентабельность EBITDA (отрасль)',
+                            type: 'line',
+                            symbol: 'none',
+                            smooth: true,
+                            data: this.mult.EBITDAMarginInd,
+                            lineStyle: { color: '#91cc75', type: 'dotted' },
+                            itemStyle: { color: '#91cc75' }
+
+                        }
+                    ]
+                };
+
+                // colors palette ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc']
+                myChart.setOption(option);
+
+            },
             async getTickerData() {
 
                 let response = await fetch(`/ticker?id=${window.tickerid}&mode=candles`, { method: "GET" });
@@ -452,6 +522,12 @@
                 } else {
                     alert("Проблема при получении данных CF");
                 }
+                res = await fetch(`/ticker?id=${window.tickerid}&mode=mult`, { method: "GET" });
+                if (res.ok) {
+                    this.mult = await res.json();
+                    this.multView(this.$refs.multView);
+
+                } else alert("Проблема при получении данных MULT");
             }
         },
     };

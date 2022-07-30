@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime/pprof"
 	"time"
 
 	gh "github.com/gorilla/handlers"
@@ -76,6 +77,15 @@ func initServer(listenAddr string) *http.Server {
 
 func main() {
 
+	if config.C.Debug {
+		f, err := os.Create("cpu.prof")
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
+
 	listenAddr := config.C.ListenAddr
 
 	done := make(chan bool, 1)
@@ -103,6 +113,16 @@ func main() {
 	}
 
 	<-done
+
+	if config.C.Debug {
+		f, err := os.Create("mem.prof")
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.WriteHeapProfile(f)
+		f.Close()
+	}
+
 	log.Println("Server stopped")
 
 }

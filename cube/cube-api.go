@@ -116,3 +116,12 @@ func (c *Cube) CellsByTickerByDate(ticker string, d time.Time) *Cell {
 	return c.cellsByTickerByDate[ticker][d]
 
 }
+
+func (c *Cube) GetIndustryCell(industry string, d time.Time) *Cell {
+
+	c.l.Lock()
+	defer c.l.Unlock()
+
+	return c.cellsByIndustryByDate[industry][d]
+
+}
