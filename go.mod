@@ -3,7 +3,7 @@ module github.com/softilium/mb4
 go 1.18
 
 require (
-	entgo.io/ent v0.10.2-0.20220502113020-4ac82f5bb3f0
+	entgo.io/ent v0.11.1
 	github.com/flosch/pongo2/v6 v6.0.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/joho/godotenv v1.4.0
@@ -13,7 +13,7 @@ require (
 require github.com/gorilla/securecookie v1.1.1 // indirect
 
 require (
-	ariga.io/atlas v0.4.3 // indirect
+	ariga.io/atlas v0.5.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
