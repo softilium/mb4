@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block title %}Тикер{{ pd.TRI.Cell.Quote.Edges.Ticker.Descr }}{% endblock %}
+{% block title %}Тикер {{ pd.TRI.Cell.Quote.Edges.Ticker.Descr }}{% endblock %}
 
 {% block content %}
 
@@ -29,21 +29,67 @@
             <div ref="multView" style="height:400px;"></div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-12 col-xl-4">
+            <h4>Дивиденды</h4>
+            <table class="table table-hover table-responsive table-sm">
+                <thead>
+                    <th>Закрытие реестра</th>
+                    <th>Период</th>
+                    <th class="text-end">Сумма</th>
+                    <th class="text-end">Доходность, %</th>
+                </thead>
+                <tbody v-for="item in dpo">
+                    <tr>
+                        <td>${ $prnDate(item.CloseDate) }</td>
+                        <td>${ item.SrcPeriod }</td>
+                        <td class="text-end">${ $prnCurrency12(item.DPS) }</td>
+                        <td class="text-end">${ $prnPercent1(item.Yield) }</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-12 col-xl-4">
+            <h4>Отчеты</h4>
+            <table class="table table-hover table-responsive table-sm">
+                <thead>
+                    <th>Q1</th>
+                    <th>Q2</th>
+                    <th>Q3</th>
+                    <th>Q4</th>
+                </thead>
+                <tbody v-for="item in reps">
+                    <td v-for="q in item">
+                        <a v-if="q!=null"
+                            v-bind:href="'/reports?y=' + q.ReportYear+'&q=' + q.ReportQuarter + '&tickerid=' + tickerid">
+                            ${q.ReportYear}.Q${q.ReportQuarter}
+                        </a>
+                    </td>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
 <script type="text/javascript">
     window.tickerid = "{{ pd.TRI.Cell.Quote.Edges.Ticker.ID }}";
     window.tickerDescr = "{{ pd.TRI.Cell.Quote.Edges.Ticker.Descr }}";
 
     const App = {
+        delimiters: ['${', '}'],
         data() {
             return {
+                tickerid: "",
                 tri: {},
                 pnl: {},
                 cf: {},
-                mult: {}
+                mult: {},
+                dpo: [],
+                reps: []
             }
         },
         async mounted() {
+            this.tickerid = window.tickerid;
             await this.getTickerData();
         },
         methods: {
@@ -505,6 +551,7 @@
                     );
                 } else {
                     alert("Проблема при получении данных PNL");
+                    return;
                 }
 
                 response = await fetch(`/ticker?id=${window.tickerid}&mode=cf`, { method: "GET" });
@@ -521,15 +568,35 @@
                     );
                 } else {
                     alert("Проблема при получении данных CF");
+                    return;
                 }
+
+
                 res = await fetch(`/ticker?id=${window.tickerid}&mode=mult`, { method: "GET" });
                 if (res.ok) {
                     this.mult = await res.json();
                     this.multView(this.$refs.multView);
+                } else {
+                    alert("Проблема при получении данных MULT");
+                    return;
+                }
 
-                } else alert("Проблема при получении данных MULT");
+                res = await fetch(`/ticker?id=${window.tickerid}&mode=divpayouts`, { method: "GET" });
+                if (res.ok) this.dpo = await res.json();
+                else {
+                    alert("Проблема при получении данных дивидендов");
+                    return;
+                }
+
+                res = await fetch(`/ticker?id=${window.tickerid}&mode=reps`, { method: "GET" });
+                if (res.ok) this.reps = await res.json();
+                else {
+                    alert("Проблема при получении данных отчетов");
+                    return;
+                }
+
             }
-        },
+        }
     };
 
     let app = Vue.createApp(App)

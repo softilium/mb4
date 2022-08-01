@@ -50,6 +50,7 @@ func (p *RepV) CalcCashflowAnnualGrowth(prevY *Report2) {
 }
 
 type Report2 struct { // enriched report with calculated fields
+	ReportYear    int
 	ReportQuarter int
 	ReportDate    time.Time
 
@@ -111,6 +112,7 @@ func (r *Report2) Init() {
 func (r *Report2) LoadFromRawReport(s *ent.Report, prevY, prevQ *Report2) {
 
 	r.ReportQuarter = s.ReportQuarter
+	r.ReportYear = s.ReportYear
 	r.ReportDate = s.ReportDate
 
 	r.prevQuarter = prevQ

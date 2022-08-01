@@ -27,8 +27,8 @@ type SessionStruct struct {
 	UserName      string
 	UserIsAdmin   bool
 	Debug         bool
-	Vue           bool
-	Echarts       bool
+	Vue           bool // use vue js lib ?
+	Echarts       bool // use echarts js lib ?
 }
 
 func (session *SessionStruct) GetUser() *ent.User {

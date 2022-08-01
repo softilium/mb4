@@ -467,7 +467,7 @@ func (c *Cube) loadIndustries() error {
 			ir.DivSum3Y.V += cell.DivSum3Y.V
 			ir.DivSum5Y.V += cell.DivSum5Y.V
 
-			ir.R2 = &Report2{ReportQuarter: 4}
+			ir.R2 = &Report2{ReportQuarter: 4, ReportYear: cell.R2.ReportYear}
 			ir.R2.Init()
 
 			ir.R2.Revenue.V += cell.R2.Revenue.V
@@ -498,7 +498,10 @@ func (c *Cube) loadIndustries() error {
 			ir.R2.Equity.V += cell.R2.Equity.V
 			ir.R2.Total.V += cell.R2.Total.V
 
-			ir.R2.Calc(nil, nil) //TODO calc previous reports
+			ir.R2.Calc(nil, nil)
+
+			//TODO calc previous reports
+			//TODO calc avg.values from mults for industry+day. Now it is value-weighted average, we need to just flat average
 
 			_, ok = dsiArr[cell.Industry.ID]
 			if !ok {

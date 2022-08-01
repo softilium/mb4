@@ -17,6 +17,10 @@
                 return new Intl.NumberFormat('ru-RU', { style: 'decimal', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(val);
             };
 
+            app.config.globalProperties.$prnCurrency12 = function (val) {
+                return new Intl.NumberFormat('ru-RU', { style: 'decimal', minimumFractionDigits: 12, maximumFractionDigits: 12 }).format(val);
+            };
+
             app.config.globalProperties.$prnPercent1 = function (val) {
                 return new Intl.NumberFormat('ru-RU', { style: 'decimal', minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(val);
             };
