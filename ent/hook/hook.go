@@ -126,6 +126,58 @@ func (f ReportFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, erro
 	return f(ctx, mv)
 }
 
+// The StrategyFunc type is an adapter to allow the use of ordinary
+// function as Strategy mutator.
+type StrategyFunc func(context.Context, *ent.StrategyMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f StrategyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.StrategyMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.StrategyMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The StrategyFactorFunc type is an adapter to allow the use of ordinary
+// function as StrategyFactor mutator.
+type StrategyFactorFunc func(context.Context, *ent.StrategyFactorMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f StrategyFactorFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.StrategyFactorMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.StrategyFactorMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The StrategyFilterFunc type is an adapter to allow the use of ordinary
+// function as StrategyFilter mutator.
+type StrategyFilterFunc func(context.Context, *ent.StrategyFilterMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f StrategyFilterFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.StrategyFilterMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.StrategyFilterMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The StrategyFixedTickerFunc type is an adapter to allow the use of ordinary
+// function as StrategyFixedTicker mutator.
+type StrategyFixedTickerFunc func(context.Context, *ent.StrategyFixedTickerMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f StrategyFixedTickerFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.StrategyFixedTickerMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.StrategyFixedTickerMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The TickerFunc type is an adapter to allow the use of ordinary
 // function as Ticker mutator.
 type TickerFunc func(context.Context, *ent.TickerMutation) (ent.Value, error)

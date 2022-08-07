@@ -26,5 +26,5 @@ require (
 	github.com/rs/xid v1.4.0
 	github.com/zclconf/go-cty v1.10.0 // indirect
 	golang.org/x/mod v0.5.1 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/text v0.3.7
 )

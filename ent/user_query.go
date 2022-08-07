@@ -15,6 +15,7 @@ import (
 	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/investaccount"
 	"github.com/softilium/mb4/ent/predicate"
+	"github.com/softilium/mb4/ent/strategy"
 	"github.com/softilium/mb4/ent/user"
 )
 
@@ -29,6 +30,7 @@ type UserQuery struct {
 	predicates []predicate.User
 	// eager-loading edges.
 	withInvestAccounts *InvestAccountQuery
+	withStrategies     *StrategyQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -80,6 +82,28 @@ func (uq *UserQuery) QueryInvestAccounts() *InvestAccountQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(investaccount.Table, investaccount.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.InvestAccountsTable, user.InvestAccountsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryStrategies chains the current query on the "Strategies" edge.
+func (uq *UserQuery) QueryStrategies() *StrategyQuery {
+	query := &StrategyQuery{config: uq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(strategy.Table, strategy.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.StrategiesTable, user.StrategiesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -269,6 +293,7 @@ func (uq *UserQuery) Clone() *UserQuery {
 		order:              append([]OrderFunc{}, uq.order...),
 		predicates:         append([]predicate.User{}, uq.predicates...),
 		withInvestAccounts: uq.withInvestAccounts.Clone(),
+		withStrategies:     uq.withStrategies.Clone(),
 		// clone intermediate query.
 		sql:    uq.sql.Clone(),
 		path:   uq.path,
@@ -284,6 +309,17 @@ func (uq *UserQuery) WithInvestAccounts(opts ...func(*InvestAccountQuery)) *User
 		opt(query)
 	}
 	uq.withInvestAccounts = query
+	return uq
+}
+
+// WithStrategies tells the query-builder to eager-load the nodes that are connected to
+// the "Strategies" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithStrategies(opts ...func(*StrategyQuery)) *UserQuery {
+	query := &StrategyQuery{config: uq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withStrategies = query
 	return uq
 }
 
@@ -352,8 +388,9 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 	var (
 		nodes       = []*User{}
 		_spec       = uq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			uq.withInvestAccounts != nil,
+			uq.withStrategies != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
@@ -402,6 +439,35 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 				return nil, fmt.Errorf(`unexpected foreign-key "user_invest_accounts" returned %v for node %v`, *fk, n.ID)
 			}
 			node.Edges.InvestAccounts = append(node.Edges.InvestAccounts, n)
+		}
+	}
+
+	if query := uq.withStrategies; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[xid.ID]*User)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Strategies = []*Strategy{}
+		}
+		query.withFKs = true
+		query.Where(predicate.Strategy(func(s *sql.Selector) {
+			s.Where(sql.InValues(user.StrategiesColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.user_strategies
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "user_strategies" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "user_strategies" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.Strategies = append(node.Edges.Strategies, n)
 		}
 	}
 

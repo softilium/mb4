@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -104,7 +105,7 @@ func handleGetMult(w http.ResponseWriter, r *http.Request, tickerId string) {
 	multres.EBITDAMarginInd = make([]float64, len(reps))
 	for idx, rep := range reps {
 
-		cell := cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate)
+		cell := cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate, true)
 		indCell := cube.Market.GetIndustryCell(cell.Industry.ID, cell.D)
 
 		if rep.ReportQuarter == 4 {
@@ -153,8 +154,8 @@ func handleGetCF(w http.ResponseWriter, r *http.Request, tickerId string) {
 		cfres.Cash[idx] = rep.Cash.V
 		cfres.Debt[idx] = rep.NetDebt.V
 		cfres.Equity[idx] = rep.Equity.V
-		cfres.MCap[idx] = cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate).Cap.V
-		cfres.BookValue[idx] = cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate).BookValue.V
+		cfres.MCap[idx] = cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate, true).Cap.V
+		cfres.BookValue[idx] = cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate, true).BookValue.V
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -231,13 +232,13 @@ func handleGetDivPayouts(w http.ResponseWriter, r *http.Request, tickerId string
 	for idx, d := range dp {
 
 		// if we do not have quote in close date, find nearest before
-		q := cube.Market.CellsByTickerByDate(tickerId, d.CloseDate)
-		cd := d.CloseDate
-		for q == nil {
-			cd = cd.AddDate(0, 0, -1)
-			q = cube.Market.CellsByTickerByDate(tickerId, cd)
+		q := cube.Market.CellsByTickerByDate(tickerId, d.CloseDate, true)
+		if q != nil {
+			dp2[idx] = dpData{CloseDate: d.CloseDate, SrcPeriod: fmt.Sprintf("%v.Q%v", d.ForYear, d.ForQuarter), DPS: d.DPS, Yield: d.DPS / q.Quote.C * 100}
+		} else {
+			dp2[idx] = dpData{CloseDate: d.CloseDate, SrcPeriod: fmt.Sprintf("%v.Q%v", d.ForYear, d.ForQuarter), DPS: d.DPS, Yield: 0}
+			log.Printf("ERR. Divpayout, but no quote for %v in %v", tickerId, d.CloseDate)
 		}
-		dp2[idx] = dpData{CloseDate: d.CloseDate, SrcPeriod: fmt.Sprintf("%v.Q%v", d.ForYear, d.ForQuarter), DPS: d.DPS, Yield: d.DPS / q.Quote.C * 100}
 	}
 
 	w.Header().Set("Content-Type", "application/json")

@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block title %}Инвестиционные стратегии{% endblock %}
+
+{% block content %}
+
+<h2> Ваши инвестиционные стратегии</h2>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <td>Стратегия</td>
+            <td class="text-end">Стартовая сумма</td>
+            <td class="text-end">Недельное пополнение</td>
+            <td class="text-end">Сумма дохода за год</td>
+            <td class="text-end">Доходность за год</td>
+            <td class="text-end">Сумма дохода за 3 года</td>
+            <td class="text-end">Доходность за 3 года</td>
+            <td>&nbsp;</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in pd.Items %}
+        <tr>
+            <td>
+                <a href="{{ '/strategy/' + item.ID }}">{{ item.Descr }}</a>
+            </td>
+            <td class="text-end">{{ item.StartAmount|rub0 }}</td>
+            <td class="text-end">{{ item.WeekRefillAmount|rub0 }}</td>
+            <td class="text-end">{{ item.LastYearInvertResult|rub0 }}</td>
+            <td class="text-end">{{ item.LastYearYield|rub0 }}</td>
+            <td class="text-end">{{ item.Last3YearsInvertResult|rub0 }}</td>
+            <td class="text-end">{{ item.Last3YearsYield|rub0 }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<form method="POST">
+
+    <div class="form-group">
+        <label for="strategyName">Название стратегии</label>
+        <input type="text" class="form-control" name="descr" placeholder="Название стратегии">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+
+</form>
+
+{% endblock %}

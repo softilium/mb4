@@ -17,6 +17,10 @@ import (
 	"github.com/softilium/mb4/ent/investaccountvaluation"
 	"github.com/softilium/mb4/ent/quote"
 	"github.com/softilium/mb4/ent/report"
+	"github.com/softilium/mb4/ent/strategy"
+	"github.com/softilium/mb4/ent/strategyfactor"
+	"github.com/softilium/mb4/ent/strategyfilter"
+	"github.com/softilium/mb4/ent/strategyfixedticker"
 	"github.com/softilium/mb4/ent/ticker"
 	"github.com/softilium/mb4/ent/user"
 )
@@ -48,6 +52,10 @@ func columnChecker(table string) func(string) error {
 		investaccountvaluation.Table: investaccountvaluation.ValidColumn,
 		quote.Table:                  quote.ValidColumn,
 		report.Table:                 report.ValidColumn,
+		strategy.Table:               strategy.ValidColumn,
+		strategyfactor.Table:         strategyfactor.ValidColumn,
+		strategyfilter.Table:         strategyfilter.ValidColumn,
+		strategyfixedticker.Table:    strategyfixedticker.ValidColumn,
 		ticker.Table:                 ticker.ValidColumn,
 		user.Table:                   user.ValidColumn,
 	}

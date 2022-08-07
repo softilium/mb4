@@ -36,9 +36,11 @@ type User struct {
 type UserEdges struct {
 	// InvestAccounts holds the value of the InvestAccounts edge.
 	InvestAccounts []*InvestAccount `json:"InvestAccounts,omitempty"`
+	// Strategies holds the value of the Strategies edge.
+	Strategies []*Strategy `json:"Strategies,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // InvestAccountsOrErr returns the InvestAccounts value or an error if the edge
@@ -48,6 +50,15 @@ func (e UserEdges) InvestAccountsOrErr() ([]*InvestAccount, error) {
 		return e.InvestAccounts, nil
 	}
 	return nil, &NotLoadedError{edge: "InvestAccounts"}
+}
+
+// StrategiesOrErr returns the Strategies value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) StrategiesOrErr() ([]*Strategy, error) {
+	if e.loadedTypes[1] {
+		return e.Strategies, nil
+	}
+	return nil, &NotLoadedError{edge: "Strategies"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -124,6 +135,11 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 // QueryInvestAccounts queries the "InvestAccounts" edge of the User entity.
 func (u *User) QueryInvestAccounts() *InvestAccountQuery {
 	return (&UserClient{config: u.config}).QueryInvestAccounts(u)
+}
+
+// QueryStrategies queries the "Strategies" edge of the User entity.
+func (u *User) QueryStrategies() *StrategyQuery {
+	return (&UserClient{config: u.config}).QueryStrategies(u)
 }
 
 // Update returns a builder for updating this User.

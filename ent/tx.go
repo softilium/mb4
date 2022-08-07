@@ -30,6 +30,14 @@ type Tx struct {
 	Quote *QuoteClient
 	// Report is the client for interacting with the Report builders.
 	Report *ReportClient
+	// Strategy is the client for interacting with the Strategy builders.
+	Strategy *StrategyClient
+	// StrategyFactor is the client for interacting with the StrategyFactor builders.
+	StrategyFactor *StrategyFactorClient
+	// StrategyFilter is the client for interacting with the StrategyFilter builders.
+	StrategyFilter *StrategyFilterClient
+	// StrategyFixedTicker is the client for interacting with the StrategyFixedTicker builders.
+	StrategyFixedTicker *StrategyFixedTickerClient
 	// Ticker is the client for interacting with the Ticker builders.
 	Ticker *TickerClient
 	// User is the client for interacting with the User builders.
@@ -178,6 +186,10 @@ func (tx *Tx) init() {
 	tx.InvestAccountValuation = NewInvestAccountValuationClient(tx.config)
 	tx.Quote = NewQuoteClient(tx.config)
 	tx.Report = NewReportClient(tx.config)
+	tx.Strategy = NewStrategyClient(tx.config)
+	tx.StrategyFactor = NewStrategyFactorClient(tx.config)
+	tx.StrategyFilter = NewStrategyFilterClient(tx.config)
+	tx.StrategyFixedTicker = NewStrategyFixedTickerClient(tx.config)
 	tx.Ticker = NewTickerClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }

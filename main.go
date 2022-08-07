@@ -9,11 +9,14 @@ import (
 	"runtime/pprof"
 	"time"
 
+	"github.com/flosch/pongo2/v6"
 	gh "github.com/gorilla/handlers"
 	"github.com/softilium/mb4/api"
 	"github.com/softilium/mb4/config"
 	"github.com/softilium/mb4/cube"
 	"github.com/softilium/mb4/pages"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 )
 
 func gracefullShutdown(server *http.Server, quit <-chan os.Signal, done chan<- bool) {
@@ -45,6 +48,8 @@ func initServer(listenAddr string) *http.Server {
 	router.HandleFunc("/invest-accounts", pages.InvestAccounts)
 	router.HandleFunc("/invest-edit-account", pages.InvestAccount)
 	router.HandleFunc("/ticker", pages.Ticker)
+	router.HandleFunc("/industry", pages.Industry)
+	router.HandleFunc("/strategies", pages.Strategies)
 
 	router.HandleFunc("/api/users/login", api.UsersLogin)
 	router.HandleFunc("/api/users/register", api.UsersRegister)
@@ -75,7 +80,16 @@ func initServer(listenAddr string) *http.Server {
 
 }
 
+var localFormatter = message.NewPrinter(language.Russian)
+
+func filterRub0(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	r := localFormatter.Sprintf("%.0f\n", in.Float())
+	return pongo2.AsSafeValue(r), nil
+}
+
 func main() {
+
+	pongo2.RegisterFilter("rub0", filterRub0)
 
 	if config.C.Debug {
 		f, err := os.Create("cpu.prof")

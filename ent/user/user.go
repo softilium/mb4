@@ -23,6 +23,8 @@ const (
 	FieldHowManyTickersOnHomepage = "how_many_tickers_on_homepage"
 	// EdgeInvestAccounts holds the string denoting the investaccounts edge name in mutations.
 	EdgeInvestAccounts = "InvestAccounts"
+	// EdgeStrategies holds the string denoting the strategies edge name in mutations.
+	EdgeStrategies = "Strategies"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// InvestAccountsTable is the table that holds the InvestAccounts relation/edge.
@@ -32,6 +34,13 @@ const (
 	InvestAccountsInverseTable = "invest_accounts"
 	// InvestAccountsColumn is the table column denoting the InvestAccounts relation/edge.
 	InvestAccountsColumn = "user_invest_accounts"
+	// StrategiesTable is the table that holds the Strategies relation/edge.
+	StrategiesTable = "strategies"
+	// StrategiesInverseTable is the table name for the Strategy entity.
+	// It exists in this package in order to avoid circular dependency with the "strategy" package.
+	StrategiesInverseTable = "strategies"
+	// StrategiesColumn is the table column denoting the Strategies relation/edge.
+	StrategiesColumn = "user_strategies"
 )
 
 // Columns holds all SQL columns for user fields.

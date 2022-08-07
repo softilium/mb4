@@ -33,6 +33,10 @@ type hooks struct {
 	InvestAccountValuation []ent.Hook
 	Quote                  []ent.Hook
 	Report                 []ent.Hook
+	Strategy               []ent.Hook
+	StrategyFactor         []ent.Hook
+	StrategyFilter         []ent.Hook
+	StrategyFixedTicker    []ent.Hook
 	Ticker                 []ent.Hook
 	User                   []ent.Hook
 }

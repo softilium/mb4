@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block title %}Отрасль {% endblock %}
+
+{% block content %}
+
+<div class="row">
+
+    <div class="col-6">
+
+        <table class="table table-sm">
+            <thead>
+                <th>Тикер</th>
+                <th class="text-end">Капитализация, млн.руб.</th>
+                <th class="text-end">Стоимость компании, EV, млн.руб.</th>
+                <th class="text-end">EBITDA, млн.руб.</th>
+                <th class="text-end">EBITDA, рост г/г, %</th>
+            </thead>
+            <tbody>
+                {% for item in pd.Emitents %}
+                <tr>
+                    <td><a href="/ticker?id={{ item.Ticker.ID }}">{{ item.Ticker.Descr }}</a></td>
+                    <td class="text-end">{{ item.Cap|rub0 }}</td>
+                    <td class="text-end">{{ item.EV|rub0 }}</td>
+                    <td class="text-end">{{ item.EBITDA|rub0 }}</td>
+                    <td class="text-end">{{ item.EBITDAGrow|rub0 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-6">
+
+    </div>
+
+</div>
+
+{% endblock %}

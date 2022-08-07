@@ -26,5 +26,6 @@ func (User) Fields() []ent.Field {
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("InvestAccounts", InvestAccount.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
+		edge.To("Strategies", Strategy.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
 	}
 }

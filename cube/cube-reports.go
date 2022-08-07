@@ -187,3 +187,72 @@ func (r *Report2) Calc(prevY, prevQ *Report2) {
 	}
 
 }
+
+// ReportKinds - enum all possible values for a report (for strategy editor or so)
+const (
+	// Pnl Src
+	RK_Revenue          = 100
+	RK_Amortization     = 200
+	RK_OperatingIncome  = 300
+	RK_InterestIncome   = 400
+	RK_InterestExpenses = 500
+	RK_IncomeTax        = 600
+	RK_NetIncome        = 700
+
+	// Pnl calculated
+	RK_OIBDA             = 1100
+	RK_EBITDA            = 1200
+	RK_OIBDAMargin       = 1300
+	RK_EBITDAMargin      = 1400
+	RK_OperationalMargin = 1500
+	RK_NetMargin         = 1600
+	RK_Debt_on_EBITDA    = 1700
+	RK_EV_on_EBITDA      = 1800
+	RK_ROE               = 1900
+
+	// Cf src
+	RK_Cash                  = 2100
+	RK_NonCurrentLiabilities = 2200
+	RK_CurrentLiabilities    = 2300
+	RK_NonControlling        = 2400
+	RK_Equity                = 2500
+	RK_Total                 = 2600
+
+	// Cf calculated
+	RK_NetDebt = 2700
+	RK_EV      = 2800
+
+	//R3
+	RK_BookValue  = 3100
+	RK_P_on_E     = 3200
+	RK_P_on_BV    = 3300
+	RK_Cap        = 3400
+	RK_P_on_S     = 3500
+	RK_DivSum5Y   = 3600
+	RK_DivSum3Y   = 3700
+	RK_DivYield5Y = 3800
+	RK_DivYield3Y = 3900
+	RK_DSI        = 3950
+)
+
+// ReportValueTypes
+const (
+	RVT_Src    = 100 // YTD/SLD
+	RVT_YAdj   = 200 // Year adjusted for YTD
+	RVT_LTM    = 400 // Last 12 months
+	RVT_AG     = 300 // Annual growth
+	RVT_AG_Ltm = 300 // Annual growth LTM
+
+	RVT_Ind        = 1100 // Industry YTD/SLD
+	RVT_Ind_YAdj   = 1200 // Industry Year adjusted for YTD
+	RVT_Ind_LTM    = 1400 // Industry Last 12 months
+	RVT_Ind_AG     = 1300 // Industry Annual growth
+	RVT_Ind_AG_Ltm = 1300 // Industry Annual growth LTM
+
+	RVT_IndUpside        = 1100 // Industry upside YTD/SLD
+	RVT_IndUpside_YAdj   = 1200 // Industry upside Year adjusted for YTD
+	RVT_IndUpside_LTM    = 1400 // Industry upside Last 12 months
+	RVT_IndUpside_AG     = 1300 // Industry upside Annual growth
+	RVT_IndUpside_AG_Ltm = 1300 // Industry upside Annual growth LTM
+
+)

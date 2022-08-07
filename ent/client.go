@@ -19,6 +19,10 @@ import (
 	"github.com/softilium/mb4/ent/investaccountvaluation"
 	"github.com/softilium/mb4/ent/quote"
 	"github.com/softilium/mb4/ent/report"
+	"github.com/softilium/mb4/ent/strategy"
+	"github.com/softilium/mb4/ent/strategyfactor"
+	"github.com/softilium/mb4/ent/strategyfilter"
+	"github.com/softilium/mb4/ent/strategyfixedticker"
 	"github.com/softilium/mb4/ent/ticker"
 	"github.com/softilium/mb4/ent/user"
 
@@ -50,6 +54,14 @@ type Client struct {
 	Quote *QuoteClient
 	// Report is the client for interacting with the Report builders.
 	Report *ReportClient
+	// Strategy is the client for interacting with the Strategy builders.
+	Strategy *StrategyClient
+	// StrategyFactor is the client for interacting with the StrategyFactor builders.
+	StrategyFactor *StrategyFactorClient
+	// StrategyFilter is the client for interacting with the StrategyFilter builders.
+	StrategyFilter *StrategyFilterClient
+	// StrategyFixedTicker is the client for interacting with the StrategyFixedTicker builders.
+	StrategyFixedTicker *StrategyFixedTickerClient
 	// Ticker is the client for interacting with the Ticker builders.
 	Ticker *TickerClient
 	// User is the client for interacting with the User builders.
@@ -76,6 +88,10 @@ func (c *Client) init() {
 	c.InvestAccountValuation = NewInvestAccountValuationClient(c.config)
 	c.Quote = NewQuoteClient(c.config)
 	c.Report = NewReportClient(c.config)
+	c.Strategy = NewStrategyClient(c.config)
+	c.StrategyFactor = NewStrategyFactorClient(c.config)
+	c.StrategyFilter = NewStrategyFilterClient(c.config)
+	c.StrategyFixedTicker = NewStrategyFixedTickerClient(c.config)
 	c.Ticker = NewTickerClient(c.config)
 	c.User = NewUserClient(c.config)
 }
@@ -120,6 +136,10 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		InvestAccountValuation: NewInvestAccountValuationClient(cfg),
 		Quote:                  NewQuoteClient(cfg),
 		Report:                 NewReportClient(cfg),
+		Strategy:               NewStrategyClient(cfg),
+		StrategyFactor:         NewStrategyFactorClient(cfg),
+		StrategyFilter:         NewStrategyFilterClient(cfg),
+		StrategyFixedTicker:    NewStrategyFixedTickerClient(cfg),
 		Ticker:                 NewTickerClient(cfg),
 		User:                   NewUserClient(cfg),
 	}, nil
@@ -150,6 +170,10 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		InvestAccountValuation: NewInvestAccountValuationClient(cfg),
 		Quote:                  NewQuoteClient(cfg),
 		Report:                 NewReportClient(cfg),
+		Strategy:               NewStrategyClient(cfg),
+		StrategyFactor:         NewStrategyFactorClient(cfg),
+		StrategyFilter:         NewStrategyFilterClient(cfg),
+		StrategyFixedTicker:    NewStrategyFixedTickerClient(cfg),
 		Ticker:                 NewTickerClient(cfg),
 		User:                   NewUserClient(cfg),
 	}, nil
@@ -190,6 +214,10 @@ func (c *Client) Use(hooks ...Hook) {
 	c.InvestAccountValuation.Use(hooks...)
 	c.Quote.Use(hooks...)
 	c.Report.Use(hooks...)
+	c.Strategy.Use(hooks...)
+	c.StrategyFactor.Use(hooks...)
+	c.StrategyFilter.Use(hooks...)
+	c.StrategyFixedTicker.Use(hooks...)
 	c.Ticker.Use(hooks...)
 	c.User.Use(hooks...)
 }
@@ -1212,6 +1240,478 @@ func (c *ReportClient) Hooks() []Hook {
 	return c.hooks.Report
 }
 
+// StrategyClient is a client for the Strategy schema.
+type StrategyClient struct {
+	config
+}
+
+// NewStrategyClient returns a client for the Strategy from the given config.
+func NewStrategyClient(c config) *StrategyClient {
+	return &StrategyClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `strategy.Hooks(f(g(h())))`.
+func (c *StrategyClient) Use(hooks ...Hook) {
+	c.hooks.Strategy = append(c.hooks.Strategy, hooks...)
+}
+
+// Create returns a create builder for Strategy.
+func (c *StrategyClient) Create() *StrategyCreate {
+	mutation := newStrategyMutation(c.config, OpCreate)
+	return &StrategyCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Strategy entities.
+func (c *StrategyClient) CreateBulk(builders ...*StrategyCreate) *StrategyCreateBulk {
+	return &StrategyCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Strategy.
+func (c *StrategyClient) Update() *StrategyUpdate {
+	mutation := newStrategyMutation(c.config, OpUpdate)
+	return &StrategyUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *StrategyClient) UpdateOne(s *Strategy) *StrategyUpdateOne {
+	mutation := newStrategyMutation(c.config, OpUpdateOne, withStrategy(s))
+	return &StrategyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *StrategyClient) UpdateOneID(id xid.ID) *StrategyUpdateOne {
+	mutation := newStrategyMutation(c.config, OpUpdateOne, withStrategyID(id))
+	return &StrategyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Strategy.
+func (c *StrategyClient) Delete() *StrategyDelete {
+	mutation := newStrategyMutation(c.config, OpDelete)
+	return &StrategyDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *StrategyClient) DeleteOne(s *Strategy) *StrategyDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *StrategyClient) DeleteOneID(id xid.ID) *StrategyDeleteOne {
+	builder := c.Delete().Where(strategy.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &StrategyDeleteOne{builder}
+}
+
+// Query returns a query builder for Strategy.
+func (c *StrategyClient) Query() *StrategyQuery {
+	return &StrategyQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Strategy entity by its id.
+func (c *StrategyClient) Get(ctx context.Context, id xid.ID) (*Strategy, error) {
+	return c.Query().Where(strategy.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *StrategyClient) GetX(ctx context.Context, id xid.ID) *Strategy {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUser queries the User edge of a Strategy.
+func (c *StrategyClient) QueryUser(s *Strategy) *UserQuery {
+	query := &UserQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(strategy.Table, strategy.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, strategy.UserTable, strategy.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryFactors queries the Factors edge of a Strategy.
+func (c *StrategyClient) QueryFactors(s *Strategy) *StrategyFactorQuery {
+	query := &StrategyFactorQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(strategy.Table, strategy.FieldID, id),
+			sqlgraph.To(strategyfactor.Table, strategyfactor.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, strategy.FactorsTable, strategy.FactorsColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryFilters queries the Filters edge of a Strategy.
+func (c *StrategyClient) QueryFilters(s *Strategy) *StrategyFilterQuery {
+	query := &StrategyFilterQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(strategy.Table, strategy.FieldID, id),
+			sqlgraph.To(strategyfilter.Table, strategyfilter.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, strategy.FiltersTable, strategy.FiltersColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryFixedTickers queries the FixedTickers edge of a Strategy.
+func (c *StrategyClient) QueryFixedTickers(s *Strategy) *StrategyFixedTickerQuery {
+	query := &StrategyFixedTickerQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(strategy.Table, strategy.FieldID, id),
+			sqlgraph.To(strategyfixedticker.Table, strategyfixedticker.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, strategy.FixedTickersTable, strategy.FixedTickersColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *StrategyClient) Hooks() []Hook {
+	return c.hooks.Strategy
+}
+
+// StrategyFactorClient is a client for the StrategyFactor schema.
+type StrategyFactorClient struct {
+	config
+}
+
+// NewStrategyFactorClient returns a client for the StrategyFactor from the given config.
+func NewStrategyFactorClient(c config) *StrategyFactorClient {
+	return &StrategyFactorClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `strategyfactor.Hooks(f(g(h())))`.
+func (c *StrategyFactorClient) Use(hooks ...Hook) {
+	c.hooks.StrategyFactor = append(c.hooks.StrategyFactor, hooks...)
+}
+
+// Create returns a create builder for StrategyFactor.
+func (c *StrategyFactorClient) Create() *StrategyFactorCreate {
+	mutation := newStrategyFactorMutation(c.config, OpCreate)
+	return &StrategyFactorCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of StrategyFactor entities.
+func (c *StrategyFactorClient) CreateBulk(builders ...*StrategyFactorCreate) *StrategyFactorCreateBulk {
+	return &StrategyFactorCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for StrategyFactor.
+func (c *StrategyFactorClient) Update() *StrategyFactorUpdate {
+	mutation := newStrategyFactorMutation(c.config, OpUpdate)
+	return &StrategyFactorUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *StrategyFactorClient) UpdateOne(sf *StrategyFactor) *StrategyFactorUpdateOne {
+	mutation := newStrategyFactorMutation(c.config, OpUpdateOne, withStrategyFactor(sf))
+	return &StrategyFactorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *StrategyFactorClient) UpdateOneID(id xid.ID) *StrategyFactorUpdateOne {
+	mutation := newStrategyFactorMutation(c.config, OpUpdateOne, withStrategyFactorID(id))
+	return &StrategyFactorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for StrategyFactor.
+func (c *StrategyFactorClient) Delete() *StrategyFactorDelete {
+	mutation := newStrategyFactorMutation(c.config, OpDelete)
+	return &StrategyFactorDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *StrategyFactorClient) DeleteOne(sf *StrategyFactor) *StrategyFactorDeleteOne {
+	return c.DeleteOneID(sf.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *StrategyFactorClient) DeleteOneID(id xid.ID) *StrategyFactorDeleteOne {
+	builder := c.Delete().Where(strategyfactor.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &StrategyFactorDeleteOne{builder}
+}
+
+// Query returns a query builder for StrategyFactor.
+func (c *StrategyFactorClient) Query() *StrategyFactorQuery {
+	return &StrategyFactorQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a StrategyFactor entity by its id.
+func (c *StrategyFactorClient) Get(ctx context.Context, id xid.ID) (*StrategyFactor, error) {
+	return c.Query().Where(strategyfactor.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *StrategyFactorClient) GetX(ctx context.Context, id xid.ID) *StrategyFactor {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryStrategy queries the Strategy edge of a StrategyFactor.
+func (c *StrategyFactorClient) QueryStrategy(sf *StrategyFactor) *StrategyQuery {
+	query := &StrategyQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := sf.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(strategyfactor.Table, strategyfactor.FieldID, id),
+			sqlgraph.To(strategy.Table, strategy.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, strategyfactor.StrategyTable, strategyfactor.StrategyColumn),
+		)
+		fromV = sqlgraph.Neighbors(sf.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *StrategyFactorClient) Hooks() []Hook {
+	return c.hooks.StrategyFactor
+}
+
+// StrategyFilterClient is a client for the StrategyFilter schema.
+type StrategyFilterClient struct {
+	config
+}
+
+// NewStrategyFilterClient returns a client for the StrategyFilter from the given config.
+func NewStrategyFilterClient(c config) *StrategyFilterClient {
+	return &StrategyFilterClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `strategyfilter.Hooks(f(g(h())))`.
+func (c *StrategyFilterClient) Use(hooks ...Hook) {
+	c.hooks.StrategyFilter = append(c.hooks.StrategyFilter, hooks...)
+}
+
+// Create returns a create builder for StrategyFilter.
+func (c *StrategyFilterClient) Create() *StrategyFilterCreate {
+	mutation := newStrategyFilterMutation(c.config, OpCreate)
+	return &StrategyFilterCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of StrategyFilter entities.
+func (c *StrategyFilterClient) CreateBulk(builders ...*StrategyFilterCreate) *StrategyFilterCreateBulk {
+	return &StrategyFilterCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for StrategyFilter.
+func (c *StrategyFilterClient) Update() *StrategyFilterUpdate {
+	mutation := newStrategyFilterMutation(c.config, OpUpdate)
+	return &StrategyFilterUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *StrategyFilterClient) UpdateOne(sf *StrategyFilter) *StrategyFilterUpdateOne {
+	mutation := newStrategyFilterMutation(c.config, OpUpdateOne, withStrategyFilter(sf))
+	return &StrategyFilterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *StrategyFilterClient) UpdateOneID(id xid.ID) *StrategyFilterUpdateOne {
+	mutation := newStrategyFilterMutation(c.config, OpUpdateOne, withStrategyFilterID(id))
+	return &StrategyFilterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for StrategyFilter.
+func (c *StrategyFilterClient) Delete() *StrategyFilterDelete {
+	mutation := newStrategyFilterMutation(c.config, OpDelete)
+	return &StrategyFilterDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *StrategyFilterClient) DeleteOne(sf *StrategyFilter) *StrategyFilterDeleteOne {
+	return c.DeleteOneID(sf.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *StrategyFilterClient) DeleteOneID(id xid.ID) *StrategyFilterDeleteOne {
+	builder := c.Delete().Where(strategyfilter.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &StrategyFilterDeleteOne{builder}
+}
+
+// Query returns a query builder for StrategyFilter.
+func (c *StrategyFilterClient) Query() *StrategyFilterQuery {
+	return &StrategyFilterQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a StrategyFilter entity by its id.
+func (c *StrategyFilterClient) Get(ctx context.Context, id xid.ID) (*StrategyFilter, error) {
+	return c.Query().Where(strategyfilter.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *StrategyFilterClient) GetX(ctx context.Context, id xid.ID) *StrategyFilter {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryStrategy queries the Strategy edge of a StrategyFilter.
+func (c *StrategyFilterClient) QueryStrategy(sf *StrategyFilter) *StrategyQuery {
+	query := &StrategyQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := sf.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(strategyfilter.Table, strategyfilter.FieldID, id),
+			sqlgraph.To(strategy.Table, strategy.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, strategyfilter.StrategyTable, strategyfilter.StrategyColumn),
+		)
+		fromV = sqlgraph.Neighbors(sf.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *StrategyFilterClient) Hooks() []Hook {
+	return c.hooks.StrategyFilter
+}
+
+// StrategyFixedTickerClient is a client for the StrategyFixedTicker schema.
+type StrategyFixedTickerClient struct {
+	config
+}
+
+// NewStrategyFixedTickerClient returns a client for the StrategyFixedTicker from the given config.
+func NewStrategyFixedTickerClient(c config) *StrategyFixedTickerClient {
+	return &StrategyFixedTickerClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `strategyfixedticker.Hooks(f(g(h())))`.
+func (c *StrategyFixedTickerClient) Use(hooks ...Hook) {
+	c.hooks.StrategyFixedTicker = append(c.hooks.StrategyFixedTicker, hooks...)
+}
+
+// Create returns a create builder for StrategyFixedTicker.
+func (c *StrategyFixedTickerClient) Create() *StrategyFixedTickerCreate {
+	mutation := newStrategyFixedTickerMutation(c.config, OpCreate)
+	return &StrategyFixedTickerCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of StrategyFixedTicker entities.
+func (c *StrategyFixedTickerClient) CreateBulk(builders ...*StrategyFixedTickerCreate) *StrategyFixedTickerCreateBulk {
+	return &StrategyFixedTickerCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for StrategyFixedTicker.
+func (c *StrategyFixedTickerClient) Update() *StrategyFixedTickerUpdate {
+	mutation := newStrategyFixedTickerMutation(c.config, OpUpdate)
+	return &StrategyFixedTickerUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *StrategyFixedTickerClient) UpdateOne(sft *StrategyFixedTicker) *StrategyFixedTickerUpdateOne {
+	mutation := newStrategyFixedTickerMutation(c.config, OpUpdateOne, withStrategyFixedTicker(sft))
+	return &StrategyFixedTickerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *StrategyFixedTickerClient) UpdateOneID(id xid.ID) *StrategyFixedTickerUpdateOne {
+	mutation := newStrategyFixedTickerMutation(c.config, OpUpdateOne, withStrategyFixedTickerID(id))
+	return &StrategyFixedTickerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for StrategyFixedTicker.
+func (c *StrategyFixedTickerClient) Delete() *StrategyFixedTickerDelete {
+	mutation := newStrategyFixedTickerMutation(c.config, OpDelete)
+	return &StrategyFixedTickerDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *StrategyFixedTickerClient) DeleteOne(sft *StrategyFixedTicker) *StrategyFixedTickerDeleteOne {
+	return c.DeleteOneID(sft.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *StrategyFixedTickerClient) DeleteOneID(id xid.ID) *StrategyFixedTickerDeleteOne {
+	builder := c.Delete().Where(strategyfixedticker.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &StrategyFixedTickerDeleteOne{builder}
+}
+
+// Query returns a query builder for StrategyFixedTicker.
+func (c *StrategyFixedTickerClient) Query() *StrategyFixedTickerQuery {
+	return &StrategyFixedTickerQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a StrategyFixedTicker entity by its id.
+func (c *StrategyFixedTickerClient) Get(ctx context.Context, id xid.ID) (*StrategyFixedTicker, error) {
+	return c.Query().Where(strategyfixedticker.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *StrategyFixedTickerClient) GetX(ctx context.Context, id xid.ID) *StrategyFixedTicker {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryStrategy queries the Strategy edge of a StrategyFixedTicker.
+func (c *StrategyFixedTickerClient) QueryStrategy(sft *StrategyFixedTicker) *StrategyQuery {
+	query := &StrategyQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := sft.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(strategyfixedticker.Table, strategyfixedticker.FieldID, id),
+			sqlgraph.To(strategy.Table, strategy.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, strategyfixedticker.StrategyTable, strategyfixedticker.StrategyColumn),
+		)
+		fromV = sqlgraph.Neighbors(sft.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *StrategyFixedTickerClient) Hooks() []Hook {
+	return c.hooks.StrategyFixedTicker
+}
+
 // TickerClient is a client for the Ticker schema.
 type TickerClient struct {
 	config
@@ -1460,6 +1960,22 @@ func (c *UserClient) QueryInvestAccounts(u *User) *InvestAccountQuery {
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(investaccount.Table, investaccount.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.InvestAccountsTable, user.InvestAccountsColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryStrategies queries the Strategies edge of a User.
+func (c *UserClient) QueryStrategies(u *User) *StrategyQuery {
+	query := &StrategyQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(strategy.Table, strategy.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.StrategiesTable, user.StrategiesColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil

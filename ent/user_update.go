@@ -14,6 +14,7 @@ import (
 	"github.com/rs/xid"
 	"github.com/softilium/mb4/ent/investaccount"
 	"github.com/softilium/mb4/ent/predicate"
+	"github.com/softilium/mb4/ent/strategy"
 	"github.com/softilium/mb4/ent/user"
 )
 
@@ -112,6 +113,21 @@ func (uu *UserUpdate) AddInvestAccounts(i ...*InvestAccount) *UserUpdate {
 	return uu.AddInvestAccountIDs(ids...)
 }
 
+// AddStrategyIDs adds the "Strategies" edge to the Strategy entity by IDs.
+func (uu *UserUpdate) AddStrategyIDs(ids ...xid.ID) *UserUpdate {
+	uu.mutation.AddStrategyIDs(ids...)
+	return uu
+}
+
+// AddStrategies adds the "Strategies" edges to the Strategy entity.
+func (uu *UserUpdate) AddStrategies(s ...*Strategy) *UserUpdate {
+	ids := make([]xid.ID, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uu.AddStrategyIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
@@ -136,6 +152,27 @@ func (uu *UserUpdate) RemoveInvestAccounts(i ...*InvestAccount) *UserUpdate {
 		ids[j] = i[j].ID
 	}
 	return uu.RemoveInvestAccountIDs(ids...)
+}
+
+// ClearStrategies clears all "Strategies" edges to the Strategy entity.
+func (uu *UserUpdate) ClearStrategies() *UserUpdate {
+	uu.mutation.ClearStrategies()
+	return uu
+}
+
+// RemoveStrategyIDs removes the "Strategies" edge to Strategy entities by IDs.
+func (uu *UserUpdate) RemoveStrategyIDs(ids ...xid.ID) *UserUpdate {
+	uu.mutation.RemoveStrategyIDs(ids...)
+	return uu
+}
+
+// RemoveStrategies removes "Strategies" edges to Strategy entities.
+func (uu *UserUpdate) RemoveStrategies(s ...*Strategy) *UserUpdate {
+	ids := make([]xid.ID, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uu.RemoveStrategyIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -333,6 +370,60 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if uu.mutation.StrategiesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.StrategiesTable,
+			Columns: []string{user.StrategiesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: strategy.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedStrategiesIDs(); len(nodes) > 0 && !uu.mutation.StrategiesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.StrategiesTable,
+			Columns: []string{user.StrategiesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: strategy.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.StrategiesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.StrategiesTable,
+			Columns: []string{user.StrategiesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: strategy.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -434,6 +525,21 @@ func (uuo *UserUpdateOne) AddInvestAccounts(i ...*InvestAccount) *UserUpdateOne 
 	return uuo.AddInvestAccountIDs(ids...)
 }
 
+// AddStrategyIDs adds the "Strategies" edge to the Strategy entity by IDs.
+func (uuo *UserUpdateOne) AddStrategyIDs(ids ...xid.ID) *UserUpdateOne {
+	uuo.mutation.AddStrategyIDs(ids...)
+	return uuo
+}
+
+// AddStrategies adds the "Strategies" edges to the Strategy entity.
+func (uuo *UserUpdateOne) AddStrategies(s ...*Strategy) *UserUpdateOne {
+	ids := make([]xid.ID, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uuo.AddStrategyIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
@@ -458,6 +564,27 @@ func (uuo *UserUpdateOne) RemoveInvestAccounts(i ...*InvestAccount) *UserUpdateO
 		ids[j] = i[j].ID
 	}
 	return uuo.RemoveInvestAccountIDs(ids...)
+}
+
+// ClearStrategies clears all "Strategies" edges to the Strategy entity.
+func (uuo *UserUpdateOne) ClearStrategies() *UserUpdateOne {
+	uuo.mutation.ClearStrategies()
+	return uuo
+}
+
+// RemoveStrategyIDs removes the "Strategies" edge to Strategy entities by IDs.
+func (uuo *UserUpdateOne) RemoveStrategyIDs(ids ...xid.ID) *UserUpdateOne {
+	uuo.mutation.RemoveStrategyIDs(ids...)
+	return uuo
+}
+
+// RemoveStrategies removes "Strategies" edges to Strategy entities.
+func (uuo *UserUpdateOne) RemoveStrategies(s ...*Strategy) *UserUpdateOne {
+	ids := make([]xid.ID, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uuo.RemoveStrategyIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -671,6 +798,60 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeString,
 					Column: investaccount.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.StrategiesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.StrategiesTable,
+			Columns: []string{user.StrategiesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: strategy.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedStrategiesIDs(); len(nodes) > 0 && !uuo.mutation.StrategiesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.StrategiesTable,
+			Columns: []string{user.StrategiesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: strategy.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.StrategiesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.StrategiesTable,
+			Columns: []string{user.StrategiesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: strategy.FieldID,
 				},
 			},
 		}

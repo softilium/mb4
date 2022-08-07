@@ -20,6 +20,10 @@ import (
 	"github.com/softilium/mb4/ent/predicate"
 	"github.com/softilium/mb4/ent/quote"
 	"github.com/softilium/mb4/ent/report"
+	"github.com/softilium/mb4/ent/strategy"
+	"github.com/softilium/mb4/ent/strategyfactor"
+	"github.com/softilium/mb4/ent/strategyfilter"
+	"github.com/softilium/mb4/ent/strategyfixedticker"
 	"github.com/softilium/mb4/ent/ticker"
 	"github.com/softilium/mb4/ent/user"
 
@@ -44,6 +48,10 @@ const (
 	TypeInvestAccountValuation = "InvestAccountValuation"
 	TypeQuote                  = "Quote"
 	TypeReport                 = "Report"
+	TypeStrategy               = "Strategy"
+	TypeStrategyFactor         = "StrategyFactor"
+	TypeStrategyFilter         = "StrategyFilter"
+	TypeStrategyFixedTicker    = "StrategyFixedTicker"
 	TypeTicker                 = "Ticker"
 	TypeUser                   = "User"
 )
@@ -6619,6 +6627,4038 @@ func (m *ReportMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Report edge %s", name)
 }
 
+// StrategyMutation represents an operation that mutates the Strategy nodes in the graph.
+type StrategyMutation struct {
+	config
+	op                         Op
+	typ                        string
+	id                         *xid.ID
+	_Descr                     *string
+	_MaxTickers                *int
+	add_MaxTickers             *int
+	_MaxTickersPerIndustry     *int
+	add_MaxTickersPerIndustry  *int
+	_BaseIndex                 *string
+	_LastYearInventResult      *float64
+	add_LastYearInventResult   *float64
+	_LastYearYield             *float64
+	add_LastYearYield          *float64
+	_Last3YearsInvertResult    *float64
+	add_Last3YearsInvertResult *float64
+	_Last3YearsYield           *float64
+	add_Last3YearsYield        *float64
+	_WeekRefillAmount          *float64
+	add_WeekRefillAmount       *float64
+	_StartAmount               *float64
+	add_StartAmount            *float64
+	_StartSimulation           *time.Time
+	_BuyOnlyLowPrice           *bool
+	_AllowLossWhenSell         *bool
+	_SameEmitent               *int
+	add_SameEmitent            *int
+	clearedFields              map[string]struct{}
+	_User                      *xid.ID
+	cleared_User               bool
+	_Factors                   map[xid.ID]struct{}
+	removed_Factors            map[xid.ID]struct{}
+	cleared_Factors            bool
+	_Filters                   map[xid.ID]struct{}
+	removed_Filters            map[xid.ID]struct{}
+	cleared_Filters            bool
+	_FixedTickers              map[xid.ID]struct{}
+	removed_FixedTickers       map[xid.ID]struct{}
+	cleared_FixedTickers       bool
+	done                       bool
+	oldValue                   func(context.Context) (*Strategy, error)
+	predicates                 []predicate.Strategy
+}
+
+var _ ent.Mutation = (*StrategyMutation)(nil)
+
+// strategyOption allows management of the mutation configuration using functional options.
+type strategyOption func(*StrategyMutation)
+
+// newStrategyMutation creates new mutation for the Strategy entity.
+func newStrategyMutation(c config, op Op, opts ...strategyOption) *StrategyMutation {
+	m := &StrategyMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeStrategy,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withStrategyID sets the ID field of the mutation.
+func withStrategyID(id xid.ID) strategyOption {
+	return func(m *StrategyMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Strategy
+		)
+		m.oldValue = func(ctx context.Context) (*Strategy, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Strategy.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withStrategy sets the old Strategy of the mutation.
+func withStrategy(node *Strategy) strategyOption {
+	return func(m *StrategyMutation) {
+		m.oldValue = func(context.Context) (*Strategy, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m StrategyMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m StrategyMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Strategy entities.
+func (m *StrategyMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *StrategyMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *StrategyMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Strategy.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetDescr sets the "Descr" field.
+func (m *StrategyMutation) SetDescr(s string) {
+	m._Descr = &s
+}
+
+// Descr returns the value of the "Descr" field in the mutation.
+func (m *StrategyMutation) Descr() (r string, exists bool) {
+	v := m._Descr
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescr returns the old "Descr" field's value of the Strategy entity.
+// If the Strategy object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyMutation) OldDescr(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescr is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescr requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescr: %w", err)
+	}
+	return oldValue.Descr, nil
+}
+
+// ResetDescr resets all changes to the "Descr" field.
+func (m *StrategyMutation) ResetDescr() {
+	m._Descr = nil
+}
+
+// SetMaxTickers sets the "MaxTickers" field.
+func (m *StrategyMutation) SetMaxTickers(i int) {
+	m._MaxTickers = &i
+	m.add_MaxTickers = nil
+}
+
+// MaxTickers returns the value of the "MaxTickers" field in the mutation.
+func (m *StrategyMutation) MaxTickers() (r int, exists bool) {
+	v := m._MaxTickers
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMaxTickers returns the old "MaxTickers" field's value of the Strategy entity.
+// If the Strategy object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyMutation) OldMaxTickers(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMaxTickers is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMaxTickers requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMaxTickers: %w", err)
+	}
+	return oldValue.MaxTickers, nil
+}
+
+// AddMaxTickers adds i to the "MaxTickers" field.
+func (m *StrategyMutation) AddMaxTickers(i int) {
+	if m.add_MaxTickers != nil {
+		*m.add_MaxTickers += i
+	} else {
+		m.add_MaxTickers = &i
+	}
+}
+
+// AddedMaxTickers returns the value that was added to the "MaxTickers" field in this mutation.
+func (m *StrategyMutation) AddedMaxTickers() (r int, exists bool) {
+	v := m.add_MaxTickers
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetMaxTickers resets all changes to the "MaxTickers" field.
+func (m *StrategyMutation) ResetMaxTickers() {
+	m._MaxTickers = nil
+	m.add_MaxTickers = nil
+}
+
+// SetMaxTickersPerIndustry sets the "MaxTickersPerIndustry" field.
+func (m *StrategyMutation) SetMaxTickersPerIndustry(i int) {
+	m._MaxTickersPerIndustry = &i
+	m.add_MaxTickersPerIndustry = nil
+}
+
+// MaxTickersPerIndustry returns the value of the "MaxTickersPerIndustry" field in the mutation.
+func (m *StrategyMutation) MaxTickersPerIndustry() (r int, exists bool) {
+	v := m._MaxTickersPerIndustry
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMaxTickersPerIndustry returns the old "MaxTickersPerIndustry" field's value of the Strategy entity.
+// If the Strategy object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyMutation) OldMaxTickersPerIndustry(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMaxTickersPerIndustry is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMaxTickersPerIndustry requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMaxTickersPerIndustry: %w", err)
+	}
+	return oldValue.MaxTickersPerIndustry, nil
+}
+
+// AddMaxTickersPerIndustry adds i to the "MaxTickersPerIndustry" field.
+func (m *StrategyMutation) AddMaxTickersPerIndustry(i int) {
+	if m.add_MaxTickersPerIndustry != nil {
+		*m.add_MaxTickersPerIndustry += i
+	} else {
+		m.add_MaxTickersPerIndustry = &i
+	}
+}
+
+// AddedMaxTickersPerIndustry returns the value that was added to the "MaxTickersPerIndustry" field in this mutation.
+func (m *StrategyMutation) AddedMaxTickersPerIndustry() (r int, exists bool) {
+	v := m.add_MaxTickersPerIndustry
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetMaxTickersPerIndustry resets all changes to the "MaxTickersPerIndustry" field.
+func (m *StrategyMutation) ResetMaxTickersPerIndustry() {
+	m._MaxTickersPerIndustry = nil
+	m.add_MaxTickersPerIndustry = nil
+}
+
+// SetBaseIndex sets the "BaseIndex" field.
+func (m *StrategyMutation) SetBaseIndex(s string) {
+	m._BaseIndex = &s
+}
+
+// BaseIndex returns the value of the "BaseIndex" field in the mutation.
+func (m *StrategyMutation) BaseIndex() (r string, exists bool) {
+	v := m._BaseIndex
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBaseIndex returns the old "BaseIndex" field's value of the Strategy entity.
+// If the Strategy object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyMutation) OldBaseIndex(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBaseIndex is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBaseIndex requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBaseIndex: %w", err)
+	}
+	return oldValue.BaseIndex, nil
+}
+
+// ClearBaseIndex clears the value of the "BaseIndex" field.
+func (m *StrategyMutation) ClearBaseIndex() {
+	m._BaseIndex = nil
+	m.clearedFields[strategy.FieldBaseIndex] = struct{}{}
+}
+
+// BaseIndexCleared returns if the "BaseIndex" field was cleared in this mutation.
+func (m *StrategyMutation) BaseIndexCleared() bool {
+	_, ok := m.clearedFields[strategy.FieldBaseIndex]
+	return ok
+}
+
+// ResetBaseIndex resets all changes to the "BaseIndex" field.
+func (m *StrategyMutation) ResetBaseIndex() {
+	m._BaseIndex = nil
+	delete(m.clearedFields, strategy.FieldBaseIndex)
+}
+
+// SetLastYearInventResult sets the "LastYearInventResult" field.
+func (m *StrategyMutation) SetLastYearInventResult(f float64) {
+	m._LastYearInventResult = &f
+	m.add_LastYearInventResult = nil
+}
+
+// LastYearInventResult returns the value of the "LastYearInventResult" field in the mutation.
+func (m *StrategyMutation) LastYearInventResult() (r float64, exists bool) {
+	v := m._LastYearInventResult
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastYearInventResult returns the old "LastYearInventResult" field's value of the Strategy entity.
+// If the Strategy object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyMutation) OldLastYearInventResult(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastYearInventResult is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastYearInventResult requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastYearInventResult: %w", err)
+	}
+	return oldValue.LastYearInventResult, nil
+}
+
+// AddLastYearInventResult adds f to the "LastYearInventResult" field.
+func (m *StrategyMutation) AddLastYearInventResult(f float64) {
+	if m.add_LastYearInventResult != nil {
+		*m.add_LastYearInventResult += f
+	} else {
+		m.add_LastYearInventResult = &f
+	}
+}
+
+// AddedLastYearInventResult returns the value that was added to the "LastYearInventResult" field in this mutation.
+func (m *StrategyMutation) AddedLastYearInventResult() (r float64, exists bool) {
+	v := m.add_LastYearInventResult
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetLastYearInventResult resets all changes to the "LastYearInventResult" field.
+func (m *StrategyMutation) ResetLastYearInventResult() {
+	m._LastYearInventResult = nil
+	m.add_LastYearInventResult = nil
+}
+
+// SetLastYearYield sets the "LastYearYield" field.
+func (m *StrategyMutation) SetLastYearYield(f float64) {
+	m._LastYearYield = &f
+	m.add_LastYearYield = nil
+}
+
+// LastYearYield returns the value of the "LastYearYield" field in the mutation.
+func (m *StrategyMutation) LastYearYield() (r float64, exists bool) {
+	v := m._LastYearYield
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastYearYield returns the old "LastYearYield" field's value of the Strategy entity.
+// If the Strategy object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyMutation) OldLastYearYield(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastYearYield is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastYearYield requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastYearYield: %w", err)
+	}
+	return oldValue.LastYearYield, nil
+}
+
+// AddLastYearYield adds f to the "LastYearYield" field.
+func (m *StrategyMutation) AddLastYearYield(f float64) {
+	if m.add_LastYearYield != nil {
+		*m.add_LastYearYield += f
+	} else {
+		m.add_LastYearYield = &f
+	}
+}
+
+// AddedLastYearYield returns the value that was added to the "LastYearYield" field in this mutation.
+func (m *StrategyMutation) AddedLastYearYield() (r float64, exists bool) {
+	v := m.add_LastYearYield
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetLastYearYield resets all changes to the "LastYearYield" field.
+func (m *StrategyMutation) ResetLastYearYield() {
+	m._LastYearYield = nil
+	m.add_LastYearYield = nil
+}
+
+// SetLast3YearsInvertResult sets the "Last3YearsInvertResult" field.
+func (m *StrategyMutation) SetLast3YearsInvertResult(f float64) {
+	m._Last3YearsInvertResult = &f
+	m.add_Last3YearsInvertResult = nil
+}
+
+// Last3YearsInvertResult returns the value of the "Last3YearsInvertResult" field in the mutation.
+func (m *StrategyMutation) Last3YearsInvertResult() (r float64, exists bool) {
+	v := m._Last3YearsInvertResult
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLast3YearsInvertResult returns the old "Last3YearsInvertResult" field's value of the Strategy entity.
+// If the Strategy object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyMutation) OldLast3YearsInvertResult(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLast3YearsInvertResult is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLast3YearsInvertResult requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLast3YearsInvertResult: %w", err)
+	}
+	return oldValue.Last3YearsInvertResult, nil
+}
+
+// AddLast3YearsInvertResult adds f to the "Last3YearsInvertResult" field.
+func (m *StrategyMutation) AddLast3YearsInvertResult(f float64) {
+	if m.add_Last3YearsInvertResult != nil {
+		*m.add_Last3YearsInvertResult += f
+	} else {
+		m.add_Last3YearsInvertResult = &f
+	}
+}
+
+// AddedLast3YearsInvertResult returns the value that was added to the "Last3YearsInvertResult" field in this mutation.
+func (m *StrategyMutation) AddedLast3YearsInvertResult() (r float64, exists bool) {
+	v := m.add_Last3YearsInvertResult
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetLast3YearsInvertResult resets all changes to the "Last3YearsInvertResult" field.
+func (m *StrategyMutation) ResetLast3YearsInvertResult() {
+	m._Last3YearsInvertResult = nil
+	m.add_Last3YearsInvertResult = nil
+}
+
+// SetLast3YearsYield sets the "Last3YearsYield" field.
+func (m *StrategyMutation) SetLast3YearsYield(f float64) {
+	m._Last3YearsYield = &f
+	m.add_Last3YearsYield = nil
+}
+
+// Last3YearsYield returns the value of the "Last3YearsYield" field in the mutation.
+func (m *StrategyMutation) Last3YearsYield() (r float64, exists bool) {
+	v := m._Last3YearsYield
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLast3YearsYield returns the old "Last3YearsYield" field's value of the Strategy entity.
+// If the Strategy object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyMutation) OldLast3YearsYield(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLast3YearsYield is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLast3YearsYield requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLast3YearsYield: %w", err)
+	}
+	return oldValue.Last3YearsYield, nil
+}
+
+// AddLast3YearsYield adds f to the "Last3YearsYield" field.
+func (m *StrategyMutation) AddLast3YearsYield(f float64) {
+	if m.add_Last3YearsYield != nil {
+		*m.add_Last3YearsYield += f
+	} else {
+		m.add_Last3YearsYield = &f
+	}
+}
+
+// AddedLast3YearsYield returns the value that was added to the "Last3YearsYield" field in this mutation.
+func (m *StrategyMutation) AddedLast3YearsYield() (r float64, exists bool) {
+	v := m.add_Last3YearsYield
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetLast3YearsYield resets all changes to the "Last3YearsYield" field.
+func (m *StrategyMutation) ResetLast3YearsYield() {
+	m._Last3YearsYield = nil
+	m.add_Last3YearsYield = nil
+}
+
+// SetWeekRefillAmount sets the "WeekRefillAmount" field.
+func (m *StrategyMutation) SetWeekRefillAmount(f float64) {
+	m._WeekRefillAmount = &f
+	m.add_WeekRefillAmount = nil
+}
+
+// WeekRefillAmount returns the value of the "WeekRefillAmount" field in the mutation.
+func (m *StrategyMutation) WeekRefillAmount() (r float64, exists bool) {
+	v := m._WeekRefillAmount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWeekRefillAmount returns the old "WeekRefillAmount" field's value of the Strategy entity.
+// If the Strategy object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyMutation) OldWeekRefillAmount(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWeekRefillAmount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWeekRefillAmount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWeekRefillAmount: %w", err)
+	}
+	return oldValue.WeekRefillAmount, nil
+}
+
+// AddWeekRefillAmount adds f to the "WeekRefillAmount" field.
+func (m *StrategyMutation) AddWeekRefillAmount(f float64) {
+	if m.add_WeekRefillAmount != nil {
+		*m.add_WeekRefillAmount += f
+	} else {
+		m.add_WeekRefillAmount = &f
+	}
+}
+
+// AddedWeekRefillAmount returns the value that was added to the "WeekRefillAmount" field in this mutation.
+func (m *StrategyMutation) AddedWeekRefillAmount() (r float64, exists bool) {
+	v := m.add_WeekRefillAmount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetWeekRefillAmount resets all changes to the "WeekRefillAmount" field.
+func (m *StrategyMutation) ResetWeekRefillAmount() {
+	m._WeekRefillAmount = nil
+	m.add_WeekRefillAmount = nil
+}
+
+// SetStartAmount sets the "StartAmount" field.
+func (m *StrategyMutation) SetStartAmount(f float64) {
+	m._StartAmount = &f
+	m.add_StartAmount = nil
+}
+
+// StartAmount returns the value of the "StartAmount" field in the mutation.
+func (m *StrategyMutation) StartAmount() (r float64, exists bool) {
+	v := m._StartAmount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStartAmount returns the old "StartAmount" field's value of the Strategy entity.
+// If the Strategy object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyMutation) OldStartAmount(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStartAmount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStartAmount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStartAmount: %w", err)
+	}
+	return oldValue.StartAmount, nil
+}
+
+// AddStartAmount adds f to the "StartAmount" field.
+func (m *StrategyMutation) AddStartAmount(f float64) {
+	if m.add_StartAmount != nil {
+		*m.add_StartAmount += f
+	} else {
+		m.add_StartAmount = &f
+	}
+}
+
+// AddedStartAmount returns the value that was added to the "StartAmount" field in this mutation.
+func (m *StrategyMutation) AddedStartAmount() (r float64, exists bool) {
+	v := m.add_StartAmount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetStartAmount resets all changes to the "StartAmount" field.
+func (m *StrategyMutation) ResetStartAmount() {
+	m._StartAmount = nil
+	m.add_StartAmount = nil
+}
+
+// SetStartSimulation sets the "StartSimulation" field.
+func (m *StrategyMutation) SetStartSimulation(t time.Time) {
+	m._StartSimulation = &t
+}
+
+// StartSimulation returns the value of the "StartSimulation" field in the mutation.
+func (m *StrategyMutation) StartSimulation() (r time.Time, exists bool) {
+	v := m._StartSimulation
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStartSimulation returns the old "StartSimulation" field's value of the Strategy entity.
+// If the Strategy object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyMutation) OldStartSimulation(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStartSimulation is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStartSimulation requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStartSimulation: %w", err)
+	}
+	return oldValue.StartSimulation, nil
+}
+
+// ResetStartSimulation resets all changes to the "StartSimulation" field.
+func (m *StrategyMutation) ResetStartSimulation() {
+	m._StartSimulation = nil
+}
+
+// SetBuyOnlyLowPrice sets the "BuyOnlyLowPrice" field.
+func (m *StrategyMutation) SetBuyOnlyLowPrice(b bool) {
+	m._BuyOnlyLowPrice = &b
+}
+
+// BuyOnlyLowPrice returns the value of the "BuyOnlyLowPrice" field in the mutation.
+func (m *StrategyMutation) BuyOnlyLowPrice() (r bool, exists bool) {
+	v := m._BuyOnlyLowPrice
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBuyOnlyLowPrice returns the old "BuyOnlyLowPrice" field's value of the Strategy entity.
+// If the Strategy object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyMutation) OldBuyOnlyLowPrice(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBuyOnlyLowPrice is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBuyOnlyLowPrice requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBuyOnlyLowPrice: %w", err)
+	}
+	return oldValue.BuyOnlyLowPrice, nil
+}
+
+// ResetBuyOnlyLowPrice resets all changes to the "BuyOnlyLowPrice" field.
+func (m *StrategyMutation) ResetBuyOnlyLowPrice() {
+	m._BuyOnlyLowPrice = nil
+}
+
+// SetAllowLossWhenSell sets the "AllowLossWhenSell" field.
+func (m *StrategyMutation) SetAllowLossWhenSell(b bool) {
+	m._AllowLossWhenSell = &b
+}
+
+// AllowLossWhenSell returns the value of the "AllowLossWhenSell" field in the mutation.
+func (m *StrategyMutation) AllowLossWhenSell() (r bool, exists bool) {
+	v := m._AllowLossWhenSell
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAllowLossWhenSell returns the old "AllowLossWhenSell" field's value of the Strategy entity.
+// If the Strategy object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyMutation) OldAllowLossWhenSell(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAllowLossWhenSell is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAllowLossWhenSell requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAllowLossWhenSell: %w", err)
+	}
+	return oldValue.AllowLossWhenSell, nil
+}
+
+// ResetAllowLossWhenSell resets all changes to the "AllowLossWhenSell" field.
+func (m *StrategyMutation) ResetAllowLossWhenSell() {
+	m._AllowLossWhenSell = nil
+}
+
+// SetSameEmitent sets the "SameEmitent" field.
+func (m *StrategyMutation) SetSameEmitent(i int) {
+	m._SameEmitent = &i
+	m.add_SameEmitent = nil
+}
+
+// SameEmitent returns the value of the "SameEmitent" field in the mutation.
+func (m *StrategyMutation) SameEmitent() (r int, exists bool) {
+	v := m._SameEmitent
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSameEmitent returns the old "SameEmitent" field's value of the Strategy entity.
+// If the Strategy object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyMutation) OldSameEmitent(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSameEmitent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSameEmitent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSameEmitent: %w", err)
+	}
+	return oldValue.SameEmitent, nil
+}
+
+// AddSameEmitent adds i to the "SameEmitent" field.
+func (m *StrategyMutation) AddSameEmitent(i int) {
+	if m.add_SameEmitent != nil {
+		*m.add_SameEmitent += i
+	} else {
+		m.add_SameEmitent = &i
+	}
+}
+
+// AddedSameEmitent returns the value that was added to the "SameEmitent" field in this mutation.
+func (m *StrategyMutation) AddedSameEmitent() (r int, exists bool) {
+	v := m.add_SameEmitent
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSameEmitent resets all changes to the "SameEmitent" field.
+func (m *StrategyMutation) ResetSameEmitent() {
+	m._SameEmitent = nil
+	m.add_SameEmitent = nil
+}
+
+// SetUserID sets the "User" edge to the User entity by id.
+func (m *StrategyMutation) SetUserID(id xid.ID) {
+	m._User = &id
+}
+
+// ClearUser clears the "User" edge to the User entity.
+func (m *StrategyMutation) ClearUser() {
+	m.cleared_User = true
+}
+
+// UserCleared reports if the "User" edge to the User entity was cleared.
+func (m *StrategyMutation) UserCleared() bool {
+	return m.cleared_User
+}
+
+// UserID returns the "User" edge ID in the mutation.
+func (m *StrategyMutation) UserID() (id xid.ID, exists bool) {
+	if m._User != nil {
+		return *m._User, true
+	}
+	return
+}
+
+// UserIDs returns the "User" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UserID instead. It exists only for internal usage by the builders.
+func (m *StrategyMutation) UserIDs() (ids []xid.ID) {
+	if id := m._User; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUser resets all changes to the "User" edge.
+func (m *StrategyMutation) ResetUser() {
+	m._User = nil
+	m.cleared_User = false
+}
+
+// AddFactorIDs adds the "Factors" edge to the StrategyFactor entity by ids.
+func (m *StrategyMutation) AddFactorIDs(ids ...xid.ID) {
+	if m._Factors == nil {
+		m._Factors = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m._Factors[ids[i]] = struct{}{}
+	}
+}
+
+// ClearFactors clears the "Factors" edge to the StrategyFactor entity.
+func (m *StrategyMutation) ClearFactors() {
+	m.cleared_Factors = true
+}
+
+// FactorsCleared reports if the "Factors" edge to the StrategyFactor entity was cleared.
+func (m *StrategyMutation) FactorsCleared() bool {
+	return m.cleared_Factors
+}
+
+// RemoveFactorIDs removes the "Factors" edge to the StrategyFactor entity by IDs.
+func (m *StrategyMutation) RemoveFactorIDs(ids ...xid.ID) {
+	if m.removed_Factors == nil {
+		m.removed_Factors = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m._Factors, ids[i])
+		m.removed_Factors[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedFactors returns the removed IDs of the "Factors" edge to the StrategyFactor entity.
+func (m *StrategyMutation) RemovedFactorsIDs() (ids []xid.ID) {
+	for id := range m.removed_Factors {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// FactorsIDs returns the "Factors" edge IDs in the mutation.
+func (m *StrategyMutation) FactorsIDs() (ids []xid.ID) {
+	for id := range m._Factors {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetFactors resets all changes to the "Factors" edge.
+func (m *StrategyMutation) ResetFactors() {
+	m._Factors = nil
+	m.cleared_Factors = false
+	m.removed_Factors = nil
+}
+
+// AddFilterIDs adds the "Filters" edge to the StrategyFilter entity by ids.
+func (m *StrategyMutation) AddFilterIDs(ids ...xid.ID) {
+	if m._Filters == nil {
+		m._Filters = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m._Filters[ids[i]] = struct{}{}
+	}
+}
+
+// ClearFilters clears the "Filters" edge to the StrategyFilter entity.
+func (m *StrategyMutation) ClearFilters() {
+	m.cleared_Filters = true
+}
+
+// FiltersCleared reports if the "Filters" edge to the StrategyFilter entity was cleared.
+func (m *StrategyMutation) FiltersCleared() bool {
+	return m.cleared_Filters
+}
+
+// RemoveFilterIDs removes the "Filters" edge to the StrategyFilter entity by IDs.
+func (m *StrategyMutation) RemoveFilterIDs(ids ...xid.ID) {
+	if m.removed_Filters == nil {
+		m.removed_Filters = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m._Filters, ids[i])
+		m.removed_Filters[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedFilters returns the removed IDs of the "Filters" edge to the StrategyFilter entity.
+func (m *StrategyMutation) RemovedFiltersIDs() (ids []xid.ID) {
+	for id := range m.removed_Filters {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// FiltersIDs returns the "Filters" edge IDs in the mutation.
+func (m *StrategyMutation) FiltersIDs() (ids []xid.ID) {
+	for id := range m._Filters {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetFilters resets all changes to the "Filters" edge.
+func (m *StrategyMutation) ResetFilters() {
+	m._Filters = nil
+	m.cleared_Filters = false
+	m.removed_Filters = nil
+}
+
+// AddFixedTickerIDs adds the "FixedTickers" edge to the StrategyFixedTicker entity by ids.
+func (m *StrategyMutation) AddFixedTickerIDs(ids ...xid.ID) {
+	if m._FixedTickers == nil {
+		m._FixedTickers = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m._FixedTickers[ids[i]] = struct{}{}
+	}
+}
+
+// ClearFixedTickers clears the "FixedTickers" edge to the StrategyFixedTicker entity.
+func (m *StrategyMutation) ClearFixedTickers() {
+	m.cleared_FixedTickers = true
+}
+
+// FixedTickersCleared reports if the "FixedTickers" edge to the StrategyFixedTicker entity was cleared.
+func (m *StrategyMutation) FixedTickersCleared() bool {
+	return m.cleared_FixedTickers
+}
+
+// RemoveFixedTickerIDs removes the "FixedTickers" edge to the StrategyFixedTicker entity by IDs.
+func (m *StrategyMutation) RemoveFixedTickerIDs(ids ...xid.ID) {
+	if m.removed_FixedTickers == nil {
+		m.removed_FixedTickers = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m._FixedTickers, ids[i])
+		m.removed_FixedTickers[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedFixedTickers returns the removed IDs of the "FixedTickers" edge to the StrategyFixedTicker entity.
+func (m *StrategyMutation) RemovedFixedTickersIDs() (ids []xid.ID) {
+	for id := range m.removed_FixedTickers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// FixedTickersIDs returns the "FixedTickers" edge IDs in the mutation.
+func (m *StrategyMutation) FixedTickersIDs() (ids []xid.ID) {
+	for id := range m._FixedTickers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetFixedTickers resets all changes to the "FixedTickers" edge.
+func (m *StrategyMutation) ResetFixedTickers() {
+	m._FixedTickers = nil
+	m.cleared_FixedTickers = false
+	m.removed_FixedTickers = nil
+}
+
+// Where appends a list predicates to the StrategyMutation builder.
+func (m *StrategyMutation) Where(ps ...predicate.Strategy) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *StrategyMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (Strategy).
+func (m *StrategyMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *StrategyMutation) Fields() []string {
+	fields := make([]string, 0, 14)
+	if m._Descr != nil {
+		fields = append(fields, strategy.FieldDescr)
+	}
+	if m._MaxTickers != nil {
+		fields = append(fields, strategy.FieldMaxTickers)
+	}
+	if m._MaxTickersPerIndustry != nil {
+		fields = append(fields, strategy.FieldMaxTickersPerIndustry)
+	}
+	if m._BaseIndex != nil {
+		fields = append(fields, strategy.FieldBaseIndex)
+	}
+	if m._LastYearInventResult != nil {
+		fields = append(fields, strategy.FieldLastYearInventResult)
+	}
+	if m._LastYearYield != nil {
+		fields = append(fields, strategy.FieldLastYearYield)
+	}
+	if m._Last3YearsInvertResult != nil {
+		fields = append(fields, strategy.FieldLast3YearsInvertResult)
+	}
+	if m._Last3YearsYield != nil {
+		fields = append(fields, strategy.FieldLast3YearsYield)
+	}
+	if m._WeekRefillAmount != nil {
+		fields = append(fields, strategy.FieldWeekRefillAmount)
+	}
+	if m._StartAmount != nil {
+		fields = append(fields, strategy.FieldStartAmount)
+	}
+	if m._StartSimulation != nil {
+		fields = append(fields, strategy.FieldStartSimulation)
+	}
+	if m._BuyOnlyLowPrice != nil {
+		fields = append(fields, strategy.FieldBuyOnlyLowPrice)
+	}
+	if m._AllowLossWhenSell != nil {
+		fields = append(fields, strategy.FieldAllowLossWhenSell)
+	}
+	if m._SameEmitent != nil {
+		fields = append(fields, strategy.FieldSameEmitent)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *StrategyMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case strategy.FieldDescr:
+		return m.Descr()
+	case strategy.FieldMaxTickers:
+		return m.MaxTickers()
+	case strategy.FieldMaxTickersPerIndustry:
+		return m.MaxTickersPerIndustry()
+	case strategy.FieldBaseIndex:
+		return m.BaseIndex()
+	case strategy.FieldLastYearInventResult:
+		return m.LastYearInventResult()
+	case strategy.FieldLastYearYield:
+		return m.LastYearYield()
+	case strategy.FieldLast3YearsInvertResult:
+		return m.Last3YearsInvertResult()
+	case strategy.FieldLast3YearsYield:
+		return m.Last3YearsYield()
+	case strategy.FieldWeekRefillAmount:
+		return m.WeekRefillAmount()
+	case strategy.FieldStartAmount:
+		return m.StartAmount()
+	case strategy.FieldStartSimulation:
+		return m.StartSimulation()
+	case strategy.FieldBuyOnlyLowPrice:
+		return m.BuyOnlyLowPrice()
+	case strategy.FieldAllowLossWhenSell:
+		return m.AllowLossWhenSell()
+	case strategy.FieldSameEmitent:
+		return m.SameEmitent()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *StrategyMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case strategy.FieldDescr:
+		return m.OldDescr(ctx)
+	case strategy.FieldMaxTickers:
+		return m.OldMaxTickers(ctx)
+	case strategy.FieldMaxTickersPerIndustry:
+		return m.OldMaxTickersPerIndustry(ctx)
+	case strategy.FieldBaseIndex:
+		return m.OldBaseIndex(ctx)
+	case strategy.FieldLastYearInventResult:
+		return m.OldLastYearInventResult(ctx)
+	case strategy.FieldLastYearYield:
+		return m.OldLastYearYield(ctx)
+	case strategy.FieldLast3YearsInvertResult:
+		return m.OldLast3YearsInvertResult(ctx)
+	case strategy.FieldLast3YearsYield:
+		return m.OldLast3YearsYield(ctx)
+	case strategy.FieldWeekRefillAmount:
+		return m.OldWeekRefillAmount(ctx)
+	case strategy.FieldStartAmount:
+		return m.OldStartAmount(ctx)
+	case strategy.FieldStartSimulation:
+		return m.OldStartSimulation(ctx)
+	case strategy.FieldBuyOnlyLowPrice:
+		return m.OldBuyOnlyLowPrice(ctx)
+	case strategy.FieldAllowLossWhenSell:
+		return m.OldAllowLossWhenSell(ctx)
+	case strategy.FieldSameEmitent:
+		return m.OldSameEmitent(ctx)
+	}
+	return nil, fmt.Errorf("unknown Strategy field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *StrategyMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case strategy.FieldDescr:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescr(v)
+		return nil
+	case strategy.FieldMaxTickers:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMaxTickers(v)
+		return nil
+	case strategy.FieldMaxTickersPerIndustry:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMaxTickersPerIndustry(v)
+		return nil
+	case strategy.FieldBaseIndex:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBaseIndex(v)
+		return nil
+	case strategy.FieldLastYearInventResult:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastYearInventResult(v)
+		return nil
+	case strategy.FieldLastYearYield:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastYearYield(v)
+		return nil
+	case strategy.FieldLast3YearsInvertResult:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLast3YearsInvertResult(v)
+		return nil
+	case strategy.FieldLast3YearsYield:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLast3YearsYield(v)
+		return nil
+	case strategy.FieldWeekRefillAmount:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWeekRefillAmount(v)
+		return nil
+	case strategy.FieldStartAmount:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStartAmount(v)
+		return nil
+	case strategy.FieldStartSimulation:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStartSimulation(v)
+		return nil
+	case strategy.FieldBuyOnlyLowPrice:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBuyOnlyLowPrice(v)
+		return nil
+	case strategy.FieldAllowLossWhenSell:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAllowLossWhenSell(v)
+		return nil
+	case strategy.FieldSameEmitent:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSameEmitent(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Strategy field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *StrategyMutation) AddedFields() []string {
+	var fields []string
+	if m.add_MaxTickers != nil {
+		fields = append(fields, strategy.FieldMaxTickers)
+	}
+	if m.add_MaxTickersPerIndustry != nil {
+		fields = append(fields, strategy.FieldMaxTickersPerIndustry)
+	}
+	if m.add_LastYearInventResult != nil {
+		fields = append(fields, strategy.FieldLastYearInventResult)
+	}
+	if m.add_LastYearYield != nil {
+		fields = append(fields, strategy.FieldLastYearYield)
+	}
+	if m.add_Last3YearsInvertResult != nil {
+		fields = append(fields, strategy.FieldLast3YearsInvertResult)
+	}
+	if m.add_Last3YearsYield != nil {
+		fields = append(fields, strategy.FieldLast3YearsYield)
+	}
+	if m.add_WeekRefillAmount != nil {
+		fields = append(fields, strategy.FieldWeekRefillAmount)
+	}
+	if m.add_StartAmount != nil {
+		fields = append(fields, strategy.FieldStartAmount)
+	}
+	if m.add_SameEmitent != nil {
+		fields = append(fields, strategy.FieldSameEmitent)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *StrategyMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case strategy.FieldMaxTickers:
+		return m.AddedMaxTickers()
+	case strategy.FieldMaxTickersPerIndustry:
+		return m.AddedMaxTickersPerIndustry()
+	case strategy.FieldLastYearInventResult:
+		return m.AddedLastYearInventResult()
+	case strategy.FieldLastYearYield:
+		return m.AddedLastYearYield()
+	case strategy.FieldLast3YearsInvertResult:
+		return m.AddedLast3YearsInvertResult()
+	case strategy.FieldLast3YearsYield:
+		return m.AddedLast3YearsYield()
+	case strategy.FieldWeekRefillAmount:
+		return m.AddedWeekRefillAmount()
+	case strategy.FieldStartAmount:
+		return m.AddedStartAmount()
+	case strategy.FieldSameEmitent:
+		return m.AddedSameEmitent()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *StrategyMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case strategy.FieldMaxTickers:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddMaxTickers(v)
+		return nil
+	case strategy.FieldMaxTickersPerIndustry:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddMaxTickersPerIndustry(v)
+		return nil
+	case strategy.FieldLastYearInventResult:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLastYearInventResult(v)
+		return nil
+	case strategy.FieldLastYearYield:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLastYearYield(v)
+		return nil
+	case strategy.FieldLast3YearsInvertResult:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLast3YearsInvertResult(v)
+		return nil
+	case strategy.FieldLast3YearsYield:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLast3YearsYield(v)
+		return nil
+	case strategy.FieldWeekRefillAmount:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddWeekRefillAmount(v)
+		return nil
+	case strategy.FieldStartAmount:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStartAmount(v)
+		return nil
+	case strategy.FieldSameEmitent:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSameEmitent(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Strategy numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *StrategyMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(strategy.FieldBaseIndex) {
+		fields = append(fields, strategy.FieldBaseIndex)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *StrategyMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *StrategyMutation) ClearField(name string) error {
+	switch name {
+	case strategy.FieldBaseIndex:
+		m.ClearBaseIndex()
+		return nil
+	}
+	return fmt.Errorf("unknown Strategy nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *StrategyMutation) ResetField(name string) error {
+	switch name {
+	case strategy.FieldDescr:
+		m.ResetDescr()
+		return nil
+	case strategy.FieldMaxTickers:
+		m.ResetMaxTickers()
+		return nil
+	case strategy.FieldMaxTickersPerIndustry:
+		m.ResetMaxTickersPerIndustry()
+		return nil
+	case strategy.FieldBaseIndex:
+		m.ResetBaseIndex()
+		return nil
+	case strategy.FieldLastYearInventResult:
+		m.ResetLastYearInventResult()
+		return nil
+	case strategy.FieldLastYearYield:
+		m.ResetLastYearYield()
+		return nil
+	case strategy.FieldLast3YearsInvertResult:
+		m.ResetLast3YearsInvertResult()
+		return nil
+	case strategy.FieldLast3YearsYield:
+		m.ResetLast3YearsYield()
+		return nil
+	case strategy.FieldWeekRefillAmount:
+		m.ResetWeekRefillAmount()
+		return nil
+	case strategy.FieldStartAmount:
+		m.ResetStartAmount()
+		return nil
+	case strategy.FieldStartSimulation:
+		m.ResetStartSimulation()
+		return nil
+	case strategy.FieldBuyOnlyLowPrice:
+		m.ResetBuyOnlyLowPrice()
+		return nil
+	case strategy.FieldAllowLossWhenSell:
+		m.ResetAllowLossWhenSell()
+		return nil
+	case strategy.FieldSameEmitent:
+		m.ResetSameEmitent()
+		return nil
+	}
+	return fmt.Errorf("unknown Strategy field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *StrategyMutation) AddedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m._User != nil {
+		edges = append(edges, strategy.EdgeUser)
+	}
+	if m._Factors != nil {
+		edges = append(edges, strategy.EdgeFactors)
+	}
+	if m._Filters != nil {
+		edges = append(edges, strategy.EdgeFilters)
+	}
+	if m._FixedTickers != nil {
+		edges = append(edges, strategy.EdgeFixedTickers)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *StrategyMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case strategy.EdgeUser:
+		if id := m._User; id != nil {
+			return []ent.Value{*id}
+		}
+	case strategy.EdgeFactors:
+		ids := make([]ent.Value, 0, len(m._Factors))
+		for id := range m._Factors {
+			ids = append(ids, id)
+		}
+		return ids
+	case strategy.EdgeFilters:
+		ids := make([]ent.Value, 0, len(m._Filters))
+		for id := range m._Filters {
+			ids = append(ids, id)
+		}
+		return ids
+	case strategy.EdgeFixedTickers:
+		ids := make([]ent.Value, 0, len(m._FixedTickers))
+		for id := range m._FixedTickers {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *StrategyMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.removed_Factors != nil {
+		edges = append(edges, strategy.EdgeFactors)
+	}
+	if m.removed_Filters != nil {
+		edges = append(edges, strategy.EdgeFilters)
+	}
+	if m.removed_FixedTickers != nil {
+		edges = append(edges, strategy.EdgeFixedTickers)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *StrategyMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case strategy.EdgeFactors:
+		ids := make([]ent.Value, 0, len(m.removed_Factors))
+		for id := range m.removed_Factors {
+			ids = append(ids, id)
+		}
+		return ids
+	case strategy.EdgeFilters:
+		ids := make([]ent.Value, 0, len(m.removed_Filters))
+		for id := range m.removed_Filters {
+			ids = append(ids, id)
+		}
+		return ids
+	case strategy.EdgeFixedTickers:
+		ids := make([]ent.Value, 0, len(m.removed_FixedTickers))
+		for id := range m.removed_FixedTickers {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *StrategyMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.cleared_User {
+		edges = append(edges, strategy.EdgeUser)
+	}
+	if m.cleared_Factors {
+		edges = append(edges, strategy.EdgeFactors)
+	}
+	if m.cleared_Filters {
+		edges = append(edges, strategy.EdgeFilters)
+	}
+	if m.cleared_FixedTickers {
+		edges = append(edges, strategy.EdgeFixedTickers)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *StrategyMutation) EdgeCleared(name string) bool {
+	switch name {
+	case strategy.EdgeUser:
+		return m.cleared_User
+	case strategy.EdgeFactors:
+		return m.cleared_Factors
+	case strategy.EdgeFilters:
+		return m.cleared_Filters
+	case strategy.EdgeFixedTickers:
+		return m.cleared_FixedTickers
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *StrategyMutation) ClearEdge(name string) error {
+	switch name {
+	case strategy.EdgeUser:
+		m.ClearUser()
+		return nil
+	}
+	return fmt.Errorf("unknown Strategy unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *StrategyMutation) ResetEdge(name string) error {
+	switch name {
+	case strategy.EdgeUser:
+		m.ResetUser()
+		return nil
+	case strategy.EdgeFactors:
+		m.ResetFactors()
+		return nil
+	case strategy.EdgeFilters:
+		m.ResetFilters()
+		return nil
+	case strategy.EdgeFixedTickers:
+		m.ResetFixedTickers()
+		return nil
+	}
+	return fmt.Errorf("unknown Strategy edge %s", name)
+}
+
+// StrategyFactorMutation represents an operation that mutates the StrategyFactor nodes in the graph.
+type StrategyFactorMutation struct {
+	config
+	op                Op
+	typ               string
+	id                *xid.ID
+	_LineNum          *int
+	add_LineNum       *int
+	_IsUsed           *bool
+	_RK               *int
+	add_RK            *int
+	_RVT              *int
+	add_RVT           *int
+	_MinAcceptabe     *float64
+	add_MinAcceptabe  *float64
+	_MaxAcceptable    *float64
+	add_MaxAcceptable *float64
+	_Inverse          *bool
+	_K                *float64
+	add_K             *float64
+	_Gist             *float64
+	add_Gist          *float64
+	clearedFields     map[string]struct{}
+	_Strategy         *xid.ID
+	cleared_Strategy  bool
+	done              bool
+	oldValue          func(context.Context) (*StrategyFactor, error)
+	predicates        []predicate.StrategyFactor
+}
+
+var _ ent.Mutation = (*StrategyFactorMutation)(nil)
+
+// strategyfactorOption allows management of the mutation configuration using functional options.
+type strategyfactorOption func(*StrategyFactorMutation)
+
+// newStrategyFactorMutation creates new mutation for the StrategyFactor entity.
+func newStrategyFactorMutation(c config, op Op, opts ...strategyfactorOption) *StrategyFactorMutation {
+	m := &StrategyFactorMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeStrategyFactor,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withStrategyFactorID sets the ID field of the mutation.
+func withStrategyFactorID(id xid.ID) strategyfactorOption {
+	return func(m *StrategyFactorMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *StrategyFactor
+		)
+		m.oldValue = func(ctx context.Context) (*StrategyFactor, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().StrategyFactor.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withStrategyFactor sets the old StrategyFactor of the mutation.
+func withStrategyFactor(node *StrategyFactor) strategyfactorOption {
+	return func(m *StrategyFactorMutation) {
+		m.oldValue = func(context.Context) (*StrategyFactor, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m StrategyFactorMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m StrategyFactorMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of StrategyFactor entities.
+func (m *StrategyFactorMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *StrategyFactorMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *StrategyFactorMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().StrategyFactor.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetLineNum sets the "LineNum" field.
+func (m *StrategyFactorMutation) SetLineNum(i int) {
+	m._LineNum = &i
+	m.add_LineNum = nil
+}
+
+// LineNum returns the value of the "LineNum" field in the mutation.
+func (m *StrategyFactorMutation) LineNum() (r int, exists bool) {
+	v := m._LineNum
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLineNum returns the old "LineNum" field's value of the StrategyFactor entity.
+// If the StrategyFactor object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyFactorMutation) OldLineNum(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLineNum is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLineNum requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLineNum: %w", err)
+	}
+	return oldValue.LineNum, nil
+}
+
+// AddLineNum adds i to the "LineNum" field.
+func (m *StrategyFactorMutation) AddLineNum(i int) {
+	if m.add_LineNum != nil {
+		*m.add_LineNum += i
+	} else {
+		m.add_LineNum = &i
+	}
+}
+
+// AddedLineNum returns the value that was added to the "LineNum" field in this mutation.
+func (m *StrategyFactorMutation) AddedLineNum() (r int, exists bool) {
+	v := m.add_LineNum
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetLineNum resets all changes to the "LineNum" field.
+func (m *StrategyFactorMutation) ResetLineNum() {
+	m._LineNum = nil
+	m.add_LineNum = nil
+}
+
+// SetIsUsed sets the "IsUsed" field.
+func (m *StrategyFactorMutation) SetIsUsed(b bool) {
+	m._IsUsed = &b
+}
+
+// IsUsed returns the value of the "IsUsed" field in the mutation.
+func (m *StrategyFactorMutation) IsUsed() (r bool, exists bool) {
+	v := m._IsUsed
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsUsed returns the old "IsUsed" field's value of the StrategyFactor entity.
+// If the StrategyFactor object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyFactorMutation) OldIsUsed(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsUsed is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsUsed requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsUsed: %w", err)
+	}
+	return oldValue.IsUsed, nil
+}
+
+// ResetIsUsed resets all changes to the "IsUsed" field.
+func (m *StrategyFactorMutation) ResetIsUsed() {
+	m._IsUsed = nil
+}
+
+// SetRK sets the "RK" field.
+func (m *StrategyFactorMutation) SetRK(i int) {
+	m._RK = &i
+	m.add_RK = nil
+}
+
+// RK returns the value of the "RK" field in the mutation.
+func (m *StrategyFactorMutation) RK() (r int, exists bool) {
+	v := m._RK
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRK returns the old "RK" field's value of the StrategyFactor entity.
+// If the StrategyFactor object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyFactorMutation) OldRK(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRK is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRK requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRK: %w", err)
+	}
+	return oldValue.RK, nil
+}
+
+// AddRK adds i to the "RK" field.
+func (m *StrategyFactorMutation) AddRK(i int) {
+	if m.add_RK != nil {
+		*m.add_RK += i
+	} else {
+		m.add_RK = &i
+	}
+}
+
+// AddedRK returns the value that was added to the "RK" field in this mutation.
+func (m *StrategyFactorMutation) AddedRK() (r int, exists bool) {
+	v := m.add_RK
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetRK resets all changes to the "RK" field.
+func (m *StrategyFactorMutation) ResetRK() {
+	m._RK = nil
+	m.add_RK = nil
+}
+
+// SetRVT sets the "RVT" field.
+func (m *StrategyFactorMutation) SetRVT(i int) {
+	m._RVT = &i
+	m.add_RVT = nil
+}
+
+// RVT returns the value of the "RVT" field in the mutation.
+func (m *StrategyFactorMutation) RVT() (r int, exists bool) {
+	v := m._RVT
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRVT returns the old "RVT" field's value of the StrategyFactor entity.
+// If the StrategyFactor object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyFactorMutation) OldRVT(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRVT is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRVT requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRVT: %w", err)
+	}
+	return oldValue.RVT, nil
+}
+
+// AddRVT adds i to the "RVT" field.
+func (m *StrategyFactorMutation) AddRVT(i int) {
+	if m.add_RVT != nil {
+		*m.add_RVT += i
+	} else {
+		m.add_RVT = &i
+	}
+}
+
+// AddedRVT returns the value that was added to the "RVT" field in this mutation.
+func (m *StrategyFactorMutation) AddedRVT() (r int, exists bool) {
+	v := m.add_RVT
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetRVT resets all changes to the "RVT" field.
+func (m *StrategyFactorMutation) ResetRVT() {
+	m._RVT = nil
+	m.add_RVT = nil
+}
+
+// SetMinAcceptabe sets the "MinAcceptabe" field.
+func (m *StrategyFactorMutation) SetMinAcceptabe(f float64) {
+	m._MinAcceptabe = &f
+	m.add_MinAcceptabe = nil
+}
+
+// MinAcceptabe returns the value of the "MinAcceptabe" field in the mutation.
+func (m *StrategyFactorMutation) MinAcceptabe() (r float64, exists bool) {
+	v := m._MinAcceptabe
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMinAcceptabe returns the old "MinAcceptabe" field's value of the StrategyFactor entity.
+// If the StrategyFactor object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyFactorMutation) OldMinAcceptabe(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMinAcceptabe is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMinAcceptabe requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMinAcceptabe: %w", err)
+	}
+	return oldValue.MinAcceptabe, nil
+}
+
+// AddMinAcceptabe adds f to the "MinAcceptabe" field.
+func (m *StrategyFactorMutation) AddMinAcceptabe(f float64) {
+	if m.add_MinAcceptabe != nil {
+		*m.add_MinAcceptabe += f
+	} else {
+		m.add_MinAcceptabe = &f
+	}
+}
+
+// AddedMinAcceptabe returns the value that was added to the "MinAcceptabe" field in this mutation.
+func (m *StrategyFactorMutation) AddedMinAcceptabe() (r float64, exists bool) {
+	v := m.add_MinAcceptabe
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetMinAcceptabe resets all changes to the "MinAcceptabe" field.
+func (m *StrategyFactorMutation) ResetMinAcceptabe() {
+	m._MinAcceptabe = nil
+	m.add_MinAcceptabe = nil
+}
+
+// SetMaxAcceptable sets the "MaxAcceptable" field.
+func (m *StrategyFactorMutation) SetMaxAcceptable(f float64) {
+	m._MaxAcceptable = &f
+	m.add_MaxAcceptable = nil
+}
+
+// MaxAcceptable returns the value of the "MaxAcceptable" field in the mutation.
+func (m *StrategyFactorMutation) MaxAcceptable() (r float64, exists bool) {
+	v := m._MaxAcceptable
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMaxAcceptable returns the old "MaxAcceptable" field's value of the StrategyFactor entity.
+// If the StrategyFactor object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyFactorMutation) OldMaxAcceptable(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMaxAcceptable is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMaxAcceptable requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMaxAcceptable: %w", err)
+	}
+	return oldValue.MaxAcceptable, nil
+}
+
+// AddMaxAcceptable adds f to the "MaxAcceptable" field.
+func (m *StrategyFactorMutation) AddMaxAcceptable(f float64) {
+	if m.add_MaxAcceptable != nil {
+		*m.add_MaxAcceptable += f
+	} else {
+		m.add_MaxAcceptable = &f
+	}
+}
+
+// AddedMaxAcceptable returns the value that was added to the "MaxAcceptable" field in this mutation.
+func (m *StrategyFactorMutation) AddedMaxAcceptable() (r float64, exists bool) {
+	v := m.add_MaxAcceptable
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetMaxAcceptable resets all changes to the "MaxAcceptable" field.
+func (m *StrategyFactorMutation) ResetMaxAcceptable() {
+	m._MaxAcceptable = nil
+	m.add_MaxAcceptable = nil
+}
+
+// SetInverse sets the "Inverse" field.
+func (m *StrategyFactorMutation) SetInverse(b bool) {
+	m._Inverse = &b
+}
+
+// Inverse returns the value of the "Inverse" field in the mutation.
+func (m *StrategyFactorMutation) Inverse() (r bool, exists bool) {
+	v := m._Inverse
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldInverse returns the old "Inverse" field's value of the StrategyFactor entity.
+// If the StrategyFactor object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyFactorMutation) OldInverse(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldInverse is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldInverse requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldInverse: %w", err)
+	}
+	return oldValue.Inverse, nil
+}
+
+// ResetInverse resets all changes to the "Inverse" field.
+func (m *StrategyFactorMutation) ResetInverse() {
+	m._Inverse = nil
+}
+
+// SetK sets the "K" field.
+func (m *StrategyFactorMutation) SetK(f float64) {
+	m._K = &f
+	m.add_K = nil
+}
+
+// K returns the value of the "K" field in the mutation.
+func (m *StrategyFactorMutation) K() (r float64, exists bool) {
+	v := m._K
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldK returns the old "K" field's value of the StrategyFactor entity.
+// If the StrategyFactor object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyFactorMutation) OldK(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldK is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldK requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldK: %w", err)
+	}
+	return oldValue.K, nil
+}
+
+// AddK adds f to the "K" field.
+func (m *StrategyFactorMutation) AddK(f float64) {
+	if m.add_K != nil {
+		*m.add_K += f
+	} else {
+		m.add_K = &f
+	}
+}
+
+// AddedK returns the value that was added to the "K" field in this mutation.
+func (m *StrategyFactorMutation) AddedK() (r float64, exists bool) {
+	v := m.add_K
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetK resets all changes to the "K" field.
+func (m *StrategyFactorMutation) ResetK() {
+	m._K = nil
+	m.add_K = nil
+}
+
+// SetGist sets the "Gist" field.
+func (m *StrategyFactorMutation) SetGist(f float64) {
+	m._Gist = &f
+	m.add_Gist = nil
+}
+
+// Gist returns the value of the "Gist" field in the mutation.
+func (m *StrategyFactorMutation) Gist() (r float64, exists bool) {
+	v := m._Gist
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGist returns the old "Gist" field's value of the StrategyFactor entity.
+// If the StrategyFactor object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyFactorMutation) OldGist(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGist is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGist requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGist: %w", err)
+	}
+	return oldValue.Gist, nil
+}
+
+// AddGist adds f to the "Gist" field.
+func (m *StrategyFactorMutation) AddGist(f float64) {
+	if m.add_Gist != nil {
+		*m.add_Gist += f
+	} else {
+		m.add_Gist = &f
+	}
+}
+
+// AddedGist returns the value that was added to the "Gist" field in this mutation.
+func (m *StrategyFactorMutation) AddedGist() (r float64, exists bool) {
+	v := m.add_Gist
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetGist resets all changes to the "Gist" field.
+func (m *StrategyFactorMutation) ResetGist() {
+	m._Gist = nil
+	m.add_Gist = nil
+}
+
+// SetStrategyID sets the "Strategy" edge to the Strategy entity by id.
+func (m *StrategyFactorMutation) SetStrategyID(id xid.ID) {
+	m._Strategy = &id
+}
+
+// ClearStrategy clears the "Strategy" edge to the Strategy entity.
+func (m *StrategyFactorMutation) ClearStrategy() {
+	m.cleared_Strategy = true
+}
+
+// StrategyCleared reports if the "Strategy" edge to the Strategy entity was cleared.
+func (m *StrategyFactorMutation) StrategyCleared() bool {
+	return m.cleared_Strategy
+}
+
+// StrategyID returns the "Strategy" edge ID in the mutation.
+func (m *StrategyFactorMutation) StrategyID() (id xid.ID, exists bool) {
+	if m._Strategy != nil {
+		return *m._Strategy, true
+	}
+	return
+}
+
+// StrategyIDs returns the "Strategy" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// StrategyID instead. It exists only for internal usage by the builders.
+func (m *StrategyFactorMutation) StrategyIDs() (ids []xid.ID) {
+	if id := m._Strategy; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetStrategy resets all changes to the "Strategy" edge.
+func (m *StrategyFactorMutation) ResetStrategy() {
+	m._Strategy = nil
+	m.cleared_Strategy = false
+}
+
+// Where appends a list predicates to the StrategyFactorMutation builder.
+func (m *StrategyFactorMutation) Where(ps ...predicate.StrategyFactor) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *StrategyFactorMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (StrategyFactor).
+func (m *StrategyFactorMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *StrategyFactorMutation) Fields() []string {
+	fields := make([]string, 0, 9)
+	if m._LineNum != nil {
+		fields = append(fields, strategyfactor.FieldLineNum)
+	}
+	if m._IsUsed != nil {
+		fields = append(fields, strategyfactor.FieldIsUsed)
+	}
+	if m._RK != nil {
+		fields = append(fields, strategyfactor.FieldRK)
+	}
+	if m._RVT != nil {
+		fields = append(fields, strategyfactor.FieldRVT)
+	}
+	if m._MinAcceptabe != nil {
+		fields = append(fields, strategyfactor.FieldMinAcceptabe)
+	}
+	if m._MaxAcceptable != nil {
+		fields = append(fields, strategyfactor.FieldMaxAcceptable)
+	}
+	if m._Inverse != nil {
+		fields = append(fields, strategyfactor.FieldInverse)
+	}
+	if m._K != nil {
+		fields = append(fields, strategyfactor.FieldK)
+	}
+	if m._Gist != nil {
+		fields = append(fields, strategyfactor.FieldGist)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *StrategyFactorMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case strategyfactor.FieldLineNum:
+		return m.LineNum()
+	case strategyfactor.FieldIsUsed:
+		return m.IsUsed()
+	case strategyfactor.FieldRK:
+		return m.RK()
+	case strategyfactor.FieldRVT:
+		return m.RVT()
+	case strategyfactor.FieldMinAcceptabe:
+		return m.MinAcceptabe()
+	case strategyfactor.FieldMaxAcceptable:
+		return m.MaxAcceptable()
+	case strategyfactor.FieldInverse:
+		return m.Inverse()
+	case strategyfactor.FieldK:
+		return m.K()
+	case strategyfactor.FieldGist:
+		return m.Gist()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *StrategyFactorMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case strategyfactor.FieldLineNum:
+		return m.OldLineNum(ctx)
+	case strategyfactor.FieldIsUsed:
+		return m.OldIsUsed(ctx)
+	case strategyfactor.FieldRK:
+		return m.OldRK(ctx)
+	case strategyfactor.FieldRVT:
+		return m.OldRVT(ctx)
+	case strategyfactor.FieldMinAcceptabe:
+		return m.OldMinAcceptabe(ctx)
+	case strategyfactor.FieldMaxAcceptable:
+		return m.OldMaxAcceptable(ctx)
+	case strategyfactor.FieldInverse:
+		return m.OldInverse(ctx)
+	case strategyfactor.FieldK:
+		return m.OldK(ctx)
+	case strategyfactor.FieldGist:
+		return m.OldGist(ctx)
+	}
+	return nil, fmt.Errorf("unknown StrategyFactor field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *StrategyFactorMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case strategyfactor.FieldLineNum:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLineNum(v)
+		return nil
+	case strategyfactor.FieldIsUsed:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsUsed(v)
+		return nil
+	case strategyfactor.FieldRK:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRK(v)
+		return nil
+	case strategyfactor.FieldRVT:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRVT(v)
+		return nil
+	case strategyfactor.FieldMinAcceptabe:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMinAcceptabe(v)
+		return nil
+	case strategyfactor.FieldMaxAcceptable:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMaxAcceptable(v)
+		return nil
+	case strategyfactor.FieldInverse:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetInverse(v)
+		return nil
+	case strategyfactor.FieldK:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetK(v)
+		return nil
+	case strategyfactor.FieldGist:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGist(v)
+		return nil
+	}
+	return fmt.Errorf("unknown StrategyFactor field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *StrategyFactorMutation) AddedFields() []string {
+	var fields []string
+	if m.add_LineNum != nil {
+		fields = append(fields, strategyfactor.FieldLineNum)
+	}
+	if m.add_RK != nil {
+		fields = append(fields, strategyfactor.FieldRK)
+	}
+	if m.add_RVT != nil {
+		fields = append(fields, strategyfactor.FieldRVT)
+	}
+	if m.add_MinAcceptabe != nil {
+		fields = append(fields, strategyfactor.FieldMinAcceptabe)
+	}
+	if m.add_MaxAcceptable != nil {
+		fields = append(fields, strategyfactor.FieldMaxAcceptable)
+	}
+	if m.add_K != nil {
+		fields = append(fields, strategyfactor.FieldK)
+	}
+	if m.add_Gist != nil {
+		fields = append(fields, strategyfactor.FieldGist)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *StrategyFactorMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case strategyfactor.FieldLineNum:
+		return m.AddedLineNum()
+	case strategyfactor.FieldRK:
+		return m.AddedRK()
+	case strategyfactor.FieldRVT:
+		return m.AddedRVT()
+	case strategyfactor.FieldMinAcceptabe:
+		return m.AddedMinAcceptabe()
+	case strategyfactor.FieldMaxAcceptable:
+		return m.AddedMaxAcceptable()
+	case strategyfactor.FieldK:
+		return m.AddedK()
+	case strategyfactor.FieldGist:
+		return m.AddedGist()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *StrategyFactorMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case strategyfactor.FieldLineNum:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLineNum(v)
+		return nil
+	case strategyfactor.FieldRK:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRK(v)
+		return nil
+	case strategyfactor.FieldRVT:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRVT(v)
+		return nil
+	case strategyfactor.FieldMinAcceptabe:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddMinAcceptabe(v)
+		return nil
+	case strategyfactor.FieldMaxAcceptable:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddMaxAcceptable(v)
+		return nil
+	case strategyfactor.FieldK:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddK(v)
+		return nil
+	case strategyfactor.FieldGist:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddGist(v)
+		return nil
+	}
+	return fmt.Errorf("unknown StrategyFactor numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *StrategyFactorMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *StrategyFactorMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *StrategyFactorMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown StrategyFactor nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *StrategyFactorMutation) ResetField(name string) error {
+	switch name {
+	case strategyfactor.FieldLineNum:
+		m.ResetLineNum()
+		return nil
+	case strategyfactor.FieldIsUsed:
+		m.ResetIsUsed()
+		return nil
+	case strategyfactor.FieldRK:
+		m.ResetRK()
+		return nil
+	case strategyfactor.FieldRVT:
+		m.ResetRVT()
+		return nil
+	case strategyfactor.FieldMinAcceptabe:
+		m.ResetMinAcceptabe()
+		return nil
+	case strategyfactor.FieldMaxAcceptable:
+		m.ResetMaxAcceptable()
+		return nil
+	case strategyfactor.FieldInverse:
+		m.ResetInverse()
+		return nil
+	case strategyfactor.FieldK:
+		m.ResetK()
+		return nil
+	case strategyfactor.FieldGist:
+		m.ResetGist()
+		return nil
+	}
+	return fmt.Errorf("unknown StrategyFactor field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *StrategyFactorMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m._Strategy != nil {
+		edges = append(edges, strategyfactor.EdgeStrategy)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *StrategyFactorMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case strategyfactor.EdgeStrategy:
+		if id := m._Strategy; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *StrategyFactorMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *StrategyFactorMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *StrategyFactorMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.cleared_Strategy {
+		edges = append(edges, strategyfactor.EdgeStrategy)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *StrategyFactorMutation) EdgeCleared(name string) bool {
+	switch name {
+	case strategyfactor.EdgeStrategy:
+		return m.cleared_Strategy
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *StrategyFactorMutation) ClearEdge(name string) error {
+	switch name {
+	case strategyfactor.EdgeStrategy:
+		m.ClearStrategy()
+		return nil
+	}
+	return fmt.Errorf("unknown StrategyFactor unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *StrategyFactorMutation) ResetEdge(name string) error {
+	switch name {
+	case strategyfactor.EdgeStrategy:
+		m.ResetStrategy()
+		return nil
+	}
+	return fmt.Errorf("unknown StrategyFactor edge %s", name)
+}
+
+// StrategyFilterMutation represents an operation that mutates the StrategyFilter nodes in the graph.
+type StrategyFilterMutation struct {
+	config
+	op                Op
+	typ               string
+	id                *xid.ID
+	_LineNum          *int
+	add_LineNum       *int
+	_IsUsed           *bool
+	_LeftValueKind    *int
+	add_LeftValueKind *int
+	_LeftValue        *string
+	_RVT              *int
+	add_RVT           *int
+	_Operation        *int
+	add_Operation     *int
+	_RightValue       *string
+	clearedFields     map[string]struct{}
+	_Strategy         *xid.ID
+	cleared_Strategy  bool
+	done              bool
+	oldValue          func(context.Context) (*StrategyFilter, error)
+	predicates        []predicate.StrategyFilter
+}
+
+var _ ent.Mutation = (*StrategyFilterMutation)(nil)
+
+// strategyfilterOption allows management of the mutation configuration using functional options.
+type strategyfilterOption func(*StrategyFilterMutation)
+
+// newStrategyFilterMutation creates new mutation for the StrategyFilter entity.
+func newStrategyFilterMutation(c config, op Op, opts ...strategyfilterOption) *StrategyFilterMutation {
+	m := &StrategyFilterMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeStrategyFilter,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withStrategyFilterID sets the ID field of the mutation.
+func withStrategyFilterID(id xid.ID) strategyfilterOption {
+	return func(m *StrategyFilterMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *StrategyFilter
+		)
+		m.oldValue = func(ctx context.Context) (*StrategyFilter, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().StrategyFilter.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withStrategyFilter sets the old StrategyFilter of the mutation.
+func withStrategyFilter(node *StrategyFilter) strategyfilterOption {
+	return func(m *StrategyFilterMutation) {
+		m.oldValue = func(context.Context) (*StrategyFilter, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m StrategyFilterMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m StrategyFilterMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of StrategyFilter entities.
+func (m *StrategyFilterMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *StrategyFilterMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *StrategyFilterMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().StrategyFilter.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetLineNum sets the "LineNum" field.
+func (m *StrategyFilterMutation) SetLineNum(i int) {
+	m._LineNum = &i
+	m.add_LineNum = nil
+}
+
+// LineNum returns the value of the "LineNum" field in the mutation.
+func (m *StrategyFilterMutation) LineNum() (r int, exists bool) {
+	v := m._LineNum
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLineNum returns the old "LineNum" field's value of the StrategyFilter entity.
+// If the StrategyFilter object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyFilterMutation) OldLineNum(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLineNum is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLineNum requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLineNum: %w", err)
+	}
+	return oldValue.LineNum, nil
+}
+
+// AddLineNum adds i to the "LineNum" field.
+func (m *StrategyFilterMutation) AddLineNum(i int) {
+	if m.add_LineNum != nil {
+		*m.add_LineNum += i
+	} else {
+		m.add_LineNum = &i
+	}
+}
+
+// AddedLineNum returns the value that was added to the "LineNum" field in this mutation.
+func (m *StrategyFilterMutation) AddedLineNum() (r int, exists bool) {
+	v := m.add_LineNum
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetLineNum resets all changes to the "LineNum" field.
+func (m *StrategyFilterMutation) ResetLineNum() {
+	m._LineNum = nil
+	m.add_LineNum = nil
+}
+
+// SetIsUsed sets the "IsUsed" field.
+func (m *StrategyFilterMutation) SetIsUsed(b bool) {
+	m._IsUsed = &b
+}
+
+// IsUsed returns the value of the "IsUsed" field in the mutation.
+func (m *StrategyFilterMutation) IsUsed() (r bool, exists bool) {
+	v := m._IsUsed
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsUsed returns the old "IsUsed" field's value of the StrategyFilter entity.
+// If the StrategyFilter object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyFilterMutation) OldIsUsed(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsUsed is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsUsed requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsUsed: %w", err)
+	}
+	return oldValue.IsUsed, nil
+}
+
+// ResetIsUsed resets all changes to the "IsUsed" field.
+func (m *StrategyFilterMutation) ResetIsUsed() {
+	m._IsUsed = nil
+}
+
+// SetLeftValueKind sets the "LeftValueKind" field.
+func (m *StrategyFilterMutation) SetLeftValueKind(i int) {
+	m._LeftValueKind = &i
+	m.add_LeftValueKind = nil
+}
+
+// LeftValueKind returns the value of the "LeftValueKind" field in the mutation.
+func (m *StrategyFilterMutation) LeftValueKind() (r int, exists bool) {
+	v := m._LeftValueKind
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLeftValueKind returns the old "LeftValueKind" field's value of the StrategyFilter entity.
+// If the StrategyFilter object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyFilterMutation) OldLeftValueKind(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLeftValueKind is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLeftValueKind requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLeftValueKind: %w", err)
+	}
+	return oldValue.LeftValueKind, nil
+}
+
+// AddLeftValueKind adds i to the "LeftValueKind" field.
+func (m *StrategyFilterMutation) AddLeftValueKind(i int) {
+	if m.add_LeftValueKind != nil {
+		*m.add_LeftValueKind += i
+	} else {
+		m.add_LeftValueKind = &i
+	}
+}
+
+// AddedLeftValueKind returns the value that was added to the "LeftValueKind" field in this mutation.
+func (m *StrategyFilterMutation) AddedLeftValueKind() (r int, exists bool) {
+	v := m.add_LeftValueKind
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetLeftValueKind resets all changes to the "LeftValueKind" field.
+func (m *StrategyFilterMutation) ResetLeftValueKind() {
+	m._LeftValueKind = nil
+	m.add_LeftValueKind = nil
+}
+
+// SetLeftValue sets the "LeftValue" field.
+func (m *StrategyFilterMutation) SetLeftValue(s string) {
+	m._LeftValue = &s
+}
+
+// LeftValue returns the value of the "LeftValue" field in the mutation.
+func (m *StrategyFilterMutation) LeftValue() (r string, exists bool) {
+	v := m._LeftValue
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLeftValue returns the old "LeftValue" field's value of the StrategyFilter entity.
+// If the StrategyFilter object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyFilterMutation) OldLeftValue(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLeftValue is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLeftValue requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLeftValue: %w", err)
+	}
+	return oldValue.LeftValue, nil
+}
+
+// ResetLeftValue resets all changes to the "LeftValue" field.
+func (m *StrategyFilterMutation) ResetLeftValue() {
+	m._LeftValue = nil
+}
+
+// SetRVT sets the "RVT" field.
+func (m *StrategyFilterMutation) SetRVT(i int) {
+	m._RVT = &i
+	m.add_RVT = nil
+}
+
+// RVT returns the value of the "RVT" field in the mutation.
+func (m *StrategyFilterMutation) RVT() (r int, exists bool) {
+	v := m._RVT
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRVT returns the old "RVT" field's value of the StrategyFilter entity.
+// If the StrategyFilter object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyFilterMutation) OldRVT(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRVT is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRVT requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRVT: %w", err)
+	}
+	return oldValue.RVT, nil
+}
+
+// AddRVT adds i to the "RVT" field.
+func (m *StrategyFilterMutation) AddRVT(i int) {
+	if m.add_RVT != nil {
+		*m.add_RVT += i
+	} else {
+		m.add_RVT = &i
+	}
+}
+
+// AddedRVT returns the value that was added to the "RVT" field in this mutation.
+func (m *StrategyFilterMutation) AddedRVT() (r int, exists bool) {
+	v := m.add_RVT
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetRVT resets all changes to the "RVT" field.
+func (m *StrategyFilterMutation) ResetRVT() {
+	m._RVT = nil
+	m.add_RVT = nil
+}
+
+// SetOperation sets the "Operation" field.
+func (m *StrategyFilterMutation) SetOperation(i int) {
+	m._Operation = &i
+	m.add_Operation = nil
+}
+
+// Operation returns the value of the "Operation" field in the mutation.
+func (m *StrategyFilterMutation) Operation() (r int, exists bool) {
+	v := m._Operation
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOperation returns the old "Operation" field's value of the StrategyFilter entity.
+// If the StrategyFilter object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyFilterMutation) OldOperation(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOperation is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOperation requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOperation: %w", err)
+	}
+	return oldValue.Operation, nil
+}
+
+// AddOperation adds i to the "Operation" field.
+func (m *StrategyFilterMutation) AddOperation(i int) {
+	if m.add_Operation != nil {
+		*m.add_Operation += i
+	} else {
+		m.add_Operation = &i
+	}
+}
+
+// AddedOperation returns the value that was added to the "Operation" field in this mutation.
+func (m *StrategyFilterMutation) AddedOperation() (r int, exists bool) {
+	v := m.add_Operation
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetOperation resets all changes to the "Operation" field.
+func (m *StrategyFilterMutation) ResetOperation() {
+	m._Operation = nil
+	m.add_Operation = nil
+}
+
+// SetRightValue sets the "RightValue" field.
+func (m *StrategyFilterMutation) SetRightValue(s string) {
+	m._RightValue = &s
+}
+
+// RightValue returns the value of the "RightValue" field in the mutation.
+func (m *StrategyFilterMutation) RightValue() (r string, exists bool) {
+	v := m._RightValue
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRightValue returns the old "RightValue" field's value of the StrategyFilter entity.
+// If the StrategyFilter object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyFilterMutation) OldRightValue(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRightValue is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRightValue requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRightValue: %w", err)
+	}
+	return oldValue.RightValue, nil
+}
+
+// ResetRightValue resets all changes to the "RightValue" field.
+func (m *StrategyFilterMutation) ResetRightValue() {
+	m._RightValue = nil
+}
+
+// SetStrategyID sets the "Strategy" edge to the Strategy entity by id.
+func (m *StrategyFilterMutation) SetStrategyID(id xid.ID) {
+	m._Strategy = &id
+}
+
+// ClearStrategy clears the "Strategy" edge to the Strategy entity.
+func (m *StrategyFilterMutation) ClearStrategy() {
+	m.cleared_Strategy = true
+}
+
+// StrategyCleared reports if the "Strategy" edge to the Strategy entity was cleared.
+func (m *StrategyFilterMutation) StrategyCleared() bool {
+	return m.cleared_Strategy
+}
+
+// StrategyID returns the "Strategy" edge ID in the mutation.
+func (m *StrategyFilterMutation) StrategyID() (id xid.ID, exists bool) {
+	if m._Strategy != nil {
+		return *m._Strategy, true
+	}
+	return
+}
+
+// StrategyIDs returns the "Strategy" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// StrategyID instead. It exists only for internal usage by the builders.
+func (m *StrategyFilterMutation) StrategyIDs() (ids []xid.ID) {
+	if id := m._Strategy; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetStrategy resets all changes to the "Strategy" edge.
+func (m *StrategyFilterMutation) ResetStrategy() {
+	m._Strategy = nil
+	m.cleared_Strategy = false
+}
+
+// Where appends a list predicates to the StrategyFilterMutation builder.
+func (m *StrategyFilterMutation) Where(ps ...predicate.StrategyFilter) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *StrategyFilterMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (StrategyFilter).
+func (m *StrategyFilterMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *StrategyFilterMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m._LineNum != nil {
+		fields = append(fields, strategyfilter.FieldLineNum)
+	}
+	if m._IsUsed != nil {
+		fields = append(fields, strategyfilter.FieldIsUsed)
+	}
+	if m._LeftValueKind != nil {
+		fields = append(fields, strategyfilter.FieldLeftValueKind)
+	}
+	if m._LeftValue != nil {
+		fields = append(fields, strategyfilter.FieldLeftValue)
+	}
+	if m._RVT != nil {
+		fields = append(fields, strategyfilter.FieldRVT)
+	}
+	if m._Operation != nil {
+		fields = append(fields, strategyfilter.FieldOperation)
+	}
+	if m._RightValue != nil {
+		fields = append(fields, strategyfilter.FieldRightValue)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *StrategyFilterMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case strategyfilter.FieldLineNum:
+		return m.LineNum()
+	case strategyfilter.FieldIsUsed:
+		return m.IsUsed()
+	case strategyfilter.FieldLeftValueKind:
+		return m.LeftValueKind()
+	case strategyfilter.FieldLeftValue:
+		return m.LeftValue()
+	case strategyfilter.FieldRVT:
+		return m.RVT()
+	case strategyfilter.FieldOperation:
+		return m.Operation()
+	case strategyfilter.FieldRightValue:
+		return m.RightValue()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *StrategyFilterMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case strategyfilter.FieldLineNum:
+		return m.OldLineNum(ctx)
+	case strategyfilter.FieldIsUsed:
+		return m.OldIsUsed(ctx)
+	case strategyfilter.FieldLeftValueKind:
+		return m.OldLeftValueKind(ctx)
+	case strategyfilter.FieldLeftValue:
+		return m.OldLeftValue(ctx)
+	case strategyfilter.FieldRVT:
+		return m.OldRVT(ctx)
+	case strategyfilter.FieldOperation:
+		return m.OldOperation(ctx)
+	case strategyfilter.FieldRightValue:
+		return m.OldRightValue(ctx)
+	}
+	return nil, fmt.Errorf("unknown StrategyFilter field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *StrategyFilterMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case strategyfilter.FieldLineNum:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLineNum(v)
+		return nil
+	case strategyfilter.FieldIsUsed:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsUsed(v)
+		return nil
+	case strategyfilter.FieldLeftValueKind:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLeftValueKind(v)
+		return nil
+	case strategyfilter.FieldLeftValue:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLeftValue(v)
+		return nil
+	case strategyfilter.FieldRVT:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRVT(v)
+		return nil
+	case strategyfilter.FieldOperation:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOperation(v)
+		return nil
+	case strategyfilter.FieldRightValue:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRightValue(v)
+		return nil
+	}
+	return fmt.Errorf("unknown StrategyFilter field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *StrategyFilterMutation) AddedFields() []string {
+	var fields []string
+	if m.add_LineNum != nil {
+		fields = append(fields, strategyfilter.FieldLineNum)
+	}
+	if m.add_LeftValueKind != nil {
+		fields = append(fields, strategyfilter.FieldLeftValueKind)
+	}
+	if m.add_RVT != nil {
+		fields = append(fields, strategyfilter.FieldRVT)
+	}
+	if m.add_Operation != nil {
+		fields = append(fields, strategyfilter.FieldOperation)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *StrategyFilterMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case strategyfilter.FieldLineNum:
+		return m.AddedLineNum()
+	case strategyfilter.FieldLeftValueKind:
+		return m.AddedLeftValueKind()
+	case strategyfilter.FieldRVT:
+		return m.AddedRVT()
+	case strategyfilter.FieldOperation:
+		return m.AddedOperation()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *StrategyFilterMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case strategyfilter.FieldLineNum:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLineNum(v)
+		return nil
+	case strategyfilter.FieldLeftValueKind:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLeftValueKind(v)
+		return nil
+	case strategyfilter.FieldRVT:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRVT(v)
+		return nil
+	case strategyfilter.FieldOperation:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddOperation(v)
+		return nil
+	}
+	return fmt.Errorf("unknown StrategyFilter numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *StrategyFilterMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *StrategyFilterMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *StrategyFilterMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown StrategyFilter nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *StrategyFilterMutation) ResetField(name string) error {
+	switch name {
+	case strategyfilter.FieldLineNum:
+		m.ResetLineNum()
+		return nil
+	case strategyfilter.FieldIsUsed:
+		m.ResetIsUsed()
+		return nil
+	case strategyfilter.FieldLeftValueKind:
+		m.ResetLeftValueKind()
+		return nil
+	case strategyfilter.FieldLeftValue:
+		m.ResetLeftValue()
+		return nil
+	case strategyfilter.FieldRVT:
+		m.ResetRVT()
+		return nil
+	case strategyfilter.FieldOperation:
+		m.ResetOperation()
+		return nil
+	case strategyfilter.FieldRightValue:
+		m.ResetRightValue()
+		return nil
+	}
+	return fmt.Errorf("unknown StrategyFilter field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *StrategyFilterMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m._Strategy != nil {
+		edges = append(edges, strategyfilter.EdgeStrategy)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *StrategyFilterMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case strategyfilter.EdgeStrategy:
+		if id := m._Strategy; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *StrategyFilterMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *StrategyFilterMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *StrategyFilterMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.cleared_Strategy {
+		edges = append(edges, strategyfilter.EdgeStrategy)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *StrategyFilterMutation) EdgeCleared(name string) bool {
+	switch name {
+	case strategyfilter.EdgeStrategy:
+		return m.cleared_Strategy
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *StrategyFilterMutation) ClearEdge(name string) error {
+	switch name {
+	case strategyfilter.EdgeStrategy:
+		m.ClearStrategy()
+		return nil
+	}
+	return fmt.Errorf("unknown StrategyFilter unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *StrategyFilterMutation) ResetEdge(name string) error {
+	switch name {
+	case strategyfilter.EdgeStrategy:
+		m.ResetStrategy()
+		return nil
+	}
+	return fmt.Errorf("unknown StrategyFilter edge %s", name)
+}
+
+// StrategyFixedTickerMutation represents an operation that mutates the StrategyFixedTicker nodes in the graph.
+type StrategyFixedTickerMutation struct {
+	config
+	op               Op
+	typ              string
+	id               *xid.ID
+	_LineNum         *int
+	add_LineNum      *int
+	_IsUsed          *bool
+	clearedFields    map[string]struct{}
+	_Strategy        *xid.ID
+	cleared_Strategy bool
+	done             bool
+	oldValue         func(context.Context) (*StrategyFixedTicker, error)
+	predicates       []predicate.StrategyFixedTicker
+}
+
+var _ ent.Mutation = (*StrategyFixedTickerMutation)(nil)
+
+// strategyfixedtickerOption allows management of the mutation configuration using functional options.
+type strategyfixedtickerOption func(*StrategyFixedTickerMutation)
+
+// newStrategyFixedTickerMutation creates new mutation for the StrategyFixedTicker entity.
+func newStrategyFixedTickerMutation(c config, op Op, opts ...strategyfixedtickerOption) *StrategyFixedTickerMutation {
+	m := &StrategyFixedTickerMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeStrategyFixedTicker,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withStrategyFixedTickerID sets the ID field of the mutation.
+func withStrategyFixedTickerID(id xid.ID) strategyfixedtickerOption {
+	return func(m *StrategyFixedTickerMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *StrategyFixedTicker
+		)
+		m.oldValue = func(ctx context.Context) (*StrategyFixedTicker, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().StrategyFixedTicker.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withStrategyFixedTicker sets the old StrategyFixedTicker of the mutation.
+func withStrategyFixedTicker(node *StrategyFixedTicker) strategyfixedtickerOption {
+	return func(m *StrategyFixedTickerMutation) {
+		m.oldValue = func(context.Context) (*StrategyFixedTicker, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m StrategyFixedTickerMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m StrategyFixedTickerMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of StrategyFixedTicker entities.
+func (m *StrategyFixedTickerMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *StrategyFixedTickerMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *StrategyFixedTickerMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().StrategyFixedTicker.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetLineNum sets the "LineNum" field.
+func (m *StrategyFixedTickerMutation) SetLineNum(i int) {
+	m._LineNum = &i
+	m.add_LineNum = nil
+}
+
+// LineNum returns the value of the "LineNum" field in the mutation.
+func (m *StrategyFixedTickerMutation) LineNum() (r int, exists bool) {
+	v := m._LineNum
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLineNum returns the old "LineNum" field's value of the StrategyFixedTicker entity.
+// If the StrategyFixedTicker object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyFixedTickerMutation) OldLineNum(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLineNum is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLineNum requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLineNum: %w", err)
+	}
+	return oldValue.LineNum, nil
+}
+
+// AddLineNum adds i to the "LineNum" field.
+func (m *StrategyFixedTickerMutation) AddLineNum(i int) {
+	if m.add_LineNum != nil {
+		*m.add_LineNum += i
+	} else {
+		m.add_LineNum = &i
+	}
+}
+
+// AddedLineNum returns the value that was added to the "LineNum" field in this mutation.
+func (m *StrategyFixedTickerMutation) AddedLineNum() (r int, exists bool) {
+	v := m.add_LineNum
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetLineNum resets all changes to the "LineNum" field.
+func (m *StrategyFixedTickerMutation) ResetLineNum() {
+	m._LineNum = nil
+	m.add_LineNum = nil
+}
+
+// SetIsUsed sets the "IsUsed" field.
+func (m *StrategyFixedTickerMutation) SetIsUsed(b bool) {
+	m._IsUsed = &b
+}
+
+// IsUsed returns the value of the "IsUsed" field in the mutation.
+func (m *StrategyFixedTickerMutation) IsUsed() (r bool, exists bool) {
+	v := m._IsUsed
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsUsed returns the old "IsUsed" field's value of the StrategyFixedTicker entity.
+// If the StrategyFixedTicker object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StrategyFixedTickerMutation) OldIsUsed(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsUsed is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsUsed requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsUsed: %w", err)
+	}
+	return oldValue.IsUsed, nil
+}
+
+// ResetIsUsed resets all changes to the "IsUsed" field.
+func (m *StrategyFixedTickerMutation) ResetIsUsed() {
+	m._IsUsed = nil
+}
+
+// SetStrategyID sets the "Strategy" edge to the Strategy entity by id.
+func (m *StrategyFixedTickerMutation) SetStrategyID(id xid.ID) {
+	m._Strategy = &id
+}
+
+// ClearStrategy clears the "Strategy" edge to the Strategy entity.
+func (m *StrategyFixedTickerMutation) ClearStrategy() {
+	m.cleared_Strategy = true
+}
+
+// StrategyCleared reports if the "Strategy" edge to the Strategy entity was cleared.
+func (m *StrategyFixedTickerMutation) StrategyCleared() bool {
+	return m.cleared_Strategy
+}
+
+// StrategyID returns the "Strategy" edge ID in the mutation.
+func (m *StrategyFixedTickerMutation) StrategyID() (id xid.ID, exists bool) {
+	if m._Strategy != nil {
+		return *m._Strategy, true
+	}
+	return
+}
+
+// StrategyIDs returns the "Strategy" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// StrategyID instead. It exists only for internal usage by the builders.
+func (m *StrategyFixedTickerMutation) StrategyIDs() (ids []xid.ID) {
+	if id := m._Strategy; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetStrategy resets all changes to the "Strategy" edge.
+func (m *StrategyFixedTickerMutation) ResetStrategy() {
+	m._Strategy = nil
+	m.cleared_Strategy = false
+}
+
+// Where appends a list predicates to the StrategyFixedTickerMutation builder.
+func (m *StrategyFixedTickerMutation) Where(ps ...predicate.StrategyFixedTicker) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *StrategyFixedTickerMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (StrategyFixedTicker).
+func (m *StrategyFixedTickerMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *StrategyFixedTickerMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m._LineNum != nil {
+		fields = append(fields, strategyfixedticker.FieldLineNum)
+	}
+	if m._IsUsed != nil {
+		fields = append(fields, strategyfixedticker.FieldIsUsed)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *StrategyFixedTickerMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case strategyfixedticker.FieldLineNum:
+		return m.LineNum()
+	case strategyfixedticker.FieldIsUsed:
+		return m.IsUsed()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *StrategyFixedTickerMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case strategyfixedticker.FieldLineNum:
+		return m.OldLineNum(ctx)
+	case strategyfixedticker.FieldIsUsed:
+		return m.OldIsUsed(ctx)
+	}
+	return nil, fmt.Errorf("unknown StrategyFixedTicker field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *StrategyFixedTickerMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case strategyfixedticker.FieldLineNum:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLineNum(v)
+		return nil
+	case strategyfixedticker.FieldIsUsed:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsUsed(v)
+		return nil
+	}
+	return fmt.Errorf("unknown StrategyFixedTicker field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *StrategyFixedTickerMutation) AddedFields() []string {
+	var fields []string
+	if m.add_LineNum != nil {
+		fields = append(fields, strategyfixedticker.FieldLineNum)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *StrategyFixedTickerMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case strategyfixedticker.FieldLineNum:
+		return m.AddedLineNum()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *StrategyFixedTickerMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case strategyfixedticker.FieldLineNum:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLineNum(v)
+		return nil
+	}
+	return fmt.Errorf("unknown StrategyFixedTicker numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *StrategyFixedTickerMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *StrategyFixedTickerMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *StrategyFixedTickerMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown StrategyFixedTicker nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *StrategyFixedTickerMutation) ResetField(name string) error {
+	switch name {
+	case strategyfixedticker.FieldLineNum:
+		m.ResetLineNum()
+		return nil
+	case strategyfixedticker.FieldIsUsed:
+		m.ResetIsUsed()
+		return nil
+	}
+	return fmt.Errorf("unknown StrategyFixedTicker field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *StrategyFixedTickerMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m._Strategy != nil {
+		edges = append(edges, strategyfixedticker.EdgeStrategy)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *StrategyFixedTickerMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case strategyfixedticker.EdgeStrategy:
+		if id := m._Strategy; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *StrategyFixedTickerMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *StrategyFixedTickerMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *StrategyFixedTickerMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.cleared_Strategy {
+		edges = append(edges, strategyfixedticker.EdgeStrategy)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *StrategyFixedTickerMutation) EdgeCleared(name string) bool {
+	switch name {
+	case strategyfixedticker.EdgeStrategy:
+		return m.cleared_Strategy
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *StrategyFixedTickerMutation) ClearEdge(name string) error {
+	switch name {
+	case strategyfixedticker.EdgeStrategy:
+		m.ClearStrategy()
+		return nil
+	}
+	return fmt.Errorf("unknown StrategyFixedTicker unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *StrategyFixedTickerMutation) ResetEdge(name string) error {
+	switch name {
+	case strategyfixedticker.EdgeStrategy:
+		m.ResetStrategy()
+		return nil
+	}
+	return fmt.Errorf("unknown StrategyFixedTicker edge %s", name)
+}
+
 // TickerMutation represents an operation that mutates the Ticker nodes in the graph.
 type TickerMutation struct {
 	config
@@ -7360,6 +11400,9 @@ type UserMutation struct {
 	_InvestAccounts              map[xid.ID]struct{}
 	removed_InvestAccounts       map[xid.ID]struct{}
 	cleared_InvestAccounts       bool
+	_Strategies                  map[xid.ID]struct{}
+	removed_Strategies           map[xid.ID]struct{}
+	cleared_Strategies           bool
 	done                         bool
 	oldValue                     func(context.Context) (*User, error)
 	predicates                   []predicate.User
@@ -7736,6 +11779,60 @@ func (m *UserMutation) ResetInvestAccounts() {
 	m.removed_InvestAccounts = nil
 }
 
+// AddStrategyIDs adds the "Strategies" edge to the Strategy entity by ids.
+func (m *UserMutation) AddStrategyIDs(ids ...xid.ID) {
+	if m._Strategies == nil {
+		m._Strategies = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m._Strategies[ids[i]] = struct{}{}
+	}
+}
+
+// ClearStrategies clears the "Strategies" edge to the Strategy entity.
+func (m *UserMutation) ClearStrategies() {
+	m.cleared_Strategies = true
+}
+
+// StrategiesCleared reports if the "Strategies" edge to the Strategy entity was cleared.
+func (m *UserMutation) StrategiesCleared() bool {
+	return m.cleared_Strategies
+}
+
+// RemoveStrategyIDs removes the "Strategies" edge to the Strategy entity by IDs.
+func (m *UserMutation) RemoveStrategyIDs(ids ...xid.ID) {
+	if m.removed_Strategies == nil {
+		m.removed_Strategies = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m._Strategies, ids[i])
+		m.removed_Strategies[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedStrategies returns the removed IDs of the "Strategies" edge to the Strategy entity.
+func (m *UserMutation) RemovedStrategiesIDs() (ids []xid.ID) {
+	for id := range m.removed_Strategies {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// StrategiesIDs returns the "Strategies" edge IDs in the mutation.
+func (m *UserMutation) StrategiesIDs() (ids []xid.ID) {
+	for id := range m._Strategies {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetStrategies resets all changes to the "Strategies" edge.
+func (m *UserMutation) ResetStrategies() {
+	m._Strategies = nil
+	m.cleared_Strategies = false
+	m.removed_Strategies = nil
+}
+
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -7946,9 +12043,12 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m._InvestAccounts != nil {
 		edges = append(edges, user.EdgeInvestAccounts)
+	}
+	if m._Strategies != nil {
+		edges = append(edges, user.EdgeStrategies)
 	}
 	return edges
 }
@@ -7963,15 +12063,24 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeStrategies:
+		ids := make([]ent.Value, 0, len(m._Strategies))
+		for id := range m._Strategies {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.removed_InvestAccounts != nil {
 		edges = append(edges, user.EdgeInvestAccounts)
+	}
+	if m.removed_Strategies != nil {
+		edges = append(edges, user.EdgeStrategies)
 	}
 	return edges
 }
@@ -7986,15 +12095,24 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeStrategies:
+		ids := make([]ent.Value, 0, len(m.removed_Strategies))
+		for id := range m.removed_Strategies {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.cleared_InvestAccounts {
 		edges = append(edges, user.EdgeInvestAccounts)
+	}
+	if m.cleared_Strategies {
+		edges = append(edges, user.EdgeStrategies)
 	}
 	return edges
 }
@@ -8005,6 +12123,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 	switch name {
 	case user.EdgeInvestAccounts:
 		return m.cleared_InvestAccounts
+	case user.EdgeStrategies:
+		return m.cleared_Strategies
 	}
 	return false
 }
@@ -8023,6 +12143,9 @@ func (m *UserMutation) ResetEdge(name string) error {
 	switch name {
 	case user.EdgeInvestAccounts:
 		m.ResetInvestAccounts()
+		return nil
+	case user.EdgeStrategies:
+		m.ResetStrategies()
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)

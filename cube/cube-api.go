@@ -3,11 +3,17 @@ package cube
 import (
 	"sort"
 	"time"
+
+	"github.com/softilium/mb4/ent"
 )
 
 func (c *Cube) TopDivYields5Y(HowMany int) []*Cell {
 	c.l.Lock()
 	defer c.l.Unlock()
+
+	if len(c.allDays) == 0 {
+		return make([]*Cell, 0)
+	}
 
 	slice := c.cellsByDate[c.allDays[len(c.allDays)-1]]
 	newslice := make([]*Cell, len(slice))
@@ -19,6 +25,10 @@ func (c *Cube) TopDivYields5Y(HowMany int) []*Cell {
 func (c *Cube) TopDSI(HowMany int) []*Cell {
 	c.l.Lock()
 	defer c.l.Unlock()
+
+	if len(c.allDays) == 0 {
+		return make([]*Cell, 0)
+	}
 
 	slice := c.cellsByDate[c.allDays[len(c.allDays)-1]]
 	newslice := make([]*Cell, len(slice))
@@ -36,6 +46,10 @@ func (c *Cube) TopFallenRaise(HowMany int, Raise bool) []ItemPriceChange {
 
 	c.l.Lock()
 	defer c.l.Unlock()
+
+	if len(c.allDays) == 0 {
+		return make([]ItemPriceChange, 0)
+	}
 
 	lastDate := c.allDays[len(c.allDays)-1]
 	oneMonthAgo := lastDate.Add(-30 * 24 * time.Hour)
@@ -108,12 +122,28 @@ func (c *Cube) GetReports2(ticker string) []*Report2 {
 
 }
 
-func (c *Cube) CellsByTickerByDate(ticker string, d time.Time) *Cell {
+func (c *Cube) CellsByTickerByDate(ticker string, d time.Time, lookLast bool) *Cell {
 
 	c.l.Lock()
 	defer c.l.Unlock()
 
-	return c.cellsByTickerByDate[ticker][d]
+	minDate := c.allDays[0]
+	d0 := d
+	r, ok := c.cellsByTickerByDate[ticker][d0]
+	for !ok && lookLast && d0.After(minDate) {
+		d0 = d0.AddDate(0, 0, -1)
+		r, ok = c.cellsByTickerByDate[ticker][d0]
+	}
+	return r
+
+}
+
+func (c *Cube) GetAllTickers(d time.Time) map[string]*ent.Ticker {
+
+	c.l.Lock()
+	defer c.l.Unlock()
+
+	return c.allTickets
 
 }
 
@@ -124,4 +154,11 @@ func (c *Cube) GetIndustryCell(industry string, d time.Time) *Cell {
 
 	return c.cellsByIndustryByDate[industry][d]
 
+}
+
+func (c *Cube) LastDate() time.Time {
+	c.l.Lock()
+	defer c.l.Unlock()
+
+	return c.allDays[len(c.allDays)-1]
 }

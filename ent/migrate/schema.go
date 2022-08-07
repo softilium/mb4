@@ -217,6 +217,114 @@ var (
 			},
 		},
 	}
+	// StrategiesColumns holds the columns for the "strategies" table.
+	StrategiesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "descr", Type: field.TypeString, Size: 100},
+		{Name: "max_tickers", Type: field.TypeInt, Default: 10},
+		{Name: "max_tickers_per_industry", Type: field.TypeInt, Default: 5},
+		{Name: "base_index", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "last_year_invent_result", Type: field.TypeFloat64, Default: 0},
+		{Name: "last_year_yield", Type: field.TypeFloat64, Default: 0},
+		{Name: "last3years_invert_result", Type: field.TypeFloat64, Default: 0},
+		{Name: "last3years_yield", Type: field.TypeFloat64, Default: 0},
+		{Name: "week_refill_amount", Type: field.TypeFloat64},
+		{Name: "start_amount", Type: field.TypeFloat64},
+		{Name: "start_simulation", Type: field.TypeTime},
+		{Name: "buy_only_low_price", Type: field.TypeBool, Default: false},
+		{Name: "allow_loss_when_sell", Type: field.TypeBool, Default: true},
+		{Name: "same_emitent", Type: field.TypeInt, Default: 100},
+		{Name: "user_strategies", Type: field.TypeString, Size: 20},
+	}
+	// StrategiesTable holds the schema information for the "strategies" table.
+	StrategiesTable = &schema.Table{
+		Name:       "strategies",
+		Columns:    StrategiesColumns,
+		PrimaryKey: []*schema.Column{StrategiesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "strategies_users_Strategies",
+				Columns:    []*schema.Column{StrategiesColumns[15]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// StrategyFactorsColumns holds the columns for the "strategy_factors" table.
+	StrategyFactorsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "line_num", Type: field.TypeInt, Default: 1},
+		{Name: "is_used", Type: field.TypeBool, Default: true},
+		{Name: "rk", Type: field.TypeInt},
+		{Name: "rvt", Type: field.TypeInt},
+		{Name: "min_acceptabe", Type: field.TypeFloat64},
+		{Name: "max_acceptable", Type: field.TypeFloat64},
+		{Name: "inverse", Type: field.TypeBool, Default: false},
+		{Name: "k", Type: field.TypeFloat64, Default: 1},
+		{Name: "gist", Type: field.TypeFloat64, Default: 1},
+		{Name: "strategy_factors", Type: field.TypeString, Size: 20},
+	}
+	// StrategyFactorsTable holds the schema information for the "strategy_factors" table.
+	StrategyFactorsTable = &schema.Table{
+		Name:       "strategy_factors",
+		Columns:    StrategyFactorsColumns,
+		PrimaryKey: []*schema.Column{StrategyFactorsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "strategy_factors_strategies_Factors",
+				Columns:    []*schema.Column{StrategyFactorsColumns[10]},
+				RefColumns: []*schema.Column{StrategiesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// StrategyFiltersColumns holds the columns for the "strategy_filters" table.
+	StrategyFiltersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "line_num", Type: field.TypeInt, Default: 1},
+		{Name: "is_used", Type: field.TypeBool, Default: true},
+		{Name: "left_value_kind", Type: field.TypeInt, Default: 100},
+		{Name: "left_value", Type: field.TypeString, Size: 100},
+		{Name: "rvt", Type: field.TypeInt},
+		{Name: "operation", Type: field.TypeInt, Default: 10},
+		{Name: "right_value", Type: field.TypeString, Size: 100},
+		{Name: "strategy_filters", Type: field.TypeString, Size: 20},
+	}
+	// StrategyFiltersTable holds the schema information for the "strategy_filters" table.
+	StrategyFiltersTable = &schema.Table{
+		Name:       "strategy_filters",
+		Columns:    StrategyFiltersColumns,
+		PrimaryKey: []*schema.Column{StrategyFiltersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "strategy_filters_strategies_Filters",
+				Columns:    []*schema.Column{StrategyFiltersColumns[8]},
+				RefColumns: []*schema.Column{StrategiesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// StrategyFixedTickersColumns holds the columns for the "strategy_fixed_tickers" table.
+	StrategyFixedTickersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "line_num", Type: field.TypeInt, Default: 1},
+		{Name: "is_used", Type: field.TypeBool, Default: true},
+		{Name: "strategy_fixed_tickers", Type: field.TypeString, Size: 20},
+	}
+	// StrategyFixedTickersTable holds the schema information for the "strategy_fixed_tickers" table.
+	StrategyFixedTickersTable = &schema.Table{
+		Name:       "strategy_fixed_tickers",
+		Columns:    StrategyFixedTickersColumns,
+		PrimaryKey: []*schema.Column{StrategyFixedTickersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "strategy_fixed_tickers_strategies_FixedTickers",
+				Columns:    []*schema.Column{StrategyFixedTickersColumns[3]},
+				RefColumns: []*schema.Column{StrategiesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// TickersColumns holds the columns for the "tickers" table.
 	TickersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true, Size: 20},
@@ -264,6 +372,10 @@ var (
 		InvestAccountValuationsTable,
 		QuotesTable,
 		ReportsTable,
+		StrategiesTable,
+		StrategyFactorsTable,
+		StrategyFiltersTable,
+		StrategyFixedTickersTable,
 		TickersTable,
 		UsersTable,
 	}
@@ -278,5 +390,9 @@ func init() {
 	InvestAccountValuationsTable.ForeignKeys[0].RefTable = InvestAccountsTable
 	QuotesTable.ForeignKeys[0].RefTable = TickersTable
 	ReportsTable.ForeignKeys[0].RefTable = EmitentsTable
+	StrategiesTable.ForeignKeys[0].RefTable = UsersTable
+	StrategyFactorsTable.ForeignKeys[0].RefTable = StrategiesTable
+	StrategyFiltersTable.ForeignKeys[0].RefTable = StrategiesTable
+	StrategyFixedTickersTable.ForeignKeys[0].RefTable = StrategiesTable
 	TickersTable.ForeignKeys[0].RefTable = EmitentsTable
 }
