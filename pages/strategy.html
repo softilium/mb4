@@ -19,7 +19,7 @@
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="pills-shares-tab" data-bs-toggle="pill" data-bs-target="#pills-shares" type="button" role="tab"
-                        aria-controls="pills-shares" aria-selected="false"> Фикс.доли (${totalFixedTickers()}%) </button>
+                        aria-controls="pills-shares" aria-selected="false"> Фиксированные доли</button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="pills-factors-tab" data-bs-toggle="pill" data-bs-target="#pills-factors" type="button" role="tab"
@@ -130,41 +130,7 @@
                 </div>
 
                 <div class="tab-pane fade show" id="pills-shares" role="tabpanel" aria-labelledby="pills-shares-tab">
-
-                    <small>
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <td>Исп.</td>
-                                    <td>Тикер</td>
-                                    <td class='text-end'>Доля</td>
-                                    <td></td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for='item in obj.edges.FixedTickers'>
-                                    <td> <input class="form-check-input form-control-sm" type="checkbox" v-model='item.IsUsed' /> </td>
-                                    <td>
-                                        <select class="form-select form-control-sm" v-model='item.Ticker'>
-                                            <option></option>
-                                            <option v-for="item2 in renderInfo.Tickers" v-bind:value="item2.Id"> ${item2.Descr} </option>
-                                        </select>
-                                    </td>
-                                    <td class='text-end'> <input type='range' v-model='item.Share' />${item.Share}% </td>
-                                    <td> <button class="btn" v-on:click='removeFixedTickers(item)'> <i class="bi bi-trash3"></i> </button> </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td class='text-end'> ${totalFixedTickers()}%</td>
-                                    <td> <button class="btn" v-on:click='addFixedTickers()'> <i class="bi bi-file-earmark-plus"></i></i> </button>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </small>
+                    <strategy-fixed-tickers :strategy='obj' :renderinfo='renderInfo' />
                 </div>
 
                 <div class="tab-pane fade show" id="pills-factors" role="tabpanel" aria-labelledby="pills-factors-tab">
@@ -516,6 +482,7 @@
 </div>
 
 {% include "components/StrategyFilters.html" %}
+{% include "components/StrategyFixedTickers.html" %}
 
 <script type="text/javascript">
 
@@ -544,7 +511,10 @@
                 }
             }
         },
-        components: { StrategyFilters: StrategyFilters },
+        components: {
+            StrategyFilters: StrategyFilters,
+            StrategyFixedTickers: StrategyFixedTickers
+        },
 
         async mounted() {
             await this.getStrategy();
@@ -725,25 +695,14 @@
 
             },
 
-            totalFixedTickers() {
-                let sum = 0;
-                this.obj.edges.FixedTickers.forEach(function (el) {
-                    if (el.IsUsed)
-                        sum = +sum + +el.Share;
-                });
-                return sum;
-            },
-
-            removeFixedTickers(item) {
-                this.obj.edges.FixedTickers.splice(this.obj.edges.FixedTickers.indexOf(item), 1);
-            },
-
-            addFixedTickers() {
-                this.obj.edges.FixedTickers.push({ IsUsed: true, Ticker: null, Share: 1 });
-            },
-
             validateStrategy() {
-                if (this.totalFixedTickers() > 100) {
+
+                let shares = 0;
+                this.obj.edges.FixedTickers.forEach(
+                    function (el) { if (el.IsUsed) shares += +el.Share; }
+                );
+
+                if (shares > 100) {
                     alert("Сумма всех фиксированных долей не может превышать 100")
                     return false;
                 }
