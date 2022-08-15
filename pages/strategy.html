@@ -14,31 +14,20 @@
 
             <ul class="nav nav-tabs" id="pills-tab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="pills-main-tab" data-bs-toggle="pill"
-                        data-bs-target="#pills-main" type="button" role="tab" aria-controls="pills-main"
-                        aria-selected="true">
-                        Основное
-                    </button>
+                    <button class="nav-link active" id="pills-main-tab" data-bs-toggle="pill" data-bs-target="#pills-main" type="button" role="tab"
+                        aria-controls="pills-main" aria-selected="true"> Основное </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="pills-shares-tab" data-bs-toggle="pill" data-bs-target="#pills-shares"
-                        type="button" role="tab" aria-controls="pills-shares" aria-selected="false">
-                        Фикс.доли (${totalPreSelected()}%)
-                    </button>
+                    <button class="nav-link" id="pills-shares-tab" data-bs-toggle="pill" data-bs-target="#pills-shares" type="button" role="tab"
+                        aria-controls="pills-shares" aria-selected="false"> Фикс.доли (${totalFixedTickers()}%) </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="pills-factors-tab" data-bs-toggle="pill"
-                        data-bs-target="#pills-factors" type="button" role="tab" aria-controls="pills-factors"
-                        aria-selected="false">
-                        Факторы
-                    </button>
+                    <button class="nav-link" id="pills-factors-tab" data-bs-toggle="pill" data-bs-target="#pills-factors" type="button" role="tab"
+                        aria-controls="pills-factors" aria-selected="false"> Факторы </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="pills-filters-tab" data-bs-toggle="pill"
-                        data-bs-target="#pills-filters" type="button" role="tab" aria-controls="pills-filters"
-                        aria-selected="false">
-                        Отборы
-                    </button>
+                    <button class="nav-link" id="pills-filters-tab" data-bs-toggle="pill" data-bs-target="#pills-filters" type="button" role="tab"
+                        aria-controls="pills-filters" aria-selected="false"> Отборы </button>
                 </li>
             </ul>
 
@@ -50,8 +39,7 @@
                             <div class="form-group form-group-sm row">
                                 <label for="descr" class="col-sm-3 col-form-label">Наименование</label>
                                 <div class="col-sm-9">
-                                    <input class="form-control input-sm form-control-sm" type="text"
-                                        v-model="obj.Descr" />
+                                    <input class="form-control input-sm form-control-sm" type="text" v-model="obj.Descr" />
                                 </div>
                             </div>
 
@@ -59,48 +47,35 @@
                                 <div class="col">
 
                                     <div class="form-group row">
-                                        <label for="maxtickers" class="col-sm-6 col-form-label">
-                                            Максимальное число инструментов
-                                        </label>
+                                        <label for="maxtickers" class="col-sm-6 col-form-label"> Максимальное число инструментов </label>
                                         <div class="col-sm-6">
-                                            <input class="form-control form-control-sm" type='number'
-                                                v-model='obj.MaxTickers' />
+                                            <input class="form-control form-control-sm" type='number' v-model='obj.MaxTickers' />
                                         </div>
                                     </div>
 
                                     <div class="form-group row">
-                                        <label for="startAmount" class="col-sm-6 col-form-label">
-                                            Стартовый баланс</label>
+                                        <label for="startAmount" class="col-sm-6 col-form-label"> Стартовый баланс</label>
                                         <div class="col-sm-6">
-                                            <input class="form-control form-control-sm" type='number'
-                                                v-model='obj.StartAmount' />
+                                            <input class="form-control form-control-sm" type='number' v-model='obj.StartAmount' />
                                         </div>
                                     </div>
 
                                     <div class="form-group row">
-                                        <label for="weekRefillAmount" class="col-sm-6 col-form-label">
-                                            Недельное пополнение
-                                        </label>
+                                        <label for="weekRefillAmount" class="col-sm-6 col-form-label"> Недельное пополнение </label>
                                         <div class="col-sm-6">
-                                            <input class="form-control form-control-sm" type='number'
-                                                v-model='obj.WeekRefillAmount' />
+                                            <input class="form-control form-control-sm" type='number' v-model='obj.WeekRefillAmount' />
                                         </div>
                                     </div>
 
                                     <div class="form-group row">
-                                        <label for="startSimulation" class="col-sm-6 col-form-label">
-                                            Стартовая дата симуляции
-                                        </label>
+                                        <label for="startSimulation" class="col-sm-6 col-form-label"> Стартовая дата симуляции </label>
                                         <div class="col-sm-6">
-                                            <input class="form-control form-control-sm" type='date'
-                                                v-model='obj.StartSimulation' />
+                                            <input class="form-control form-control-sm" type='date' v-model='obj.StartSimulation' />
                                         </div>
                                     </div>
 
                                     <div class="'form-group row">
-                                        <label for="baseIndex" class="col-sm-6 col-form-label">
-                                            Базовый индекс для сравнения
-                                        </label>
+                                        <label for="baseIndex" class="col-sm-6 col-form-label"> Базовый индекс для сравнения </label>
                                         <div class="col-sm-6">
                                             <select class="form-select form-control-sm" v-model='obj.BaseIndex'>
                                                 <option></option>
@@ -112,13 +87,10 @@
                                     </div>
 
                                     <div class="form-group row">
-                                        <label for="SameEmitent" class="col-sm-6 col-form-label">
-                                            Разные тикеры одного эмитента
-                                        </label>
+                                        <label for="SameEmitent" class="col-sm-6 col-form-label"> Разные тикеры одного эмитента </label>
                                         <div class="col-sm-6">
                                             <select class="form-select form-control-sm" v-model='obj.SameEmitent'>
-                                                <option v-for="item in renderInfo.SameEmitentPolicies"
-                                                    v-bind:value="item.Id">${item.Descr}</option>
+                                                <option v-for="item in renderInfo.SameEmitentPolicies" v-bind:value="item.Id">${item.Descr}</option>
                                             </select>
                                         </div>
                                     </div>
@@ -130,18 +102,14 @@
                                             Разрешать закрывать позицию в убыток
                                         </label>
                                         <div class="col-sm-6">
-                                            <input class="form-check-input form-control-sm" type="checkbox"
-                                                v-model='obj.AllowLossWhenSell' />
+                                            <input class="form-check-input form-control-sm" type="checkbox" v-model='obj.AllowLossWhenSell' />
                                         </div>
                                     </div>
 
                                     <div class="form-group row">
-                                        <label for="buyOnlyLowPrice" class="col-sm-6 col-form-label">
-                                            Докупать только на просадках
-                                        </label>
+                                        <label for="buyOnlyLowPrice" class="col-sm-6 col-form-label"> Докупать только на просадках </label>
                                         <div class="col-sm-6">
-                                            <input class="form-check-input form-control-sm" type="checkbox"
-                                                v-model='obj.BuyOnlyLowPrice' />
+                                            <input class="form-check-input form-control-sm" type="checkbox" v-model='obj.BuyOnlyLowPrice' />
                                         </div>
                                     </div>
 
@@ -150,8 +118,7 @@
                                             Частичная продажа позиции для выравнивания долей
                                         </label>
                                         <div class="col-sm-6">
-                                            <input class="form-check-input form-control-sm" type="checkbox"
-                                                v-model='obj.AllowSellToFit' />
+                                            <input class="form-check-input form-control-sm" type="checkbox" v-model='obj.AllowSellToFit' />
                                         </div>
                                     </div>
 
@@ -176,37 +143,23 @@
                             </thead>
                             <tbody>
                                 <tr v-for='item in obj.edges.FixedTickers'>
-                                    <td>
-                                        <input class="form-check-input form-control-sm" type="checkbox"
-                                            v-model='item.IsUsed' />
-                                    </td>
+                                    <td> <input class="form-check-input form-control-sm" type="checkbox" v-model='item.IsUsed' /> </td>
                                     <td>
                                         <select class="form-select form-control-sm" v-model='item.Ticker'>
                                             <option></option>
-                                            <option v-for="item2 in renderInfo.Tickers" v-bind:value="item2.Id">
-                                                ${item2.Descr}
-                                            </option>
+                                            <option v-for="item2 in renderInfo.Tickers" v-bind:value="item2.Id"> ${item2.Descr} </option>
                                         </select>
                                     </td>
-                                    <td class='text-end'>
-                                        <input type='range' v-model='item.Share' />${item.Share}%
-                                    </td>
-                                    <td>
-                                        <button class="btn" v-on:click='removePreSelected(item)'>
-                                            <i class="bi bi-trash3"></i>
-                                        </button>
-                                    </td>
+                                    <td class='text-end'> <input type='range' v-model='item.Share' />${item.Share}% </td>
+                                    <td> <button class="btn" v-on:click='removeFixedTickers(item)'> <i class="bi bi-trash3"></i> </button> </td>
                                 </tr>
                             </tbody>
                             <tfoot>
                                 <tr>
                                     <td></td>
                                     <td></td>
-                                    <td class='text-end'> ${totalPreSelected()}%</td>
-                                    <td>
-                                        <button class="btn" v-on:click='addPreSelected()'>
-                                            <i class="bi bi-file-earmark-plus"></i></i>
-                                        </button>
+                                    <td class='text-end'> ${totalFixedTickers()}%</td>
+                                    <td> <button class="btn" v-on:click='addFixedTickers()'> <i class="bi bi-file-earmark-plus"></i></i> </button>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -231,59 +184,44 @@
                             </thead>
                             <tbody>
                                 <tr v-for='item in obj.factors'>
-                                    <td>
-                                        <input class="form-check-input form-control-sm" type="checkbox"
-                                            v-model='item.IsUsed' disabled />
-                                    </td>
+                                    <td> <input class="form-check-input form-control-sm" type="checkbox" v-model='item.IsUsed' disabled /> </td>
                                     <td>
                                         <select class="form-select form-control-sm" v-model='item.RK' disabled>
                                             <option></option>
-                                            <option v-for="item2 in renderInfo.ReportValues" v-bind:value="item2.Id">
-                                                ${item2.Descr}
-                                            </option>
+                                            <option v-for="item2 in renderInfo.ReportValues" v-bind:value="item2.Id"> ${item2.Descr} </option>
                                         </select>
                                     </td>
                                     <td>
                                         <select class="form-select form-control-sm" v-model='item.RVT' disabled>
                                             <option></option>
-                                            <option v-for="item2 in renderInfo.ReportValueTypes" value="item2.Id">
-                                                ${item2.Descr}
-                                            </option>
+                                            <option v-for="item2 in renderInfo.ReportValueTypes" value="item2.Id"> ${item2.Descr} </option>
                                         </select>
                                     </td>
                                     <td>${item.MinAcceptable}..${item.MaxAcceptable}</td>
-                                    <td>
-                                        <input class="form-check-input form-control-sm" type="checkbox"
-                                            v-model='item.Inverse' disabled />
-                                    </td>
+                                    <td> <input class="form-check-input form-control-sm" type="checkbox" v-model='item.Inverse' disabled /> </td>
                                     <td>${item.K}</td>
                                     <td>${item.Gist}</td>
                                     <td>
-                                        <button class="btn" data-bs-toggle="modal" data-bs-target="#factorModal"
-                                            v-on:click='selectedFactor=item'>
+                                        <button class="btn" data-bs-toggle="modal" data-bs-target="#factorModal" v-on:click='selectedFactor=item'>
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
                                         <button class="btn"><i class="bi bi-trash3"></i></button>
 
                                         <!-- редактор фактора стратегии -->
-                                        <div class="modal fade" id="factorModal" tabindex="-1"
-                                            aria-labelledby="factorModalLabel" aria-hidden="true">
+                                        <div class="modal fade" id="factorModal" tabindex="-1" aria-labelledby="factorModalLabel" aria-hidden="true">
                                             <div class="modal-dialog">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="factorModalLabel">
-                                                            Редактирование фактора стратегии
-                                                        </h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
+                                                        <h5 class="modal-title" id="factorModalLabel"> Редактирование фактора стратегии </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
 
                                                         <div class="mb-3 row">
                                                             <label class="col-sm-3 col-form-label">Используется</label>
                                                             <div class="col-sm-9">
-                                                                <input class="form-check-input form-control-sm"
-                                                                    type="checkbox" v-model='selectedFactor.IsUsed' />
+                                                                <input class="form-check-input form-control-sm" type="checkbox"
+                                                                    v-model='selectedFactor.IsUsed' />
                                                             </div>
                                                         </div>
 
@@ -292,11 +230,10 @@
                                                                 Параметр отчета
                                                             </label>
                                                             <div class="col-sm-9">
-                                                                <select class="form-select form-control-sm"
-                                                                    v-model='selectedFactor.RK'>
+                                                                <select class="form-select form-control-sm" v-model='selectedFactor.RK'>
                                                                     <option></option>
-                                                                    <option v-for="item2 in renderInfo.ReportValues"
-                                                                        v-bind:value="item2.Id">${item2.Descr}</option>
+                                                                    <option v-for="item2 in renderInfo.ReportValues" v-bind:value="item2.Id">
+                                                                        ${item2.Descr}</option>
                                                                 </select>
                                                             </div>
                                                         </div>
@@ -306,11 +243,10 @@
                                                                 Расчет параметра
                                                             </label>
                                                             <div class="col-sm-9">
-                                                                <select class="form-select form-control-sm"
-                                                                    v-model='selectedFactor.RVT'>
+                                                                <select class="form-select form-control-sm" v-model='selectedFactor.RVT'>
                                                                     <option></option>
-                                                                    <option v-for="item2 in renderInfo.ReportValueTypes"
-                                                                        v-bind:value="item2.Id">${item2.Descr}</option>
+                                                                    <option v-for="item2 in renderInfo.ReportValueTypes" v-bind:value="item2.Id">
+                                                                        ${item2.Descr}</option>
                                                                 </select>
                                                             </div>
                                                         </div>
@@ -318,8 +254,7 @@
                                                         <div class="mb-3 row">
                                                             <label class="col-sm-3 col-form-label">Мин.значение</label>
                                                             <div class="col-sm-9">
-                                                                <input class="form-control form-control-sm"
-                                                                    type="number"
+                                                                <input class="form-control form-control-sm" type="number"
                                                                     v-model='selectedFactor.MinAcceptable' />
                                                             </div>
                                                         </div>
@@ -327,8 +262,7 @@
                                                         <div class="mb-3 row">
                                                             <label class="col-sm-3 col-form-label">Макс.значение</label>
                                                             <div class="col-sm-9">
-                                                                <input class="form-control form-control-sm"
-                                                                    type="number"
+                                                                <input class="form-control form-control-sm" type="number"
                                                                     v-model='selectedFactor.MaxAcceptable' />
                                                             </div>
                                                         </div>
@@ -336,31 +270,30 @@
                                                         <div class="mb-3 row">
                                                             <label class="col-sm-3 col-form-label">Инвертировать</label>
                                                             <div class="col-sm-9">
-                                                                <input class="form-check-input form-control-sm"
-                                                                    type="checkbox" v-model='selectedFactor.Inverse' />
+                                                                <input class="form-check-input form-control-sm" type="checkbox"
+                                                                    v-model='selectedFactor.Inverse' />
                                                             </div>
                                                         </div>
 
                                                         <div class="mb-3 row">
                                                             <label class="col-sm-3 col-form-label">Коэффициент</label>
                                                             <div class="col-sm-9">
-                                                                <input class="form-control form-control-sm"
-                                                                    type="number" v-model='selectedFactor.K' />
+                                                                <input class="form-control form-control-sm" type="number"
+                                                                    v-model='selectedFactor.K' />
                                                             </div>
                                                         </div>
 
                                                         <div class="mb-3 row">
                                                             <label class="col-sm-3 col-form-label">Гистерезис</label>
                                                             <div class="col-sm-9">
-                                                                <input class="form-control form-control-sm"
-                                                                    type="number" v-model='selectedFactor.Gist' />
+                                                                <input class="form-control form-control-sm" type="number"
+                                                                    v-model='selectedFactor.Gist' />
                                                             </div>
                                                         </div>
 
                                                     </div>
                                                     <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary"
-                                                            data-bs-dismiss="modal">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                                             Закрыть
                                                         </button>
                                                     </div>
@@ -373,11 +306,7 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td>
-                                        <button class="btn" v-on:click='addFactor()'>
-                                            <i class="bi bi-file-earmark-plus"></i></i>
-                                        </button>
-                                    </td>
+                                    <td> <button class="btn" v-on:click='addFactor()'> <i class="bi bi-file-earmark-plus"></i></i> </button> </td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -444,9 +373,7 @@
                     </thead>
                     <tbody>
                         <tr v-for='item in results.simulation.industryTradeResults'>
-                            <td>
-                                <a v-bind:href="industryUrl(item.industry.industryId)">${item.industry.descr}</a>
-                            </td>
+                            <td> <a v-bind:href="industryUrl(item.industry.industryId)">${item.industry.descr}</a> </td>
                             <td class="text-end">${ $prnCurrency(item.profit) }</td>
                             <td class="text-end">${item.dealsCount}</td>
                         </tr>
@@ -538,8 +465,7 @@
 
             <div>
                 <button v-for='y in results.yearsInResult' class="btn btn-xs"
-                    v-bind:class="{ 'btn-primary': y==selectedYear, 'btn-link': y!=selectedYear }"
-                    v-on:click='setSelectedYear(y)'>
+                    v-bind:class="{ 'btn-primary': y==selectedYear, 'btn-link': y!=selectedYear }" v-on:click='setSelectedYear(y)'>
                     ${y}
                 </button>
             </div>
@@ -564,8 +490,7 @@
                             <td class="text-end">${ $prnCurrency(item.refill) }</td>
                             <td>
                                 <div v-for='deal in item.deals'>
-                                    <span
-                                        v-bind:class="{'text-danger': deal.investResult<0, 'text-success': deal.investResult>=0 }"
+                                    <span v-bind:class="{'text-danger': deal.investResult<0, 'text-success': deal.investResult>=0 }"
                                         v-if='deal.kind==0'>
                                         продажа ${deal.tickerId} ${deal.lots} лот., ${ $prnCurrency(deal.investResult) }
                                         р.
@@ -613,27 +538,27 @@
                     SameEmitentPolicies: [],
                     FilterValueKinds: [],
                     FilterOps: [],
-                    FilterOpsShort: [], 
+                    FilterOpsShort: [],
                     Industries: [],
                     ReportValueTypes: [],
                 }
             }
         },
         components: { StrategyFilters: StrategyFilters },
-        created() {
-            this.$watch('results', () => {
-                this.$nextTick(function () {
-                    // we need to defer $refs.strategyChartRef with: watch + nextTick
-                    // otherwise $refs will empty due to lazy render in vue
-                    this.createStrategyChart(this.$refs.strategyChartRef, this.results.dates, this.results.equity, this.results.investResults, this.results.divs);
-                    if (this.obj.BaseIndex != null && this.obj.BaseIndex != '')
-                        this.createStrategyPerformanceChart(this.$refs.PerformanceChartRef, this.results.dates, this.results.strategyLevels, this.results.baseLevels);
-                });
-            })
-        },
+
         async mounted() {
             await this.getStrategy();
             await this.getResults();
+        },
+        watch: {
+            results: {
+                async handler(newVal, oldVal) {
+                    await this.$nextTick();
+                    this.createStrategyChart(this.$refs.strategyChartRef, this.results.dates, this.results.equity, this.results.investResults, this.results.divs);
+                    if (this.obj.BaseIndex != null && this.obj.BaseIndex != '')
+                        this.createStrategyPerformanceChart(this.$refs.PerformanceChartRef, this.results.dates, this.results.strategyLevels, this.results.baseLevels);
+                }
+            }
         },
         methods: {
 
@@ -800,29 +725,29 @@
 
             },
 
-            totalPreSelected() {
+            totalFixedTickers() {
                 let sum = 0;
-                let activePreSels = this.obj.edges.FixedTickers.forEach(function (el) {
+                this.obj.edges.FixedTickers.forEach(function (el) {
                     if (el.IsUsed)
                         sum = +sum + +el.Share;
                 });
                 return sum;
             },
 
+            removeFixedTickers(item) {
+                this.obj.edges.FixedTickers.splice(this.obj.edges.FixedTickers.indexOf(item), 1);
+            },
+
+            addFixedTickers() {
+                this.obj.edges.FixedTickers.push({ IsUsed: true, Ticker: null, Share: 1 });
+            },
+
             validateStrategy() {
-                if (this.totalPreSelected() > 100) {
+                if (this.totalFixedTickers() > 100) {
                     alert("Сумма всех фиксированных долей не может превышать 100")
                     return false;
                 }
                 return true;
-            },
-
-            removePreSelected(item) {
-                this.obj.edges.FixedTickers.splice(this.obj.edges.FixedTickers.indexOf(item), 1);
-            },
-
-            addPreSelected() {
-                this.obj.edges.FixedTickers.push({ IsUsed: true, Ticker: null, Share: 1 });
             },
 
             addFactor() {
