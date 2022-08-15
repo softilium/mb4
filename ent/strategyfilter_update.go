@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/rs/xid"
+	"github.com/softilium/mb4/domains"
 	"github.com/softilium/mb4/ent/predicate"
 	"github.com/softilium/mb4/ent/strategy"
 	"github.com/softilium/mb4/ent/strategyfilter"
@@ -65,69 +66,105 @@ func (sfu *StrategyFilterUpdate) SetNillableIsUsed(b *bool) *StrategyFilterUpdat
 }
 
 // SetLeftValueKind sets the "LeftValueKind" field.
-func (sfu *StrategyFilterUpdate) SetLeftValueKind(i int) *StrategyFilterUpdate {
+func (sfu *StrategyFilterUpdate) SetLeftValueKind(dvk domains.FilterValueKind) *StrategyFilterUpdate {
 	sfu.mutation.ResetLeftValueKind()
-	sfu.mutation.SetLeftValueKind(i)
+	sfu.mutation.SetLeftValueKind(dvk)
 	return sfu
 }
 
-// SetNillableLeftValueKind sets the "LeftValueKind" field if the given value is not nil.
-func (sfu *StrategyFilterUpdate) SetNillableLeftValueKind(i *int) *StrategyFilterUpdate {
-	if i != nil {
-		sfu.SetLeftValueKind(*i)
+// AddLeftValueKind adds dvk to the "LeftValueKind" field.
+func (sfu *StrategyFilterUpdate) AddLeftValueKind(dvk domains.FilterValueKind) *StrategyFilterUpdate {
+	sfu.mutation.AddLeftValueKind(dvk)
+	return sfu
+}
+
+// SetLeftReportValue sets the "LeftReportValue" field.
+func (sfu *StrategyFilterUpdate) SetLeftReportValue(dv domains.ReportValue) *StrategyFilterUpdate {
+	sfu.mutation.ResetLeftReportValue()
+	sfu.mutation.SetLeftReportValue(dv)
+	return sfu
+}
+
+// SetNillableLeftReportValue sets the "LeftReportValue" field if the given value is not nil.
+func (sfu *StrategyFilterUpdate) SetNillableLeftReportValue(dv *domains.ReportValue) *StrategyFilterUpdate {
+	if dv != nil {
+		sfu.SetLeftReportValue(*dv)
 	}
 	return sfu
 }
 
-// AddLeftValueKind adds i to the "LeftValueKind" field.
-func (sfu *StrategyFilterUpdate) AddLeftValueKind(i int) *StrategyFilterUpdate {
-	sfu.mutation.AddLeftValueKind(i)
+// AddLeftReportValue adds dv to the "LeftReportValue" field.
+func (sfu *StrategyFilterUpdate) AddLeftReportValue(dv domains.ReportValue) *StrategyFilterUpdate {
+	sfu.mutation.AddLeftReportValue(dv)
 	return sfu
 }
 
-// SetLeftValue sets the "LeftValue" field.
-func (sfu *StrategyFilterUpdate) SetLeftValue(s string) *StrategyFilterUpdate {
-	sfu.mutation.SetLeftValue(s)
+// SetLeftReportValueType sets the "LeftReportValueType" field.
+func (sfu *StrategyFilterUpdate) SetLeftReportValueType(dvt domains.ReportValueType) *StrategyFilterUpdate {
+	sfu.mutation.ResetLeftReportValueType()
+	sfu.mutation.SetLeftReportValueType(dvt)
 	return sfu
 }
 
-// SetRVT sets the "RVT" field.
-func (sfu *StrategyFilterUpdate) SetRVT(i int) *StrategyFilterUpdate {
-	sfu.mutation.ResetRVT()
-	sfu.mutation.SetRVT(i)
+// SetNillableLeftReportValueType sets the "LeftReportValueType" field if the given value is not nil.
+func (sfu *StrategyFilterUpdate) SetNillableLeftReportValueType(dvt *domains.ReportValueType) *StrategyFilterUpdate {
+	if dvt != nil {
+		sfu.SetLeftReportValueType(*dvt)
+	}
 	return sfu
 }
 
-// AddRVT adds i to the "RVT" field.
-func (sfu *StrategyFilterUpdate) AddRVT(i int) *StrategyFilterUpdate {
-	sfu.mutation.AddRVT(i)
+// AddLeftReportValueType adds dvt to the "LeftReportValueType" field.
+func (sfu *StrategyFilterUpdate) AddLeftReportValueType(dvt domains.ReportValueType) *StrategyFilterUpdate {
+	sfu.mutation.AddLeftReportValueType(dvt)
 	return sfu
 }
 
 // SetOperation sets the "Operation" field.
-func (sfu *StrategyFilterUpdate) SetOperation(i int) *StrategyFilterUpdate {
+func (sfu *StrategyFilterUpdate) SetOperation(do domains.FilterOp) *StrategyFilterUpdate {
 	sfu.mutation.ResetOperation()
-	sfu.mutation.SetOperation(i)
+	sfu.mutation.SetOperation(do)
 	return sfu
 }
 
-// SetNillableOperation sets the "Operation" field if the given value is not nil.
-func (sfu *StrategyFilterUpdate) SetNillableOperation(i *int) *StrategyFilterUpdate {
-	if i != nil {
-		sfu.SetOperation(*i)
+// AddOperation adds do to the "Operation" field.
+func (sfu *StrategyFilterUpdate) AddOperation(do domains.FilterOp) *StrategyFilterUpdate {
+	sfu.mutation.AddOperation(do)
+	return sfu
+}
+
+// SetRightValueStr sets the "RightValueStr" field.
+func (sfu *StrategyFilterUpdate) SetRightValueStr(s string) *StrategyFilterUpdate {
+	sfu.mutation.SetRightValueStr(s)
+	return sfu
+}
+
+// SetNillableRightValueStr sets the "RightValueStr" field if the given value is not nil.
+func (sfu *StrategyFilterUpdate) SetNillableRightValueStr(s *string) *StrategyFilterUpdate {
+	if s != nil {
+		sfu.SetRightValueStr(*s)
 	}
 	return sfu
 }
 
-// AddOperation adds i to the "Operation" field.
-func (sfu *StrategyFilterUpdate) AddOperation(i int) *StrategyFilterUpdate {
-	sfu.mutation.AddOperation(i)
+// SetRightValueFloat sets the "RightValueFloat" field.
+func (sfu *StrategyFilterUpdate) SetRightValueFloat(f float64) *StrategyFilterUpdate {
+	sfu.mutation.ResetRightValueFloat()
+	sfu.mutation.SetRightValueFloat(f)
 	return sfu
 }
 
-// SetRightValue sets the "RightValue" field.
-func (sfu *StrategyFilterUpdate) SetRightValue(s string) *StrategyFilterUpdate {
-	sfu.mutation.SetRightValue(s)
+// SetNillableRightValueFloat sets the "RightValueFloat" field if the given value is not nil.
+func (sfu *StrategyFilterUpdate) SetNillableRightValueFloat(f *float64) *StrategyFilterUpdate {
+	if f != nil {
+		sfu.SetRightValueFloat(*f)
+	}
+	return sfu
+}
+
+// AddRightValueFloat adds f to the "RightValueFloat" field.
+func (sfu *StrategyFilterUpdate) AddRightValueFloat(f float64) *StrategyFilterUpdate {
+	sfu.mutation.AddRightValueFloat(f)
 	return sfu
 }
 
@@ -220,24 +257,9 @@ func (sfu *StrategyFilterUpdate) check() error {
 			return &ValidationError{Name: "LineNum", err: fmt.Errorf(`ent: validator failed for field "StrategyFilter.LineNum": %w`, err)}
 		}
 	}
-	if v, ok := sfu.mutation.LeftValueKind(); ok {
-		if err := strategyfilter.LeftValueKindValidator(v); err != nil {
-			return &ValidationError{Name: "LeftValueKind", err: fmt.Errorf(`ent: validator failed for field "StrategyFilter.LeftValueKind": %w`, err)}
-		}
-	}
-	if v, ok := sfu.mutation.LeftValue(); ok {
-		if err := strategyfilter.LeftValueValidator(v); err != nil {
-			return &ValidationError{Name: "LeftValue", err: fmt.Errorf(`ent: validator failed for field "StrategyFilter.LeftValue": %w`, err)}
-		}
-	}
-	if v, ok := sfu.mutation.Operation(); ok {
-		if err := strategyfilter.OperationValidator(v); err != nil {
-			return &ValidationError{Name: "Operation", err: fmt.Errorf(`ent: validator failed for field "StrategyFilter.Operation": %w`, err)}
-		}
-	}
-	if v, ok := sfu.mutation.RightValue(); ok {
-		if err := strategyfilter.RightValueValidator(v); err != nil {
-			return &ValidationError{Name: "RightValue", err: fmt.Errorf(`ent: validator failed for field "StrategyFilter.RightValue": %w`, err)}
+	if v, ok := sfu.mutation.RightValueStr(); ok {
+		if err := strategyfilter.RightValueStrValidator(v); err != nil {
+			return &ValidationError{Name: "RightValueStr", err: fmt.Errorf(`ent: validator failed for field "StrategyFilter.RightValueStr": %w`, err)}
 		}
 	}
 	if _, ok := sfu.mutation.StrategyID(); sfu.mutation.StrategyCleared() && !ok {
@@ -299,25 +321,32 @@ func (sfu *StrategyFilterUpdate) sqlSave(ctx context.Context) (n int, err error)
 			Column: strategyfilter.FieldLeftValueKind,
 		})
 	}
-	if value, ok := sfu.mutation.LeftValue(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: strategyfilter.FieldLeftValue,
-		})
-	}
-	if value, ok := sfu.mutation.RVT(); ok {
+	if value, ok := sfu.mutation.LeftReportValue(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
-			Column: strategyfilter.FieldRVT,
+			Column: strategyfilter.FieldLeftReportValue,
 		})
 	}
-	if value, ok := sfu.mutation.AddedRVT(); ok {
+	if value, ok := sfu.mutation.AddedLeftReportValue(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
-			Column: strategyfilter.FieldRVT,
+			Column: strategyfilter.FieldLeftReportValue,
+		})
+	}
+	if value, ok := sfu.mutation.LeftReportValueType(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: strategyfilter.FieldLeftReportValueType,
+		})
+	}
+	if value, ok := sfu.mutation.AddedLeftReportValueType(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: strategyfilter.FieldLeftReportValueType,
 		})
 	}
 	if value, ok := sfu.mutation.Operation(); ok {
@@ -334,11 +363,25 @@ func (sfu *StrategyFilterUpdate) sqlSave(ctx context.Context) (n int, err error)
 			Column: strategyfilter.FieldOperation,
 		})
 	}
-	if value, ok := sfu.mutation.RightValue(); ok {
+	if value, ok := sfu.mutation.RightValueStr(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: strategyfilter.FieldRightValue,
+			Column: strategyfilter.FieldRightValueStr,
+		})
+	}
+	if value, ok := sfu.mutation.RightValueFloat(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat64,
+			Value:  value,
+			Column: strategyfilter.FieldRightValueFloat,
+		})
+	}
+	if value, ok := sfu.mutation.AddedRightValueFloat(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat64,
+			Value:  value,
+			Column: strategyfilter.FieldRightValueFloat,
 		})
 	}
 	if sfu.mutation.StrategyCleared() {
@@ -431,69 +474,105 @@ func (sfuo *StrategyFilterUpdateOne) SetNillableIsUsed(b *bool) *StrategyFilterU
 }
 
 // SetLeftValueKind sets the "LeftValueKind" field.
-func (sfuo *StrategyFilterUpdateOne) SetLeftValueKind(i int) *StrategyFilterUpdateOne {
+func (sfuo *StrategyFilterUpdateOne) SetLeftValueKind(dvk domains.FilterValueKind) *StrategyFilterUpdateOne {
 	sfuo.mutation.ResetLeftValueKind()
-	sfuo.mutation.SetLeftValueKind(i)
+	sfuo.mutation.SetLeftValueKind(dvk)
 	return sfuo
 }
 
-// SetNillableLeftValueKind sets the "LeftValueKind" field if the given value is not nil.
-func (sfuo *StrategyFilterUpdateOne) SetNillableLeftValueKind(i *int) *StrategyFilterUpdateOne {
-	if i != nil {
-		sfuo.SetLeftValueKind(*i)
+// AddLeftValueKind adds dvk to the "LeftValueKind" field.
+func (sfuo *StrategyFilterUpdateOne) AddLeftValueKind(dvk domains.FilterValueKind) *StrategyFilterUpdateOne {
+	sfuo.mutation.AddLeftValueKind(dvk)
+	return sfuo
+}
+
+// SetLeftReportValue sets the "LeftReportValue" field.
+func (sfuo *StrategyFilterUpdateOne) SetLeftReportValue(dv domains.ReportValue) *StrategyFilterUpdateOne {
+	sfuo.mutation.ResetLeftReportValue()
+	sfuo.mutation.SetLeftReportValue(dv)
+	return sfuo
+}
+
+// SetNillableLeftReportValue sets the "LeftReportValue" field if the given value is not nil.
+func (sfuo *StrategyFilterUpdateOne) SetNillableLeftReportValue(dv *domains.ReportValue) *StrategyFilterUpdateOne {
+	if dv != nil {
+		sfuo.SetLeftReportValue(*dv)
 	}
 	return sfuo
 }
 
-// AddLeftValueKind adds i to the "LeftValueKind" field.
-func (sfuo *StrategyFilterUpdateOne) AddLeftValueKind(i int) *StrategyFilterUpdateOne {
-	sfuo.mutation.AddLeftValueKind(i)
+// AddLeftReportValue adds dv to the "LeftReportValue" field.
+func (sfuo *StrategyFilterUpdateOne) AddLeftReportValue(dv domains.ReportValue) *StrategyFilterUpdateOne {
+	sfuo.mutation.AddLeftReportValue(dv)
 	return sfuo
 }
 
-// SetLeftValue sets the "LeftValue" field.
-func (sfuo *StrategyFilterUpdateOne) SetLeftValue(s string) *StrategyFilterUpdateOne {
-	sfuo.mutation.SetLeftValue(s)
+// SetLeftReportValueType sets the "LeftReportValueType" field.
+func (sfuo *StrategyFilterUpdateOne) SetLeftReportValueType(dvt domains.ReportValueType) *StrategyFilterUpdateOne {
+	sfuo.mutation.ResetLeftReportValueType()
+	sfuo.mutation.SetLeftReportValueType(dvt)
 	return sfuo
 }
 
-// SetRVT sets the "RVT" field.
-func (sfuo *StrategyFilterUpdateOne) SetRVT(i int) *StrategyFilterUpdateOne {
-	sfuo.mutation.ResetRVT()
-	sfuo.mutation.SetRVT(i)
+// SetNillableLeftReportValueType sets the "LeftReportValueType" field if the given value is not nil.
+func (sfuo *StrategyFilterUpdateOne) SetNillableLeftReportValueType(dvt *domains.ReportValueType) *StrategyFilterUpdateOne {
+	if dvt != nil {
+		sfuo.SetLeftReportValueType(*dvt)
+	}
 	return sfuo
 }
 
-// AddRVT adds i to the "RVT" field.
-func (sfuo *StrategyFilterUpdateOne) AddRVT(i int) *StrategyFilterUpdateOne {
-	sfuo.mutation.AddRVT(i)
+// AddLeftReportValueType adds dvt to the "LeftReportValueType" field.
+func (sfuo *StrategyFilterUpdateOne) AddLeftReportValueType(dvt domains.ReportValueType) *StrategyFilterUpdateOne {
+	sfuo.mutation.AddLeftReportValueType(dvt)
 	return sfuo
 }
 
 // SetOperation sets the "Operation" field.
-func (sfuo *StrategyFilterUpdateOne) SetOperation(i int) *StrategyFilterUpdateOne {
+func (sfuo *StrategyFilterUpdateOne) SetOperation(do domains.FilterOp) *StrategyFilterUpdateOne {
 	sfuo.mutation.ResetOperation()
-	sfuo.mutation.SetOperation(i)
+	sfuo.mutation.SetOperation(do)
 	return sfuo
 }
 
-// SetNillableOperation sets the "Operation" field if the given value is not nil.
-func (sfuo *StrategyFilterUpdateOne) SetNillableOperation(i *int) *StrategyFilterUpdateOne {
-	if i != nil {
-		sfuo.SetOperation(*i)
+// AddOperation adds do to the "Operation" field.
+func (sfuo *StrategyFilterUpdateOne) AddOperation(do domains.FilterOp) *StrategyFilterUpdateOne {
+	sfuo.mutation.AddOperation(do)
+	return sfuo
+}
+
+// SetRightValueStr sets the "RightValueStr" field.
+func (sfuo *StrategyFilterUpdateOne) SetRightValueStr(s string) *StrategyFilterUpdateOne {
+	sfuo.mutation.SetRightValueStr(s)
+	return sfuo
+}
+
+// SetNillableRightValueStr sets the "RightValueStr" field if the given value is not nil.
+func (sfuo *StrategyFilterUpdateOne) SetNillableRightValueStr(s *string) *StrategyFilterUpdateOne {
+	if s != nil {
+		sfuo.SetRightValueStr(*s)
 	}
 	return sfuo
 }
 
-// AddOperation adds i to the "Operation" field.
-func (sfuo *StrategyFilterUpdateOne) AddOperation(i int) *StrategyFilterUpdateOne {
-	sfuo.mutation.AddOperation(i)
+// SetRightValueFloat sets the "RightValueFloat" field.
+func (sfuo *StrategyFilterUpdateOne) SetRightValueFloat(f float64) *StrategyFilterUpdateOne {
+	sfuo.mutation.ResetRightValueFloat()
+	sfuo.mutation.SetRightValueFloat(f)
 	return sfuo
 }
 
-// SetRightValue sets the "RightValue" field.
-func (sfuo *StrategyFilterUpdateOne) SetRightValue(s string) *StrategyFilterUpdateOne {
-	sfuo.mutation.SetRightValue(s)
+// SetNillableRightValueFloat sets the "RightValueFloat" field if the given value is not nil.
+func (sfuo *StrategyFilterUpdateOne) SetNillableRightValueFloat(f *float64) *StrategyFilterUpdateOne {
+	if f != nil {
+		sfuo.SetRightValueFloat(*f)
+	}
+	return sfuo
+}
+
+// AddRightValueFloat adds f to the "RightValueFloat" field.
+func (sfuo *StrategyFilterUpdateOne) AddRightValueFloat(f float64) *StrategyFilterUpdateOne {
+	sfuo.mutation.AddRightValueFloat(f)
 	return sfuo
 }
 
@@ -593,24 +672,9 @@ func (sfuo *StrategyFilterUpdateOne) check() error {
 			return &ValidationError{Name: "LineNum", err: fmt.Errorf(`ent: validator failed for field "StrategyFilter.LineNum": %w`, err)}
 		}
 	}
-	if v, ok := sfuo.mutation.LeftValueKind(); ok {
-		if err := strategyfilter.LeftValueKindValidator(v); err != nil {
-			return &ValidationError{Name: "LeftValueKind", err: fmt.Errorf(`ent: validator failed for field "StrategyFilter.LeftValueKind": %w`, err)}
-		}
-	}
-	if v, ok := sfuo.mutation.LeftValue(); ok {
-		if err := strategyfilter.LeftValueValidator(v); err != nil {
-			return &ValidationError{Name: "LeftValue", err: fmt.Errorf(`ent: validator failed for field "StrategyFilter.LeftValue": %w`, err)}
-		}
-	}
-	if v, ok := sfuo.mutation.Operation(); ok {
-		if err := strategyfilter.OperationValidator(v); err != nil {
-			return &ValidationError{Name: "Operation", err: fmt.Errorf(`ent: validator failed for field "StrategyFilter.Operation": %w`, err)}
-		}
-	}
-	if v, ok := sfuo.mutation.RightValue(); ok {
-		if err := strategyfilter.RightValueValidator(v); err != nil {
-			return &ValidationError{Name: "RightValue", err: fmt.Errorf(`ent: validator failed for field "StrategyFilter.RightValue": %w`, err)}
+	if v, ok := sfuo.mutation.RightValueStr(); ok {
+		if err := strategyfilter.RightValueStrValidator(v); err != nil {
+			return &ValidationError{Name: "RightValueStr", err: fmt.Errorf(`ent: validator failed for field "StrategyFilter.RightValueStr": %w`, err)}
 		}
 	}
 	if _, ok := sfuo.mutation.StrategyID(); sfuo.mutation.StrategyCleared() && !ok {
@@ -689,25 +753,32 @@ func (sfuo *StrategyFilterUpdateOne) sqlSave(ctx context.Context) (_node *Strate
 			Column: strategyfilter.FieldLeftValueKind,
 		})
 	}
-	if value, ok := sfuo.mutation.LeftValue(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: strategyfilter.FieldLeftValue,
-		})
-	}
-	if value, ok := sfuo.mutation.RVT(); ok {
+	if value, ok := sfuo.mutation.LeftReportValue(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
-			Column: strategyfilter.FieldRVT,
+			Column: strategyfilter.FieldLeftReportValue,
 		})
 	}
-	if value, ok := sfuo.mutation.AddedRVT(); ok {
+	if value, ok := sfuo.mutation.AddedLeftReportValue(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
-			Column: strategyfilter.FieldRVT,
+			Column: strategyfilter.FieldLeftReportValue,
+		})
+	}
+	if value, ok := sfuo.mutation.LeftReportValueType(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: strategyfilter.FieldLeftReportValueType,
+		})
+	}
+	if value, ok := sfuo.mutation.AddedLeftReportValueType(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: strategyfilter.FieldLeftReportValueType,
 		})
 	}
 	if value, ok := sfuo.mutation.Operation(); ok {
@@ -724,11 +795,25 @@ func (sfuo *StrategyFilterUpdateOne) sqlSave(ctx context.Context) (_node *Strate
 			Column: strategyfilter.FieldOperation,
 		})
 	}
-	if value, ok := sfuo.mutation.RightValue(); ok {
+	if value, ok := sfuo.mutation.RightValueStr(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: strategyfilter.FieldRightValue,
+			Column: strategyfilter.FieldRightValueStr,
+		})
+	}
+	if value, ok := sfuo.mutation.RightValueFloat(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat64,
+			Value:  value,
+			Column: strategyfilter.FieldRightValueFloat,
+		})
+	}
+	if value, ok := sfuo.mutation.AddedRightValueFloat(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat64,
+			Value:  value,
+			Column: strategyfilter.FieldRightValueFloat,
 		})
 	}
 	if sfuo.mutation.StrategyCleared() {

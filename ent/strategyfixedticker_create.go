@@ -49,6 +49,26 @@ func (sftc *StrategyFixedTickerCreate) SetNillableIsUsed(b *bool) *StrategyFixed
 	return sftc
 }
 
+// SetTicker sets the "Ticker" field.
+func (sftc *StrategyFixedTickerCreate) SetTicker(s string) *StrategyFixedTickerCreate {
+	sftc.mutation.SetTicker(s)
+	return sftc
+}
+
+// SetShare sets the "Share" field.
+func (sftc *StrategyFixedTickerCreate) SetShare(i int) *StrategyFixedTickerCreate {
+	sftc.mutation.SetShare(i)
+	return sftc
+}
+
+// SetNillableShare sets the "Share" field if the given value is not nil.
+func (sftc *StrategyFixedTickerCreate) SetNillableShare(i *int) *StrategyFixedTickerCreate {
+	if i != nil {
+		sftc.SetShare(*i)
+	}
+	return sftc
+}
+
 // SetID sets the "id" field.
 func (sftc *StrategyFixedTickerCreate) SetID(x xid.ID) *StrategyFixedTickerCreate {
 	sftc.mutation.SetID(x)
@@ -153,6 +173,10 @@ func (sftc *StrategyFixedTickerCreate) defaults() {
 		v := strategyfixedticker.DefaultIsUsed
 		sftc.mutation.SetIsUsed(v)
 	}
+	if _, ok := sftc.mutation.Share(); !ok {
+		v := strategyfixedticker.DefaultShare
+		sftc.mutation.SetShare(v)
+	}
 	if _, ok := sftc.mutation.ID(); !ok {
 		v := strategyfixedticker.DefaultID()
 		sftc.mutation.SetID(v)
@@ -171,6 +195,22 @@ func (sftc *StrategyFixedTickerCreate) check() error {
 	}
 	if _, ok := sftc.mutation.IsUsed(); !ok {
 		return &ValidationError{Name: "IsUsed", err: errors.New(`ent: missing required field "StrategyFixedTicker.IsUsed"`)}
+	}
+	if _, ok := sftc.mutation.Ticker(); !ok {
+		return &ValidationError{Name: "Ticker", err: errors.New(`ent: missing required field "StrategyFixedTicker.Ticker"`)}
+	}
+	if v, ok := sftc.mutation.Ticker(); ok {
+		if err := strategyfixedticker.TickerValidator(v); err != nil {
+			return &ValidationError{Name: "Ticker", err: fmt.Errorf(`ent: validator failed for field "StrategyFixedTicker.Ticker": %w`, err)}
+		}
+	}
+	if _, ok := sftc.mutation.Share(); !ok {
+		return &ValidationError{Name: "Share", err: errors.New(`ent: missing required field "StrategyFixedTicker.Share"`)}
+	}
+	if v, ok := sftc.mutation.Share(); ok {
+		if err := strategyfixedticker.ShareValidator(v); err != nil {
+			return &ValidationError{Name: "Share", err: fmt.Errorf(`ent: validator failed for field "StrategyFixedTicker.Share": %w`, err)}
+		}
 	}
 	if v, ok := sftc.mutation.ID(); ok {
 		if err := strategyfixedticker.IDValidator(v.String()); err != nil {
@@ -231,6 +271,22 @@ func (sftc *StrategyFixedTickerCreate) createSpec() (*StrategyFixedTicker, *sqlg
 			Column: strategyfixedticker.FieldIsUsed,
 		})
 		_node.IsUsed = value
+	}
+	if value, ok := sftc.mutation.Ticker(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: strategyfixedticker.FieldTicker,
+		})
+		_node.Ticker = value
+	}
+	if value, ok := sftc.mutation.Share(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: strategyfixedticker.FieldShare,
+		})
+		_node.Share = value
 	}
 	if nodes := sftc.mutation.StrategyIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

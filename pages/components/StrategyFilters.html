@@ -1,0 +1,211 @@
+<template id="strategy-filters-markup">
+
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <td></td>
+                <td>Отбор</td>
+                <td class="text-end"><button class="btn" v-on:click='addFilter()'><i class="bi bi-file-earmark-plus"></i></button></td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for='item in strategy.edges.Filters'>
+                <td>
+                    <input class="form-check-input form-control-sm" type="checkbox" v-model='item.IsUsed' disabled />
+                </td>
+                <td>${filterDescr(item)}</td>
+                <td class='text-end text-nowrap'>
+                    <button class="btn" data-bs-toggle="modal" data-bs-target="#filterModal" v-on:click='selectedFilter=item'>
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button class="btn" v-on:click='removeFilter(item)'><i class="bi bi-trash3"></i></button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- редактор отбора стратегии -->
+    <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="filterModalLabel">Редактирование отбора</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label">Используется</label>
+                        <div class="col-sm-9">
+                            <input class="form-check-input form-control-sm" type="checkbox" v-model='selectedFilter.IsUsed' />
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label">Что отбирать</label>
+                        <div class="col-sm-9">
+                            <select class="form-select form-control-sm" v-model='selectedFilter.LeftValueKind'>
+                                <option></option>
+                                <option v-for="item in renderinfo.FilterValueKinds" v-bind:value="item.Id">
+                                    ${item.Descr}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row" v-if='selectedFilter.LeftValueKind==300'>
+                        <label class="col-sm-3 col-form-label">Параметр отчета</label>
+                        <div class="col-sm-9">
+                            <select class="form-select form-control-sm" v-model='selectedFilter.LeftReportValue'>
+                                <option></option>
+                                <option v-for="item in renderinfo.ReportValues" v-bind:value="item.Id">
+                                    ${item.Descr}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row" v-if='selectedFilter.LeftValueKind==300'>
+                        <label class="col-sm-3 col-form-label">Выберите расчет значения</label>
+                        <div class="col-sm-9">
+                            <select class="form-select form-control-sm" v-model='selectedFilter.LeftReportValueType'>
+                                <option></option>
+                                <option v-for="item in renderinfo.ReportValueTypes" v-bind:value="item.Id">
+                                    ${item.Descr}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row" v-if='selectedFilter.LeftValueKind==300'>
+                        <label class="col-sm-3 col-form-label">Вид сравнения</label>
+                        <div class="col-sm-9">
+                            <select class="form-select form-control-sm" v-model='selectedFilter.Operation'>
+                                <option></option>
+                                <option v-for="item in renderinfo.FilterOps" v-bind:value="item.Id">
+                                    ${item.Descr}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row" v-if='selectedFilter.LeftValueKind!=300'>
+                        <label class="col-sm-3 col-form-label">Вид сравнения</label>
+                        <div class="col-sm-9">
+                            <select class="form-select form-control-sm" v-model='selectedFilter.Operation'>
+                                <option></option>
+                                <option v-for="item in renderinfo.FilterOpsShort" v-bind:value="item.Id">
+                                    ${item.Descr}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row" v-if='selectedFilter.LeftValueKind==100'>
+                        <label class="col-sm-3 col-form-label">Значение</label>
+                        <div class="col-sm-9">
+                            <select class="form-select form-control-sm" v-model='selectedFilter.RightValueStr'>
+                                <option></option>
+                                <option v-for="item in renderinfo.Tickers" v-bind:value="item.Id">
+                                    ${item.Descr}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row" v-if='selectedFilter.LeftValueKind==200'>
+                        <label class="col-sm-3 col-form-label">Значение</label>
+                        <div class="col-sm-9">
+                            <select class="form-select form-control-sm" v-model='selectedFilter.RightValueStr'>
+                                <option></option>
+                                <option v-for="item in renderinfo.Industries" v-bind:value="item.Id">
+                                    ${item.Descr}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row" v-if='selectedFilter.LeftValueKind==300'>
+                        <label class="col-sm-3 col-form-label">Значение</label>
+                        <div class="col-sm-9">
+                            <input class="form-select form-control-sm" type="number" v-model='selectedFilter.RightValueFloat' />
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</template>
+
+<script type="text/javascript">
+
+    const StrategyFilters =
+    {
+        delimiters: ['${', '}'],
+        template: '#strategy-filters-markup',
+
+        props: {
+            strategy: {},
+            renderinfo: {
+                FilterValueKinds: [],
+                FilterOps: []
+            }
+        },
+
+        data() {
+            return {
+                selectedFilter: { IsUsed: false },
+                OperationsMap: new Map(),
+                IndustryMap: new Map(),
+                ReportValuesMap: new Map(),
+                ReportValueTypesMap: new Map(),
+            }
+        },
+        watch: {
+            renderinfo:
+            {
+                async handler(newVal, oldVal) {
+                    await this.$nextTick();
+                    this.renderinfo.FilterOps.forEach(i => { this.OperationsMap.set(i.Id, i.Descr) });
+                    this.renderinfo.Industries.forEach(i => { this.IndustryMap.set(i.Id, i.Descr) });
+                    this.renderinfo.ReportValues.forEach(i => { this.ReportValuesMap.set(i.Id, i.Descr) });
+                    this.renderinfo.ReportValueTypes.forEach(i => { this.ReportValueTypesMap.set(i.Id, i.Descr) });
+                },
+                immediate: true
+            }
+        },
+        methods: {
+
+            addFilter() {
+                this.strategy.edges.Filters.push({ IsUsed: true });
+            },
+
+            removeFilter(item) {
+                this.strategy.edges.Filters.splice(this.strategy.edges.Filters.indexOf(item), 1);
+            },
+
+            filterDescr(filter) {
+                if (this.renderinfo.Industries.length == 0) return '';
+                if (filter.LeftValueKind == 100) {
+                    return "Тикер " + this.OperationsMap.get(filter.Operation) + " " + filter.RightValueStr;
+                }
+                if (filter.LeftValueKind == 200) { // FVK_Industry
+                    return 'Отрасль ' + this.OperationsMap.get(filter.Operation) + this.IndustryMap.get(filter.RightValueStr);
+                }
+                if (filter.LeftValueKind == 300) { // FVK_ReportValue
+                    return this.ReportValuesMap.get(filter.LeftReportValue) + " " +
+                        this.ReportValueTypesMap.get(filter.LeftReportValueType) + " " +
+                        this.OperationsMap.get(filter.Operation) + " " +
+                        filter.RightValueFloat;
+                }
+            }
+
+        }
+    };
+
+</script>

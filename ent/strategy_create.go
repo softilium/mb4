@@ -6,11 +6,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/rs/xid"
+	"github.com/softilium/mb4/domains"
 	"github.com/softilium/mb4/ent/strategy"
 	"github.com/softilium/mb4/ent/strategyfactor"
 	"github.com/softilium/mb4/ent/strategyfilter"
@@ -142,16 +142,8 @@ func (sc *StrategyCreate) SetStartAmount(f float64) *StrategyCreate {
 }
 
 // SetStartSimulation sets the "StartSimulation" field.
-func (sc *StrategyCreate) SetStartSimulation(t time.Time) *StrategyCreate {
-	sc.mutation.SetStartSimulation(t)
-	return sc
-}
-
-// SetNillableStartSimulation sets the "StartSimulation" field if the given value is not nil.
-func (sc *StrategyCreate) SetNillableStartSimulation(t *time.Time) *StrategyCreate {
-	if t != nil {
-		sc.SetStartSimulation(*t)
-	}
+func (sc *StrategyCreate) SetStartSimulation(ddo *domains.JSDateOnly) *StrategyCreate {
+	sc.mutation.SetStartSimulation(ddo)
 	return sc
 }
 
@@ -183,17 +175,23 @@ func (sc *StrategyCreate) SetNillableAllowLossWhenSell(b *bool) *StrategyCreate 
 	return sc
 }
 
-// SetSameEmitent sets the "SameEmitent" field.
-func (sc *StrategyCreate) SetSameEmitent(i int) *StrategyCreate {
-	sc.mutation.SetSameEmitent(i)
+// SetAllowSellToFit sets the "AllowSellToFit" field.
+func (sc *StrategyCreate) SetAllowSellToFit(b bool) *StrategyCreate {
+	sc.mutation.SetAllowSellToFit(b)
 	return sc
 }
 
-// SetNillableSameEmitent sets the "SameEmitent" field if the given value is not nil.
-func (sc *StrategyCreate) SetNillableSameEmitent(i *int) *StrategyCreate {
-	if i != nil {
-		sc.SetSameEmitent(*i)
+// SetNillableAllowSellToFit sets the "AllowSellToFit" field if the given value is not nil.
+func (sc *StrategyCreate) SetNillableAllowSellToFit(b *bool) *StrategyCreate {
+	if b != nil {
+		sc.SetAllowSellToFit(*b)
 	}
+	return sc
+}
+
+// SetSameEmitent sets the "SameEmitent" field.
+func (sc *StrategyCreate) SetSameEmitent(i int) *StrategyCreate {
+	sc.mutation.SetSameEmitent(i)
 	return sc
 }
 
@@ -362,10 +360,6 @@ func (sc *StrategyCreate) defaults() {
 		v := strategy.DefaultLast3YearsYield
 		sc.mutation.SetLast3YearsYield(v)
 	}
-	if _, ok := sc.mutation.StartSimulation(); !ok {
-		v := strategy.DefaultStartSimulation
-		sc.mutation.SetStartSimulation(v)
-	}
 	if _, ok := sc.mutation.BuyOnlyLowPrice(); !ok {
 		v := strategy.DefaultBuyOnlyLowPrice
 		sc.mutation.SetBuyOnlyLowPrice(v)
@@ -374,9 +368,9 @@ func (sc *StrategyCreate) defaults() {
 		v := strategy.DefaultAllowLossWhenSell
 		sc.mutation.SetAllowLossWhenSell(v)
 	}
-	if _, ok := sc.mutation.SameEmitent(); !ok {
-		v := strategy.DefaultSameEmitent
-		sc.mutation.SetSameEmitent(v)
+	if _, ok := sc.mutation.AllowSellToFit(); !ok {
+		v := strategy.DefaultAllowSellToFit
+		sc.mutation.SetAllowSellToFit(v)
 	}
 	if _, ok := sc.mutation.ID(); !ok {
 		v := strategy.DefaultID()
@@ -452,13 +446,11 @@ func (sc *StrategyCreate) check() error {
 	if _, ok := sc.mutation.AllowLossWhenSell(); !ok {
 		return &ValidationError{Name: "AllowLossWhenSell", err: errors.New(`ent: missing required field "Strategy.AllowLossWhenSell"`)}
 	}
+	if _, ok := sc.mutation.AllowSellToFit(); !ok {
+		return &ValidationError{Name: "AllowSellToFit", err: errors.New(`ent: missing required field "Strategy.AllowSellToFit"`)}
+	}
 	if _, ok := sc.mutation.SameEmitent(); !ok {
 		return &ValidationError{Name: "SameEmitent", err: errors.New(`ent: missing required field "Strategy.SameEmitent"`)}
-	}
-	if v, ok := sc.mutation.SameEmitent(); ok {
-		if err := strategy.SameEmitentValidator(v); err != nil {
-			return &ValidationError{Name: "SameEmitent", err: fmt.Errorf(`ent: validator failed for field "Strategy.SameEmitent": %w`, err)}
-		}
 	}
 	if v, ok := sc.mutation.ID(); ok {
 		if err := strategy.IDValidator(v.String()); err != nil {
@@ -607,6 +599,14 @@ func (sc *StrategyCreate) createSpec() (*Strategy, *sqlgraph.CreateSpec) {
 			Column: strategy.FieldAllowLossWhenSell,
 		})
 		_node.AllowLossWhenSell = value
+	}
+	if value, ok := sc.mutation.AllowSellToFit(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: strategy.FieldAllowSellToFit,
+		})
+		_node.AllowSellToFit = value
 	}
 	if value, ok := sc.mutation.SameEmitent(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

@@ -5,10 +5,10 @@ package ent
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/rs/xid"
+	"github.com/softilium/mb4/domains"
 	"github.com/softilium/mb4/ent/strategy"
 	"github.com/softilium/mb4/ent/user"
 )
@@ -39,11 +39,13 @@ type Strategy struct {
 	// StartAmount holds the value of the "StartAmount" field.
 	StartAmount float64 `json:"StartAmount,omitempty"`
 	// StartSimulation holds the value of the "StartSimulation" field.
-	StartSimulation time.Time `json:"StartSimulation,omitempty"`
+	StartSimulation *domains.JSDateOnly `json:"StartSimulation,omitempty"`
 	// BuyOnlyLowPrice holds the value of the "BuyOnlyLowPrice" field.
 	BuyOnlyLowPrice bool `json:"BuyOnlyLowPrice,omitempty"`
 	// AllowLossWhenSell holds the value of the "AllowLossWhenSell" field.
 	AllowLossWhenSell bool `json:"AllowLossWhenSell,omitempty"`
+	// AllowSellToFit holds the value of the "AllowSellToFit" field.
+	AllowSellToFit bool `json:"AllowSellToFit,omitempty"`
 	// SameEmitent holds the value of the "SameEmitent" field.
 	SameEmitent int `json:"SameEmitent,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -113,7 +115,9 @@ func (*Strategy) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case strategy.FieldBuyOnlyLowPrice, strategy.FieldAllowLossWhenSell:
+		case strategy.FieldStartSimulation:
+			values[i] = new(domains.JSDateOnly)
+		case strategy.FieldBuyOnlyLowPrice, strategy.FieldAllowLossWhenSell, strategy.FieldAllowSellToFit:
 			values[i] = new(sql.NullBool)
 		case strategy.FieldLastYearInventResult, strategy.FieldLastYearYield, strategy.FieldLast3YearsInvertResult, strategy.FieldLast3YearsYield, strategy.FieldWeekRefillAmount, strategy.FieldStartAmount:
 			values[i] = new(sql.NullFloat64)
@@ -121,8 +125,6 @@ func (*Strategy) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullInt64)
 		case strategy.FieldDescr, strategy.FieldBaseIndex:
 			values[i] = new(sql.NullString)
-		case strategy.FieldStartSimulation:
-			values[i] = new(sql.NullTime)
 		case strategy.FieldID:
 			values[i] = new(xid.ID)
 		case strategy.ForeignKeys[0]: // user_strategies
@@ -209,10 +211,10 @@ func (s *Strategy) assignValues(columns []string, values []interface{}) error {
 				s.StartAmount = value.Float64
 			}
 		case strategy.FieldStartSimulation:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*domains.JSDateOnly); !ok {
 				return fmt.Errorf("unexpected type %T for field StartSimulation", values[i])
-			} else if value.Valid {
-				s.StartSimulation = value.Time
+			} else if value != nil {
+				s.StartSimulation = value
 			}
 		case strategy.FieldBuyOnlyLowPrice:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -225,6 +227,12 @@ func (s *Strategy) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field AllowLossWhenSell", values[i])
 			} else if value.Valid {
 				s.AllowLossWhenSell = value.Bool
+			}
+		case strategy.FieldAllowSellToFit:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field AllowSellToFit", values[i])
+			} else if value.Valid {
+				s.AllowSellToFit = value.Bool
 			}
 		case strategy.FieldSameEmitent:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -308,11 +316,13 @@ func (s *Strategy) String() string {
 	builder.WriteString(", StartAmount=")
 	builder.WriteString(fmt.Sprintf("%v", s.StartAmount))
 	builder.WriteString(", StartSimulation=")
-	builder.WriteString(s.StartSimulation.Format(time.ANSIC))
+	builder.WriteString(fmt.Sprintf("%v", s.StartSimulation))
 	builder.WriteString(", BuyOnlyLowPrice=")
 	builder.WriteString(fmt.Sprintf("%v", s.BuyOnlyLowPrice))
 	builder.WriteString(", AllowLossWhenSell=")
 	builder.WriteString(fmt.Sprintf("%v", s.AllowLossWhenSell))
+	builder.WriteString(", AllowSellToFit=")
+	builder.WriteString(fmt.Sprintf("%v", s.AllowSellToFit))
 	builder.WriteString(", SameEmitent=")
 	builder.WriteString(fmt.Sprintf("%v", s.SameEmitent))
 	builder.WriteByte(')')

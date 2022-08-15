@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/rs/xid"
+	"github.com/softilium/mb4/domains"
 	"github.com/softilium/mb4/ent/predicate"
 )
 
@@ -107,37 +108,48 @@ func IsUsed(v bool) predicate.StrategyFilter {
 }
 
 // LeftValueKind applies equality check predicate on the "LeftValueKind" field. It's identical to LeftValueKindEQ.
-func LeftValueKind(v int) predicate.StrategyFilter {
+func LeftValueKind(v domains.FilterValueKind) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldLeftValueKind), v))
+		s.Where(sql.EQ(s.C(FieldLeftValueKind), vc))
 	})
 }
 
-// LeftValue applies equality check predicate on the "LeftValue" field. It's identical to LeftValueEQ.
-func LeftValue(v string) predicate.StrategyFilter {
+// LeftReportValue applies equality check predicate on the "LeftReportValue" field. It's identical to LeftReportValueEQ.
+func LeftReportValue(v domains.ReportValue) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldLeftValue), v))
+		s.Where(sql.EQ(s.C(FieldLeftReportValue), vc))
 	})
 }
 
-// RVT applies equality check predicate on the "RVT" field. It's identical to RVTEQ.
-func RVT(v int) predicate.StrategyFilter {
+// LeftReportValueType applies equality check predicate on the "LeftReportValueType" field. It's identical to LeftReportValueTypeEQ.
+func LeftReportValueType(v domains.ReportValueType) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldRVT), v))
+		s.Where(sql.EQ(s.C(FieldLeftReportValueType), vc))
 	})
 }
 
 // Operation applies equality check predicate on the "Operation" field. It's identical to OperationEQ.
-func Operation(v int) predicate.StrategyFilter {
+func Operation(v domains.FilterOp) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldOperation), v))
+		s.Where(sql.EQ(s.C(FieldOperation), vc))
 	})
 }
 
-// RightValue applies equality check predicate on the "RightValue" field. It's identical to RightValueEQ.
-func RightValue(v string) predicate.StrategyFilter {
+// RightValueStr applies equality check predicate on the "RightValueStr" field. It's identical to RightValueStrEQ.
+func RightValueStr(v string) predicate.StrategyFilter {
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldRightValue), v))
+		s.Where(sql.EQ(s.C(FieldRightValueStr), v))
+	})
+}
+
+// RightValueFloat applies equality check predicate on the "RightValueFloat" field. It's identical to RightValueFloatEQ.
+func RightValueFloat(v float64) predicate.StrategyFilter {
+	return predicate.StrategyFilter(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldRightValueFloat), v))
 	})
 }
 
@@ -232,24 +244,26 @@ func IsUsedNEQ(v bool) predicate.StrategyFilter {
 }
 
 // LeftValueKindEQ applies the EQ predicate on the "LeftValueKind" field.
-func LeftValueKindEQ(v int) predicate.StrategyFilter {
+func LeftValueKindEQ(v domains.FilterValueKind) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldLeftValueKind), v))
+		s.Where(sql.EQ(s.C(FieldLeftValueKind), vc))
 	})
 }
 
 // LeftValueKindNEQ applies the NEQ predicate on the "LeftValueKind" field.
-func LeftValueKindNEQ(v int) predicate.StrategyFilter {
+func LeftValueKindNEQ(v domains.FilterValueKind) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldLeftValueKind), v))
+		s.Where(sql.NEQ(s.C(FieldLeftValueKind), vc))
 	})
 }
 
 // LeftValueKindIn applies the In predicate on the "LeftValueKind" field.
-func LeftValueKindIn(vs ...int) predicate.StrategyFilter {
+func LeftValueKindIn(vs ...domains.FilterValueKind) predicate.StrategyFilter {
 	v := make([]interface{}, len(vs))
 	for i := range v {
-		v[i] = vs[i]
+		v[i] = int(vs[i])
 	}
 	return predicate.StrategyFilter(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
@@ -263,10 +277,10 @@ func LeftValueKindIn(vs ...int) predicate.StrategyFilter {
 }
 
 // LeftValueKindNotIn applies the NotIn predicate on the "LeftValueKind" field.
-func LeftValueKindNotIn(vs ...int) predicate.StrategyFilter {
+func LeftValueKindNotIn(vs ...domains.FilterValueKind) predicate.StrategyFilter {
 	v := make([]interface{}, len(vs))
 	for i := range v {
-		v[i] = vs[i]
+		v[i] = int(vs[i])
 	}
 	return predicate.StrategyFilter(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
@@ -280,52 +294,58 @@ func LeftValueKindNotIn(vs ...int) predicate.StrategyFilter {
 }
 
 // LeftValueKindGT applies the GT predicate on the "LeftValueKind" field.
-func LeftValueKindGT(v int) predicate.StrategyFilter {
+func LeftValueKindGT(v domains.FilterValueKind) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldLeftValueKind), v))
+		s.Where(sql.GT(s.C(FieldLeftValueKind), vc))
 	})
 }
 
 // LeftValueKindGTE applies the GTE predicate on the "LeftValueKind" field.
-func LeftValueKindGTE(v int) predicate.StrategyFilter {
+func LeftValueKindGTE(v domains.FilterValueKind) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldLeftValueKind), v))
+		s.Where(sql.GTE(s.C(FieldLeftValueKind), vc))
 	})
 }
 
 // LeftValueKindLT applies the LT predicate on the "LeftValueKind" field.
-func LeftValueKindLT(v int) predicate.StrategyFilter {
+func LeftValueKindLT(v domains.FilterValueKind) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldLeftValueKind), v))
+		s.Where(sql.LT(s.C(FieldLeftValueKind), vc))
 	})
 }
 
 // LeftValueKindLTE applies the LTE predicate on the "LeftValueKind" field.
-func LeftValueKindLTE(v int) predicate.StrategyFilter {
+func LeftValueKindLTE(v domains.FilterValueKind) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldLeftValueKind), v))
+		s.Where(sql.LTE(s.C(FieldLeftValueKind), vc))
 	})
 }
 
-// LeftValueEQ applies the EQ predicate on the "LeftValue" field.
-func LeftValueEQ(v string) predicate.StrategyFilter {
+// LeftReportValueEQ applies the EQ predicate on the "LeftReportValue" field.
+func LeftReportValueEQ(v domains.ReportValue) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldLeftValue), v))
+		s.Where(sql.EQ(s.C(FieldLeftReportValue), vc))
 	})
 }
 
-// LeftValueNEQ applies the NEQ predicate on the "LeftValue" field.
-func LeftValueNEQ(v string) predicate.StrategyFilter {
+// LeftReportValueNEQ applies the NEQ predicate on the "LeftReportValue" field.
+func LeftReportValueNEQ(v domains.ReportValue) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldLeftValue), v))
+		s.Where(sql.NEQ(s.C(FieldLeftReportValue), vc))
 	})
 }
 
-// LeftValueIn applies the In predicate on the "LeftValue" field.
-func LeftValueIn(vs ...string) predicate.StrategyFilter {
+// LeftReportValueIn applies the In predicate on the "LeftReportValue" field.
+func LeftReportValueIn(vs ...domains.ReportValue) predicate.StrategyFilter {
 	v := make([]interface{}, len(vs))
 	for i := range v {
-		v[i] = vs[i]
+		v[i] = int(vs[i])
 	}
 	return predicate.StrategyFilter(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
@@ -334,15 +354,15 @@ func LeftValueIn(vs ...string) predicate.StrategyFilter {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldLeftValue), v...))
+		s.Where(sql.In(s.C(FieldLeftReportValue), v...))
 	})
 }
 
-// LeftValueNotIn applies the NotIn predicate on the "LeftValue" field.
-func LeftValueNotIn(vs ...string) predicate.StrategyFilter {
+// LeftReportValueNotIn applies the NotIn predicate on the "LeftReportValue" field.
+func LeftReportValueNotIn(vs ...domains.ReportValue) predicate.StrategyFilter {
 	v := make([]interface{}, len(vs))
 	for i := range v {
-		v[i] = vs[i]
+		v[i] = int(vs[i])
 	}
 	return predicate.StrategyFilter(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
@@ -351,92 +371,63 @@ func LeftValueNotIn(vs ...string) predicate.StrategyFilter {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldLeftValue), v...))
+		s.Where(sql.NotIn(s.C(FieldLeftReportValue), v...))
 	})
 }
 
-// LeftValueGT applies the GT predicate on the "LeftValue" field.
-func LeftValueGT(v string) predicate.StrategyFilter {
+// LeftReportValueGT applies the GT predicate on the "LeftReportValue" field.
+func LeftReportValueGT(v domains.ReportValue) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldLeftValue), v))
+		s.Where(sql.GT(s.C(FieldLeftReportValue), vc))
 	})
 }
 
-// LeftValueGTE applies the GTE predicate on the "LeftValue" field.
-func LeftValueGTE(v string) predicate.StrategyFilter {
+// LeftReportValueGTE applies the GTE predicate on the "LeftReportValue" field.
+func LeftReportValueGTE(v domains.ReportValue) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldLeftValue), v))
+		s.Where(sql.GTE(s.C(FieldLeftReportValue), vc))
 	})
 }
 
-// LeftValueLT applies the LT predicate on the "LeftValue" field.
-func LeftValueLT(v string) predicate.StrategyFilter {
+// LeftReportValueLT applies the LT predicate on the "LeftReportValue" field.
+func LeftReportValueLT(v domains.ReportValue) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldLeftValue), v))
+		s.Where(sql.LT(s.C(FieldLeftReportValue), vc))
 	})
 }
 
-// LeftValueLTE applies the LTE predicate on the "LeftValue" field.
-func LeftValueLTE(v string) predicate.StrategyFilter {
+// LeftReportValueLTE applies the LTE predicate on the "LeftReportValue" field.
+func LeftReportValueLTE(v domains.ReportValue) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldLeftValue), v))
+		s.Where(sql.LTE(s.C(FieldLeftReportValue), vc))
 	})
 }
 
-// LeftValueContains applies the Contains predicate on the "LeftValue" field.
-func LeftValueContains(v string) predicate.StrategyFilter {
+// LeftReportValueTypeEQ applies the EQ predicate on the "LeftReportValueType" field.
+func LeftReportValueTypeEQ(v domains.ReportValueType) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldLeftValue), v))
+		s.Where(sql.EQ(s.C(FieldLeftReportValueType), vc))
 	})
 }
 
-// LeftValueHasPrefix applies the HasPrefix predicate on the "LeftValue" field.
-func LeftValueHasPrefix(v string) predicate.StrategyFilter {
+// LeftReportValueTypeNEQ applies the NEQ predicate on the "LeftReportValueType" field.
+func LeftReportValueTypeNEQ(v domains.ReportValueType) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldLeftValue), v))
+		s.Where(sql.NEQ(s.C(FieldLeftReportValueType), vc))
 	})
 }
 
-// LeftValueHasSuffix applies the HasSuffix predicate on the "LeftValue" field.
-func LeftValueHasSuffix(v string) predicate.StrategyFilter {
-	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldLeftValue), v))
-	})
-}
-
-// LeftValueEqualFold applies the EqualFold predicate on the "LeftValue" field.
-func LeftValueEqualFold(v string) predicate.StrategyFilter {
-	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldLeftValue), v))
-	})
-}
-
-// LeftValueContainsFold applies the ContainsFold predicate on the "LeftValue" field.
-func LeftValueContainsFold(v string) predicate.StrategyFilter {
-	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldLeftValue), v))
-	})
-}
-
-// RVTEQ applies the EQ predicate on the "RVT" field.
-func RVTEQ(v int) predicate.StrategyFilter {
-	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldRVT), v))
-	})
-}
-
-// RVTNEQ applies the NEQ predicate on the "RVT" field.
-func RVTNEQ(v int) predicate.StrategyFilter {
-	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldRVT), v))
-	})
-}
-
-// RVTIn applies the In predicate on the "RVT" field.
-func RVTIn(vs ...int) predicate.StrategyFilter {
+// LeftReportValueTypeIn applies the In predicate on the "LeftReportValueType" field.
+func LeftReportValueTypeIn(vs ...domains.ReportValueType) predicate.StrategyFilter {
 	v := make([]interface{}, len(vs))
 	for i := range v {
-		v[i] = vs[i]
+		v[i] = int(vs[i])
 	}
 	return predicate.StrategyFilter(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
@@ -445,15 +436,15 @@ func RVTIn(vs ...int) predicate.StrategyFilter {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldRVT), v...))
+		s.Where(sql.In(s.C(FieldLeftReportValueType), v...))
 	})
 }
 
-// RVTNotIn applies the NotIn predicate on the "RVT" field.
-func RVTNotIn(vs ...int) predicate.StrategyFilter {
+// LeftReportValueTypeNotIn applies the NotIn predicate on the "LeftReportValueType" field.
+func LeftReportValueTypeNotIn(vs ...domains.ReportValueType) predicate.StrategyFilter {
 	v := make([]interface{}, len(vs))
 	for i := range v {
-		v[i] = vs[i]
+		v[i] = int(vs[i])
 	}
 	return predicate.StrategyFilter(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
@@ -462,57 +453,63 @@ func RVTNotIn(vs ...int) predicate.StrategyFilter {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldRVT), v...))
+		s.Where(sql.NotIn(s.C(FieldLeftReportValueType), v...))
 	})
 }
 
-// RVTGT applies the GT predicate on the "RVT" field.
-func RVTGT(v int) predicate.StrategyFilter {
+// LeftReportValueTypeGT applies the GT predicate on the "LeftReportValueType" field.
+func LeftReportValueTypeGT(v domains.ReportValueType) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldRVT), v))
+		s.Where(sql.GT(s.C(FieldLeftReportValueType), vc))
 	})
 }
 
-// RVTGTE applies the GTE predicate on the "RVT" field.
-func RVTGTE(v int) predicate.StrategyFilter {
+// LeftReportValueTypeGTE applies the GTE predicate on the "LeftReportValueType" field.
+func LeftReportValueTypeGTE(v domains.ReportValueType) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldRVT), v))
+		s.Where(sql.GTE(s.C(FieldLeftReportValueType), vc))
 	})
 }
 
-// RVTLT applies the LT predicate on the "RVT" field.
-func RVTLT(v int) predicate.StrategyFilter {
+// LeftReportValueTypeLT applies the LT predicate on the "LeftReportValueType" field.
+func LeftReportValueTypeLT(v domains.ReportValueType) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldRVT), v))
+		s.Where(sql.LT(s.C(FieldLeftReportValueType), vc))
 	})
 }
 
-// RVTLTE applies the LTE predicate on the "RVT" field.
-func RVTLTE(v int) predicate.StrategyFilter {
+// LeftReportValueTypeLTE applies the LTE predicate on the "LeftReportValueType" field.
+func LeftReportValueTypeLTE(v domains.ReportValueType) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldRVT), v))
+		s.Where(sql.LTE(s.C(FieldLeftReportValueType), vc))
 	})
 }
 
 // OperationEQ applies the EQ predicate on the "Operation" field.
-func OperationEQ(v int) predicate.StrategyFilter {
+func OperationEQ(v domains.FilterOp) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldOperation), v))
+		s.Where(sql.EQ(s.C(FieldOperation), vc))
 	})
 }
 
 // OperationNEQ applies the NEQ predicate on the "Operation" field.
-func OperationNEQ(v int) predicate.StrategyFilter {
+func OperationNEQ(v domains.FilterOp) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldOperation), v))
+		s.Where(sql.NEQ(s.C(FieldOperation), vc))
 	})
 }
 
 // OperationIn applies the In predicate on the "Operation" field.
-func OperationIn(vs ...int) predicate.StrategyFilter {
+func OperationIn(vs ...domains.FilterOp) predicate.StrategyFilter {
 	v := make([]interface{}, len(vs))
 	for i := range v {
-		v[i] = vs[i]
+		v[i] = int(vs[i])
 	}
 	return predicate.StrategyFilter(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
@@ -526,10 +523,10 @@ func OperationIn(vs ...int) predicate.StrategyFilter {
 }
 
 // OperationNotIn applies the NotIn predicate on the "Operation" field.
-func OperationNotIn(vs ...int) predicate.StrategyFilter {
+func OperationNotIn(vs ...domains.FilterOp) predicate.StrategyFilter {
 	v := make([]interface{}, len(vs))
 	for i := range v {
-		v[i] = vs[i]
+		v[i] = int(vs[i])
 	}
 	return predicate.StrategyFilter(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
@@ -543,49 +540,53 @@ func OperationNotIn(vs ...int) predicate.StrategyFilter {
 }
 
 // OperationGT applies the GT predicate on the "Operation" field.
-func OperationGT(v int) predicate.StrategyFilter {
+func OperationGT(v domains.FilterOp) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldOperation), v))
+		s.Where(sql.GT(s.C(FieldOperation), vc))
 	})
 }
 
 // OperationGTE applies the GTE predicate on the "Operation" field.
-func OperationGTE(v int) predicate.StrategyFilter {
+func OperationGTE(v domains.FilterOp) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldOperation), v))
+		s.Where(sql.GTE(s.C(FieldOperation), vc))
 	})
 }
 
 // OperationLT applies the LT predicate on the "Operation" field.
-func OperationLT(v int) predicate.StrategyFilter {
+func OperationLT(v domains.FilterOp) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldOperation), v))
+		s.Where(sql.LT(s.C(FieldOperation), vc))
 	})
 }
 
 // OperationLTE applies the LTE predicate on the "Operation" field.
-func OperationLTE(v int) predicate.StrategyFilter {
+func OperationLTE(v domains.FilterOp) predicate.StrategyFilter {
+	vc := int(v)
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldOperation), v))
+		s.Where(sql.LTE(s.C(FieldOperation), vc))
 	})
 }
 
-// RightValueEQ applies the EQ predicate on the "RightValue" field.
-func RightValueEQ(v string) predicate.StrategyFilter {
+// RightValueStrEQ applies the EQ predicate on the "RightValueStr" field.
+func RightValueStrEQ(v string) predicate.StrategyFilter {
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldRightValue), v))
+		s.Where(sql.EQ(s.C(FieldRightValueStr), v))
 	})
 }
 
-// RightValueNEQ applies the NEQ predicate on the "RightValue" field.
-func RightValueNEQ(v string) predicate.StrategyFilter {
+// RightValueStrNEQ applies the NEQ predicate on the "RightValueStr" field.
+func RightValueStrNEQ(v string) predicate.StrategyFilter {
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldRightValue), v))
+		s.Where(sql.NEQ(s.C(FieldRightValueStr), v))
 	})
 }
 
-// RightValueIn applies the In predicate on the "RightValue" field.
-func RightValueIn(vs ...string) predicate.StrategyFilter {
+// RightValueStrIn applies the In predicate on the "RightValueStr" field.
+func RightValueStrIn(vs ...string) predicate.StrategyFilter {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -597,12 +598,12 @@ func RightValueIn(vs ...string) predicate.StrategyFilter {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldRightValue), v...))
+		s.Where(sql.In(s.C(FieldRightValueStr), v...))
 	})
 }
 
-// RightValueNotIn applies the NotIn predicate on the "RightValue" field.
-func RightValueNotIn(vs ...string) predicate.StrategyFilter {
+// RightValueStrNotIn applies the NotIn predicate on the "RightValueStr" field.
+func RightValueStrNotIn(vs ...string) predicate.StrategyFilter {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -614,70 +615,146 @@ func RightValueNotIn(vs ...string) predicate.StrategyFilter {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldRightValue), v...))
+		s.Where(sql.NotIn(s.C(FieldRightValueStr), v...))
 	})
 }
 
-// RightValueGT applies the GT predicate on the "RightValue" field.
-func RightValueGT(v string) predicate.StrategyFilter {
+// RightValueStrGT applies the GT predicate on the "RightValueStr" field.
+func RightValueStrGT(v string) predicate.StrategyFilter {
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldRightValue), v))
+		s.Where(sql.GT(s.C(FieldRightValueStr), v))
 	})
 }
 
-// RightValueGTE applies the GTE predicate on the "RightValue" field.
-func RightValueGTE(v string) predicate.StrategyFilter {
+// RightValueStrGTE applies the GTE predicate on the "RightValueStr" field.
+func RightValueStrGTE(v string) predicate.StrategyFilter {
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldRightValue), v))
+		s.Where(sql.GTE(s.C(FieldRightValueStr), v))
 	})
 }
 
-// RightValueLT applies the LT predicate on the "RightValue" field.
-func RightValueLT(v string) predicate.StrategyFilter {
+// RightValueStrLT applies the LT predicate on the "RightValueStr" field.
+func RightValueStrLT(v string) predicate.StrategyFilter {
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldRightValue), v))
+		s.Where(sql.LT(s.C(FieldRightValueStr), v))
 	})
 }
 
-// RightValueLTE applies the LTE predicate on the "RightValue" field.
-func RightValueLTE(v string) predicate.StrategyFilter {
+// RightValueStrLTE applies the LTE predicate on the "RightValueStr" field.
+func RightValueStrLTE(v string) predicate.StrategyFilter {
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldRightValue), v))
+		s.Where(sql.LTE(s.C(FieldRightValueStr), v))
 	})
 }
 
-// RightValueContains applies the Contains predicate on the "RightValue" field.
-func RightValueContains(v string) predicate.StrategyFilter {
+// RightValueStrContains applies the Contains predicate on the "RightValueStr" field.
+func RightValueStrContains(v string) predicate.StrategyFilter {
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldRightValue), v))
+		s.Where(sql.Contains(s.C(FieldRightValueStr), v))
 	})
 }
 
-// RightValueHasPrefix applies the HasPrefix predicate on the "RightValue" field.
-func RightValueHasPrefix(v string) predicate.StrategyFilter {
+// RightValueStrHasPrefix applies the HasPrefix predicate on the "RightValueStr" field.
+func RightValueStrHasPrefix(v string) predicate.StrategyFilter {
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldRightValue), v))
+		s.Where(sql.HasPrefix(s.C(FieldRightValueStr), v))
 	})
 }
 
-// RightValueHasSuffix applies the HasSuffix predicate on the "RightValue" field.
-func RightValueHasSuffix(v string) predicate.StrategyFilter {
+// RightValueStrHasSuffix applies the HasSuffix predicate on the "RightValueStr" field.
+func RightValueStrHasSuffix(v string) predicate.StrategyFilter {
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldRightValue), v))
+		s.Where(sql.HasSuffix(s.C(FieldRightValueStr), v))
 	})
 }
 
-// RightValueEqualFold applies the EqualFold predicate on the "RightValue" field.
-func RightValueEqualFold(v string) predicate.StrategyFilter {
+// RightValueStrEqualFold applies the EqualFold predicate on the "RightValueStr" field.
+func RightValueStrEqualFold(v string) predicate.StrategyFilter {
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldRightValue), v))
+		s.Where(sql.EqualFold(s.C(FieldRightValueStr), v))
 	})
 }
 
-// RightValueContainsFold applies the ContainsFold predicate on the "RightValue" field.
-func RightValueContainsFold(v string) predicate.StrategyFilter {
+// RightValueStrContainsFold applies the ContainsFold predicate on the "RightValueStr" field.
+func RightValueStrContainsFold(v string) predicate.StrategyFilter {
 	return predicate.StrategyFilter(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldRightValue), v))
+		s.Where(sql.ContainsFold(s.C(FieldRightValueStr), v))
+	})
+}
+
+// RightValueFloatEQ applies the EQ predicate on the "RightValueFloat" field.
+func RightValueFloatEQ(v float64) predicate.StrategyFilter {
+	return predicate.StrategyFilter(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldRightValueFloat), v))
+	})
+}
+
+// RightValueFloatNEQ applies the NEQ predicate on the "RightValueFloat" field.
+func RightValueFloatNEQ(v float64) predicate.StrategyFilter {
+	return predicate.StrategyFilter(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldRightValueFloat), v))
+	})
+}
+
+// RightValueFloatIn applies the In predicate on the "RightValueFloat" field.
+func RightValueFloatIn(vs ...float64) predicate.StrategyFilter {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.StrategyFilter(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldRightValueFloat), v...))
+	})
+}
+
+// RightValueFloatNotIn applies the NotIn predicate on the "RightValueFloat" field.
+func RightValueFloatNotIn(vs ...float64) predicate.StrategyFilter {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.StrategyFilter(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldRightValueFloat), v...))
+	})
+}
+
+// RightValueFloatGT applies the GT predicate on the "RightValueFloat" field.
+func RightValueFloatGT(v float64) predicate.StrategyFilter {
+	return predicate.StrategyFilter(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldRightValueFloat), v))
+	})
+}
+
+// RightValueFloatGTE applies the GTE predicate on the "RightValueFloat" field.
+func RightValueFloatGTE(v float64) predicate.StrategyFilter {
+	return predicate.StrategyFilter(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldRightValueFloat), v))
+	})
+}
+
+// RightValueFloatLT applies the LT predicate on the "RightValueFloat" field.
+func RightValueFloatLT(v float64) predicate.StrategyFilter {
+	return predicate.StrategyFilter(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldRightValueFloat), v))
+	})
+}
+
+// RightValueFloatLTE applies the LTE predicate on the "RightValueFloat" field.
+func RightValueFloatLTE(v float64) predicate.StrategyFilter {
+	return predicate.StrategyFilter(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldRightValueFloat), v))
 	})
 }
 

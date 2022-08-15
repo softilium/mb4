@@ -16,6 +16,8 @@ func (StrategyFixedTicker) Fields() []ent.Field {
 		field.String("id").GoType(xid.ID{}).DefaultFunc(xid.New).MaxLen(20).Immutable().NotEmpty(),
 		field.Int("LineNum").Range(1, 10000).Default(1),
 		field.Bool("IsUsed").Default(true),
+		field.String("Ticker").MaxLen(20).NotEmpty(),
+		field.Int("Share").Range(1, 100).Default(1),
 	}
 }
 

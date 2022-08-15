@@ -3,9 +3,8 @@
 package ent
 
 import (
-	"time"
-
 	"github.com/rs/xid"
+	"github.com/softilium/mb4/domains"
 	"github.com/softilium/mb4/ent/divpayout"
 	"github.com/softilium/mb4/ent/emission"
 	"github.com/softilium/mb4/ent/emitent"
@@ -346,10 +345,6 @@ func init() {
 	strategyDescStartAmount := strategyFields[10].Descriptor()
 	// strategy.StartAmountValidator is a validator for the "StartAmount" field. It is called by the builders before save.
 	strategy.StartAmountValidator = strategyDescStartAmount.Validators[0].(func(float64) error)
-	// strategyDescStartSimulation is the schema descriptor for StartSimulation field.
-	strategyDescStartSimulation := strategyFields[11].Descriptor()
-	// strategy.DefaultStartSimulation holds the default value on creation for the StartSimulation field.
-	strategy.DefaultStartSimulation = strategyDescStartSimulation.Default.(time.Time)
 	// strategyDescBuyOnlyLowPrice is the schema descriptor for BuyOnlyLowPrice field.
 	strategyDescBuyOnlyLowPrice := strategyFields[12].Descriptor()
 	// strategy.DefaultBuyOnlyLowPrice holds the default value on creation for the BuyOnlyLowPrice field.
@@ -358,12 +353,10 @@ func init() {
 	strategyDescAllowLossWhenSell := strategyFields[13].Descriptor()
 	// strategy.DefaultAllowLossWhenSell holds the default value on creation for the AllowLossWhenSell field.
 	strategy.DefaultAllowLossWhenSell = strategyDescAllowLossWhenSell.Default.(bool)
-	// strategyDescSameEmitent is the schema descriptor for SameEmitent field.
-	strategyDescSameEmitent := strategyFields[14].Descriptor()
-	// strategy.DefaultSameEmitent holds the default value on creation for the SameEmitent field.
-	strategy.DefaultSameEmitent = strategyDescSameEmitent.Default.(int)
-	// strategy.SameEmitentValidator is a validator for the "SameEmitent" field. It is called by the builders before save.
-	strategy.SameEmitentValidator = strategyDescSameEmitent.Validators[0].(func(int) error)
+	// strategyDescAllowSellToFit is the schema descriptor for AllowSellToFit field.
+	strategyDescAllowSellToFit := strategyFields[14].Descriptor()
+	// strategy.DefaultAllowSellToFit holds the default value on creation for the AllowSellToFit field.
+	strategy.DefaultAllowSellToFit = strategyDescAllowSellToFit.Default.(bool)
 	// strategyDescID is the schema descriptor for id field.
 	strategyDescID := strategyFields[0].Descriptor()
 	// strategy.DefaultID holds the default value on creation for the id field.
@@ -440,54 +433,24 @@ func init() {
 	strategyfilterDescIsUsed := strategyfilterFields[2].Descriptor()
 	// strategyfilter.DefaultIsUsed holds the default value on creation for the IsUsed field.
 	strategyfilter.DefaultIsUsed = strategyfilterDescIsUsed.Default.(bool)
-	// strategyfilterDescLeftValueKind is the schema descriptor for LeftValueKind field.
-	strategyfilterDescLeftValueKind := strategyfilterFields[3].Descriptor()
-	// strategyfilter.DefaultLeftValueKind holds the default value on creation for the LeftValueKind field.
-	strategyfilter.DefaultLeftValueKind = strategyfilterDescLeftValueKind.Default.(int)
-	// strategyfilter.LeftValueKindValidator is a validator for the "LeftValueKind" field. It is called by the builders before save.
-	strategyfilter.LeftValueKindValidator = strategyfilterDescLeftValueKind.Validators[0].(func(int) error)
-	// strategyfilterDescLeftValue is the schema descriptor for LeftValue field.
-	strategyfilterDescLeftValue := strategyfilterFields[4].Descriptor()
-	// strategyfilter.LeftValueValidator is a validator for the "LeftValue" field. It is called by the builders before save.
-	strategyfilter.LeftValueValidator = func() func(string) error {
-		validators := strategyfilterDescLeftValue.Validators
-		fns := [...]func(string) error{
-			validators[0].(func(string) error),
-			validators[1].(func(string) error),
-		}
-		return func(_LeftValue string) error {
-			for _, fn := range fns {
-				if err := fn(_LeftValue); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-	}()
-	// strategyfilterDescOperation is the schema descriptor for Operation field.
-	strategyfilterDescOperation := strategyfilterFields[6].Descriptor()
-	// strategyfilter.DefaultOperation holds the default value on creation for the Operation field.
-	strategyfilter.DefaultOperation = strategyfilterDescOperation.Default.(int)
-	// strategyfilter.OperationValidator is a validator for the "Operation" field. It is called by the builders before save.
-	strategyfilter.OperationValidator = strategyfilterDescOperation.Validators[0].(func(int) error)
-	// strategyfilterDescRightValue is the schema descriptor for RightValue field.
-	strategyfilterDescRightValue := strategyfilterFields[7].Descriptor()
-	// strategyfilter.RightValueValidator is a validator for the "RightValue" field. It is called by the builders before save.
-	strategyfilter.RightValueValidator = func() func(string) error {
-		validators := strategyfilterDescRightValue.Validators
-		fns := [...]func(string) error{
-			validators[0].(func(string) error),
-			validators[1].(func(string) error),
-		}
-		return func(_RightValue string) error {
-			for _, fn := range fns {
-				if err := fn(_RightValue); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-	}()
+	// strategyfilterDescLeftReportValue is the schema descriptor for LeftReportValue field.
+	strategyfilterDescLeftReportValue := strategyfilterFields[4].Descriptor()
+	// strategyfilter.DefaultLeftReportValue holds the default value on creation for the LeftReportValue field.
+	strategyfilter.DefaultLeftReportValue = domains.ReportValue(strategyfilterDescLeftReportValue.Default.(int))
+	// strategyfilterDescLeftReportValueType is the schema descriptor for LeftReportValueType field.
+	strategyfilterDescLeftReportValueType := strategyfilterFields[5].Descriptor()
+	// strategyfilter.DefaultLeftReportValueType holds the default value on creation for the LeftReportValueType field.
+	strategyfilter.DefaultLeftReportValueType = domains.ReportValueType(strategyfilterDescLeftReportValueType.Default.(int))
+	// strategyfilterDescRightValueStr is the schema descriptor for RightValueStr field.
+	strategyfilterDescRightValueStr := strategyfilterFields[7].Descriptor()
+	// strategyfilter.DefaultRightValueStr holds the default value on creation for the RightValueStr field.
+	strategyfilter.DefaultRightValueStr = strategyfilterDescRightValueStr.Default.(string)
+	// strategyfilter.RightValueStrValidator is a validator for the "RightValueStr" field. It is called by the builders before save.
+	strategyfilter.RightValueStrValidator = strategyfilterDescRightValueStr.Validators[0].(func(string) error)
+	// strategyfilterDescRightValueFloat is the schema descriptor for RightValueFloat field.
+	strategyfilterDescRightValueFloat := strategyfilterFields[8].Descriptor()
+	// strategyfilter.DefaultRightValueFloat holds the default value on creation for the RightValueFloat field.
+	strategyfilter.DefaultRightValueFloat = strategyfilterDescRightValueFloat.Default.(float64)
 	// strategyfilterDescID is the schema descriptor for id field.
 	strategyfilterDescID := strategyfilterFields[0].Descriptor()
 	// strategyfilter.DefaultID holds the default value on creation for the id field.
@@ -520,6 +483,30 @@ func init() {
 	strategyfixedtickerDescIsUsed := strategyfixedtickerFields[2].Descriptor()
 	// strategyfixedticker.DefaultIsUsed holds the default value on creation for the IsUsed field.
 	strategyfixedticker.DefaultIsUsed = strategyfixedtickerDescIsUsed.Default.(bool)
+	// strategyfixedtickerDescTicker is the schema descriptor for Ticker field.
+	strategyfixedtickerDescTicker := strategyfixedtickerFields[3].Descriptor()
+	// strategyfixedticker.TickerValidator is a validator for the "Ticker" field. It is called by the builders before save.
+	strategyfixedticker.TickerValidator = func() func(string) error {
+		validators := strategyfixedtickerDescTicker.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(_Ticker string) error {
+			for _, fn := range fns {
+				if err := fn(_Ticker); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// strategyfixedtickerDescShare is the schema descriptor for Share field.
+	strategyfixedtickerDescShare := strategyfixedtickerFields[4].Descriptor()
+	// strategyfixedticker.DefaultShare holds the default value on creation for the Share field.
+	strategyfixedticker.DefaultShare = strategyfixedtickerDescShare.Default.(int)
+	// strategyfixedticker.ShareValidator is a validator for the "Share" field. It is called by the builders before save.
+	strategyfixedticker.ShareValidator = strategyfixedtickerDescShare.Validators[0].(func(int) error)
 	// strategyfixedtickerDescID is the schema descriptor for id field.
 	strategyfixedtickerDescID := strategyfixedtickerFields[0].Descriptor()
 	// strategyfixedticker.DefaultID holds the default value on creation for the id field.

@@ -5,6 +5,7 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/rs/xid"
+	"github.com/softilium/mb4/domains"
 )
 
 type StrategyFactor struct {
@@ -16,12 +17,12 @@ func (StrategyFactor) Fields() []ent.Field {
 		field.String("id").GoType(xid.ID{}).DefaultFunc(xid.New).MaxLen(20).Immutable().NotEmpty(),
 		field.Int("LineNum").Range(1, 10000).Default(1),
 		field.Bool("IsUsed").Default(true),
-		field.Int("RK"),  // cube.RK_* report value (Revenue, EBITDA, etc.)
-		field.Int("RVT"), // cube.RVT_* - report value type (YTD, LTM, ...)
+		field.Int("RK").GoType(domains.ReportValue(0)),
+		field.Int("RVT").GoType(domains.ReportValueType(0)),
 		field.Float("MinAcceptabe"),
 		field.Float("MaxAcceptable"),
 		field.Bool("Inverse").Default(false),
-		field.Float("K").Default(1),
+		field.Float("K").Default(1.0),
 		field.Float("Gist").Default(1),
 	}
 }

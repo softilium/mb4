@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/rs/xid"
+	"github.com/softilium/mb4/domains"
 	"github.com/softilium/mb4/ent/strategy"
 	"github.com/softilium/mb4/ent/strategyfactor"
 )
@@ -50,14 +51,14 @@ func (sfc *StrategyFactorCreate) SetNillableIsUsed(b *bool) *StrategyFactorCreat
 }
 
 // SetRK sets the "RK" field.
-func (sfc *StrategyFactorCreate) SetRK(i int) *StrategyFactorCreate {
-	sfc.mutation.SetRK(i)
+func (sfc *StrategyFactorCreate) SetRK(dv domains.ReportValue) *StrategyFactorCreate {
+	sfc.mutation.SetRK(dv)
 	return sfc
 }
 
 // SetRVT sets the "RVT" field.
-func (sfc *StrategyFactorCreate) SetRVT(i int) *StrategyFactorCreate {
-	sfc.mutation.SetRVT(i)
+func (sfc *StrategyFactorCreate) SetRVT(dvt domains.ReportValueType) *StrategyFactorCreate {
+	sfc.mutation.SetRVT(dvt)
 	return sfc
 }
 

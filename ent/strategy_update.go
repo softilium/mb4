@@ -6,12 +6,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/rs/xid"
+	"github.com/softilium/mb4/domains"
 	"github.com/softilium/mb4/ent/predicate"
 	"github.com/softilium/mb4/ent/strategy"
 	"github.com/softilium/mb4/ent/strategyfactor"
@@ -212,16 +212,8 @@ func (su *StrategyUpdate) AddStartAmount(f float64) *StrategyUpdate {
 }
 
 // SetStartSimulation sets the "StartSimulation" field.
-func (su *StrategyUpdate) SetStartSimulation(t time.Time) *StrategyUpdate {
-	su.mutation.SetStartSimulation(t)
-	return su
-}
-
-// SetNillableStartSimulation sets the "StartSimulation" field if the given value is not nil.
-func (su *StrategyUpdate) SetNillableStartSimulation(t *time.Time) *StrategyUpdate {
-	if t != nil {
-		su.SetStartSimulation(*t)
-	}
+func (su *StrategyUpdate) SetStartSimulation(ddo *domains.JSDateOnly) *StrategyUpdate {
+	su.mutation.SetStartSimulation(ddo)
 	return su
 }
 
@@ -253,18 +245,24 @@ func (su *StrategyUpdate) SetNillableAllowLossWhenSell(b *bool) *StrategyUpdate 
 	return su
 }
 
+// SetAllowSellToFit sets the "AllowSellToFit" field.
+func (su *StrategyUpdate) SetAllowSellToFit(b bool) *StrategyUpdate {
+	su.mutation.SetAllowSellToFit(b)
+	return su
+}
+
+// SetNillableAllowSellToFit sets the "AllowSellToFit" field if the given value is not nil.
+func (su *StrategyUpdate) SetNillableAllowSellToFit(b *bool) *StrategyUpdate {
+	if b != nil {
+		su.SetAllowSellToFit(*b)
+	}
+	return su
+}
+
 // SetSameEmitent sets the "SameEmitent" field.
 func (su *StrategyUpdate) SetSameEmitent(i int) *StrategyUpdate {
 	su.mutation.ResetSameEmitent()
 	su.mutation.SetSameEmitent(i)
-	return su
-}
-
-// SetNillableSameEmitent sets the "SameEmitent" field if the given value is not nil.
-func (su *StrategyUpdate) SetNillableSameEmitent(i *int) *StrategyUpdate {
-	if i != nil {
-		su.SetSameEmitent(*i)
-	}
 	return su
 }
 
@@ -496,11 +494,6 @@ func (su *StrategyUpdate) check() error {
 			return &ValidationError{Name: "StartAmount", err: fmt.Errorf(`ent: validator failed for field "Strategy.StartAmount": %w`, err)}
 		}
 	}
-	if v, ok := su.mutation.SameEmitent(); ok {
-		if err := strategy.SameEmitentValidator(v); err != nil {
-			return &ValidationError{Name: "SameEmitent", err: fmt.Errorf(`ent: validator failed for field "Strategy.SameEmitent": %w`, err)}
-		}
-	}
 	if _, ok := su.mutation.UserID(); su.mutation.UserCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Strategy.User"`)
 	}
@@ -676,6 +669,13 @@ func (su *StrategyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeBool,
 			Value:  value,
 			Column: strategy.FieldAllowLossWhenSell,
+		})
+	}
+	if value, ok := su.mutation.AllowSellToFit(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: strategy.FieldAllowSellToFit,
 		})
 	}
 	if value, ok := su.mutation.SameEmitent(); ok {
@@ -1087,16 +1087,8 @@ func (suo *StrategyUpdateOne) AddStartAmount(f float64) *StrategyUpdateOne {
 }
 
 // SetStartSimulation sets the "StartSimulation" field.
-func (suo *StrategyUpdateOne) SetStartSimulation(t time.Time) *StrategyUpdateOne {
-	suo.mutation.SetStartSimulation(t)
-	return suo
-}
-
-// SetNillableStartSimulation sets the "StartSimulation" field if the given value is not nil.
-func (suo *StrategyUpdateOne) SetNillableStartSimulation(t *time.Time) *StrategyUpdateOne {
-	if t != nil {
-		suo.SetStartSimulation(*t)
-	}
+func (suo *StrategyUpdateOne) SetStartSimulation(ddo *domains.JSDateOnly) *StrategyUpdateOne {
+	suo.mutation.SetStartSimulation(ddo)
 	return suo
 }
 
@@ -1128,18 +1120,24 @@ func (suo *StrategyUpdateOne) SetNillableAllowLossWhenSell(b *bool) *StrategyUpd
 	return suo
 }
 
+// SetAllowSellToFit sets the "AllowSellToFit" field.
+func (suo *StrategyUpdateOne) SetAllowSellToFit(b bool) *StrategyUpdateOne {
+	suo.mutation.SetAllowSellToFit(b)
+	return suo
+}
+
+// SetNillableAllowSellToFit sets the "AllowSellToFit" field if the given value is not nil.
+func (suo *StrategyUpdateOne) SetNillableAllowSellToFit(b *bool) *StrategyUpdateOne {
+	if b != nil {
+		suo.SetAllowSellToFit(*b)
+	}
+	return suo
+}
+
 // SetSameEmitent sets the "SameEmitent" field.
 func (suo *StrategyUpdateOne) SetSameEmitent(i int) *StrategyUpdateOne {
 	suo.mutation.ResetSameEmitent()
 	suo.mutation.SetSameEmitent(i)
-	return suo
-}
-
-// SetNillableSameEmitent sets the "SameEmitent" field if the given value is not nil.
-func (suo *StrategyUpdateOne) SetNillableSameEmitent(i *int) *StrategyUpdateOne {
-	if i != nil {
-		suo.SetSameEmitent(*i)
-	}
 	return suo
 }
 
@@ -1378,11 +1376,6 @@ func (suo *StrategyUpdateOne) check() error {
 			return &ValidationError{Name: "StartAmount", err: fmt.Errorf(`ent: validator failed for field "Strategy.StartAmount": %w`, err)}
 		}
 	}
-	if v, ok := suo.mutation.SameEmitent(); ok {
-		if err := strategy.SameEmitentValidator(v); err != nil {
-			return &ValidationError{Name: "SameEmitent", err: fmt.Errorf(`ent: validator failed for field "Strategy.SameEmitent": %w`, err)}
-		}
-	}
 	if _, ok := suo.mutation.UserID(); suo.mutation.UserCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Strategy.User"`)
 	}
@@ -1575,6 +1568,13 @@ func (suo *StrategyUpdateOne) sqlSave(ctx context.Context) (_node *Strategy, err
 			Type:   field.TypeBool,
 			Value:  value,
 			Column: strategy.FieldAllowLossWhenSell,
+		})
+	}
+	if value, ok := suo.mutation.AllowSellToFit(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: strategy.FieldAllowSellToFit,
 		})
 	}
 	if value, ok := suo.mutation.SameEmitent(); ok {

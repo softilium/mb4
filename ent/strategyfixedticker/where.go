@@ -106,6 +106,20 @@ func IsUsed(v bool) predicate.StrategyFixedTicker {
 	})
 }
 
+// Ticker applies equality check predicate on the "Ticker" field. It's identical to TickerEQ.
+func Ticker(v string) predicate.StrategyFixedTicker {
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldTicker), v))
+	})
+}
+
+// Share applies equality check predicate on the "Share" field. It's identical to ShareEQ.
+func Share(v int) predicate.StrategyFixedTicker {
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldShare), v))
+	})
+}
+
 // LineNumEQ applies the EQ predicate on the "LineNum" field.
 func LineNumEQ(v int) predicate.StrategyFixedTicker {
 	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
@@ -193,6 +207,193 @@ func IsUsedEQ(v bool) predicate.StrategyFixedTicker {
 func IsUsedNEQ(v bool) predicate.StrategyFixedTicker {
 	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldIsUsed), v))
+	})
+}
+
+// TickerEQ applies the EQ predicate on the "Ticker" field.
+func TickerEQ(v string) predicate.StrategyFixedTicker {
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldTicker), v))
+	})
+}
+
+// TickerNEQ applies the NEQ predicate on the "Ticker" field.
+func TickerNEQ(v string) predicate.StrategyFixedTicker {
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldTicker), v))
+	})
+}
+
+// TickerIn applies the In predicate on the "Ticker" field.
+func TickerIn(vs ...string) predicate.StrategyFixedTicker {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldTicker), v...))
+	})
+}
+
+// TickerNotIn applies the NotIn predicate on the "Ticker" field.
+func TickerNotIn(vs ...string) predicate.StrategyFixedTicker {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldTicker), v...))
+	})
+}
+
+// TickerGT applies the GT predicate on the "Ticker" field.
+func TickerGT(v string) predicate.StrategyFixedTicker {
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldTicker), v))
+	})
+}
+
+// TickerGTE applies the GTE predicate on the "Ticker" field.
+func TickerGTE(v string) predicate.StrategyFixedTicker {
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldTicker), v))
+	})
+}
+
+// TickerLT applies the LT predicate on the "Ticker" field.
+func TickerLT(v string) predicate.StrategyFixedTicker {
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldTicker), v))
+	})
+}
+
+// TickerLTE applies the LTE predicate on the "Ticker" field.
+func TickerLTE(v string) predicate.StrategyFixedTicker {
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldTicker), v))
+	})
+}
+
+// TickerContains applies the Contains predicate on the "Ticker" field.
+func TickerContains(v string) predicate.StrategyFixedTicker {
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldTicker), v))
+	})
+}
+
+// TickerHasPrefix applies the HasPrefix predicate on the "Ticker" field.
+func TickerHasPrefix(v string) predicate.StrategyFixedTicker {
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldTicker), v))
+	})
+}
+
+// TickerHasSuffix applies the HasSuffix predicate on the "Ticker" field.
+func TickerHasSuffix(v string) predicate.StrategyFixedTicker {
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldTicker), v))
+	})
+}
+
+// TickerEqualFold applies the EqualFold predicate on the "Ticker" field.
+func TickerEqualFold(v string) predicate.StrategyFixedTicker {
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldTicker), v))
+	})
+}
+
+// TickerContainsFold applies the ContainsFold predicate on the "Ticker" field.
+func TickerContainsFold(v string) predicate.StrategyFixedTicker {
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldTicker), v))
+	})
+}
+
+// ShareEQ applies the EQ predicate on the "Share" field.
+func ShareEQ(v int) predicate.StrategyFixedTicker {
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldShare), v))
+	})
+}
+
+// ShareNEQ applies the NEQ predicate on the "Share" field.
+func ShareNEQ(v int) predicate.StrategyFixedTicker {
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldShare), v))
+	})
+}
+
+// ShareIn applies the In predicate on the "Share" field.
+func ShareIn(vs ...int) predicate.StrategyFixedTicker {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldShare), v...))
+	})
+}
+
+// ShareNotIn applies the NotIn predicate on the "Share" field.
+func ShareNotIn(vs ...int) predicate.StrategyFixedTicker {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldShare), v...))
+	})
+}
+
+// ShareGT applies the GT predicate on the "Share" field.
+func ShareGT(v int) predicate.StrategyFixedTicker {
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldShare), v))
+	})
+}
+
+// ShareGTE applies the GTE predicate on the "Share" field.
+func ShareGTE(v int) predicate.StrategyFixedTicker {
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldShare), v))
+	})
+}
+
+// ShareLT applies the LT predicate on the "Share" field.
+func ShareLT(v int) predicate.StrategyFixedTicker {
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldShare), v))
+	})
+}
+
+// ShareLTE applies the LTE predicate on the "Share" field.
+func ShareLTE(v int) predicate.StrategyFixedTicker {
+	return predicate.StrategyFixedTicker(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldShare), v))
 	})
 }
 

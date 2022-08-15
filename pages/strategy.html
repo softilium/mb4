@@ -1,0 +1,874 @@
+{% extends "layout.html" %}
+
+{% block title %}Инвестиционная стратегия{% endblock %}
+
+{% block content %}
+
+<div id="vueapp">
+
+    <div class="row">
+
+        <div class="col-12 col-xl-6">
+
+            <button class="btn btn-primary btn-sm" v-on:click="putStrategy">Применить</button>
+
+            <ul class="nav nav-tabs" id="pills-tab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="pills-main-tab" data-bs-toggle="pill"
+                        data-bs-target="#pills-main" type="button" role="tab" aria-controls="pills-main"
+                        aria-selected="true">
+                        Основное
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pills-shares-tab" data-bs-toggle="pill" data-bs-target="#pills-shares"
+                        type="button" role="tab" aria-controls="pills-shares" aria-selected="false">
+                        Фикс.доли (${totalPreSelected()}%)
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pills-factors-tab" data-bs-toggle="pill"
+                        data-bs-target="#pills-factors" type="button" role="tab" aria-controls="pills-factors"
+                        aria-selected="false">
+                        Факторы
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pills-filters-tab" data-bs-toggle="pill"
+                        data-bs-target="#pills-filters" type="button" role="tab" aria-controls="pills-filters"
+                        aria-selected="false">
+                        Отборы
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="pills-tabContent">
+
+                <div class="tab-pane fade show active" id="pills-main" role="tabpanel" aria-labelledby="pills-main-tab">
+                    <div id="strategyForm">
+                        <small>
+                            <div class="form-group form-group-sm row">
+                                <label for="descr" class="col-sm-3 col-form-label">Наименование</label>
+                                <div class="col-sm-9">
+                                    <input class="form-control input-sm form-control-sm" type="text"
+                                        v-model="obj.Descr" />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col">
+
+                                    <div class="form-group row">
+                                        <label for="maxtickers" class="col-sm-6 col-form-label">
+                                            Максимальное число инструментов
+                                        </label>
+                                        <div class="col-sm-6">
+                                            <input class="form-control form-control-sm" type='number'
+                                                v-model='obj.MaxTickers' />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="startAmount" class="col-sm-6 col-form-label">
+                                            Стартовый баланс</label>
+                                        <div class="col-sm-6">
+                                            <input class="form-control form-control-sm" type='number'
+                                                v-model='obj.StartAmount' />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="weekRefillAmount" class="col-sm-6 col-form-label">
+                                            Недельное пополнение
+                                        </label>
+                                        <div class="col-sm-6">
+                                            <input class="form-control form-control-sm" type='number'
+                                                v-model='obj.WeekRefillAmount' />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="startSimulation" class="col-sm-6 col-form-label">
+                                            Стартовая дата симуляции
+                                        </label>
+                                        <div class="col-sm-6">
+                                            <input class="form-control form-control-sm" type='date'
+                                                v-model='obj.StartSimulation' />
+                                        </div>
+                                    </div>
+
+                                    <div class="'form-group row">
+                                        <label for="baseIndex" class="col-sm-6 col-form-label">
+                                            Базовый индекс для сравнения
+                                        </label>
+                                        <div class="col-sm-6">
+                                            <select class="form-select form-control-sm" v-model='obj.BaseIndex'>
+                                                <option></option>
+                                                <option v-for="item in renderInfo.Tickers" v-bind:value="item.Id">
+                                                    ${item.Descr}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="SameEmitent" class="col-sm-6 col-form-label">
+                                            Разные тикеры одного эмитента
+                                        </label>
+                                        <div class="col-sm-6">
+                                            <select class="form-select form-control-sm" v-model='obj.SameEmitent'>
+                                                <option v-for="item in renderInfo.SameEmitentPolicies"
+                                                    v-bind:value="item.Id">${item.Descr}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col">
+                                    <div class="form-group row">
+                                        <label for="allowLossWhenSell" class="col-sm-6 col-form-check-label">
+                                            Разрешать закрывать позицию в убыток
+                                        </label>
+                                        <div class="col-sm-6">
+                                            <input class="form-check-input form-control-sm" type="checkbox"
+                                                v-model='obj.AllowLossWhenSell' />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="buyOnlyLowPrice" class="col-sm-6 col-form-label">
+                                            Докупать только на просадках
+                                        </label>
+                                        <div class="col-sm-6">
+                                            <input class="form-check-input form-control-sm" type="checkbox"
+                                                v-model='obj.BuyOnlyLowPrice' />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="AllowSellToFit" class="col-sm-6 col-form-label">
+                                            Частичная продажа позиции для выравнивания долей
+                                        </label>
+                                        <div class="col-sm-6">
+                                            <input class="form-check-input form-control-sm" type="checkbox"
+                                                v-model='obj.AllowSellToFit' />
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </small>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade show" id="pills-shares" role="tabpanel" aria-labelledby="pills-shares-tab">
+
+                    <small>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <td>Исп.</td>
+                                    <td>Тикер</td>
+                                    <td class='text-end'>Доля</td>
+                                    <td></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for='item in obj.edges.FixedTickers'>
+                                    <td>
+                                        <input class="form-check-input form-control-sm" type="checkbox"
+                                            v-model='item.IsUsed' />
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-control-sm" v-model='item.Ticker'>
+                                            <option></option>
+                                            <option v-for="item2 in renderInfo.Tickers" v-bind:value="item2.Id">
+                                                ${item2.Descr}
+                                            </option>
+                                        </select>
+                                    </td>
+                                    <td class='text-end'>
+                                        <input type='range' v-model='item.Share' />${item.Share}%
+                                    </td>
+                                    <td>
+                                        <button class="btn" v-on:click='removePreSelected(item)'>
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td class='text-end'> ${totalPreSelected()}%</td>
+                                    <td>
+                                        <button class="btn" v-on:click='addPreSelected()'>
+                                            <i class="bi bi-file-earmark-plus"></i></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </small>
+                </div>
+
+                <div class="tab-pane fade show" id="pills-factors" role="tabpanel" aria-labelledby="pills-factors-tab">
+                    <small>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <td>Исп.</td>
+                                    <td>Параметр отчета</td>
+                                    <td>Расчет</td>
+                                    <td>min/max</td>
+                                    <td>Инверс.</td>
+                                    <td>К</td>
+                                    <td>Гистерезис</td>
+                                    <td></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for='item in obj.factors'>
+                                    <td>
+                                        <input class="form-check-input form-control-sm" type="checkbox"
+                                            v-model='item.IsUsed' disabled />
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-control-sm" v-model='item.RK' disabled>
+                                            <option></option>
+                                            <option v-for="item2 in renderInfo.ReportValues" v-bind:value="item2.Id">
+                                                ${item2.Descr}
+                                            </option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-control-sm" v-model='item.RVT' disabled>
+                                            <option></option>
+                                            <option v-for="item2 in renderInfo.ReportValueTypes" value="item2.Id">
+                                                ${item2.Descr}
+                                            </option>
+                                        </select>
+                                    </td>
+                                    <td>${item.MinAcceptable}..${item.MaxAcceptable}</td>
+                                    <td>
+                                        <input class="form-check-input form-control-sm" type="checkbox"
+                                            v-model='item.Inverse' disabled />
+                                    </td>
+                                    <td>${item.K}</td>
+                                    <td>${item.Gist}</td>
+                                    <td>
+                                        <button class="btn" data-bs-toggle="modal" data-bs-target="#factorModal"
+                                            v-on:click='selectedFactor=item'>
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        <button class="btn"><i class="bi bi-trash3"></i></button>
+
+                                        <!-- редактор фактора стратегии -->
+                                        <div class="modal fade" id="factorModal" tabindex="-1"
+                                            aria-labelledby="factorModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="factorModalLabel">
+                                                            Редактирование фактора стратегии
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+
+                                                        <div class="mb-3 row">
+                                                            <label class="col-sm-3 col-form-label">Используется</label>
+                                                            <div class="col-sm-9">
+                                                                <input class="form-check-input form-control-sm"
+                                                                    type="checkbox" v-model='selectedFactor.IsUsed' />
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="mb-3 row">
+                                                            <label class="col-sm-3 col-form-label">
+                                                                Параметр отчета
+                                                            </label>
+                                                            <div class="col-sm-9">
+                                                                <select class="form-select form-control-sm"
+                                                                    v-model='selectedFactor.RK'>
+                                                                    <option></option>
+                                                                    <option v-for="item2 in renderInfo.ReportValues"
+                                                                        v-bind:value="item2.Id">${item2.Descr}</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="mb-3 row">
+                                                            <label class="col-sm-3 col-form-label">
+                                                                Расчет параметра
+                                                            </label>
+                                                            <div class="col-sm-9">
+                                                                <select class="form-select form-control-sm"
+                                                                    v-model='selectedFactor.RVT'>
+                                                                    <option></option>
+                                                                    <option v-for="item2 in renderInfo.ReportValueTypes"
+                                                                        v-bind:value="item2.Id">${item2.Descr}</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="mb-3 row">
+                                                            <label class="col-sm-3 col-form-label">Мин.значение</label>
+                                                            <div class="col-sm-9">
+                                                                <input class="form-control form-control-sm"
+                                                                    type="number"
+                                                                    v-model='selectedFactor.MinAcceptable' />
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="mb-3 row">
+                                                            <label class="col-sm-3 col-form-label">Макс.значение</label>
+                                                            <div class="col-sm-9">
+                                                                <input class="form-control form-control-sm"
+                                                                    type="number"
+                                                                    v-model='selectedFactor.MaxAcceptable' />
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="mb-3 row">
+                                                            <label class="col-sm-3 col-form-label">Инвертировать</label>
+                                                            <div class="col-sm-9">
+                                                                <input class="form-check-input form-control-sm"
+                                                                    type="checkbox" v-model='selectedFactor.Inverse' />
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="mb-3 row">
+                                                            <label class="col-sm-3 col-form-label">Коэффициент</label>
+                                                            <div class="col-sm-9">
+                                                                <input class="form-control form-control-sm"
+                                                                    type="number" v-model='selectedFactor.K' />
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="mb-3 row">
+                                                            <label class="col-sm-3 col-form-label">Гистерезис</label>
+                                                            <div class="col-sm-9">
+                                                                <input class="form-control form-control-sm"
+                                                                    type="number" v-model='selectedFactor.Gist' />
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">
+                                                            Закрыть
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td>
+                                        <button class="btn" v-on:click='addFactor()'>
+                                            <i class="bi bi-file-earmark-plus"></i></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                    </small>
+                </div>
+
+                <div class="tab-pane fade show" id="pills-filters" role="tabpanel" aria-labelledby="pills-filters-tab">
+                    <strategy-filters :strategy='obj' :renderinfo='renderInfo' />
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-12 col-xl-6" v-if="results != null && results.actualPortfolio != null">
+
+            <h2>Актуальный состав портфеля на сегодня</h2>
+
+            <p>Денежные средства: ${ $prnCurrency(results.actualPortfolio.rub) } </p>
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Тикер</th>
+                        <th class="text-end">Доля</th>
+                        <th class="text-end">Сумма</th>
+                        <th class="text-end">Лоты</th>
+                        <th class="text-end" v-for="factor in results.actualPortfolio.factors">${factor.RK}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in results.actualPortfolio.itemsForJson">
+                        <td><a v-bind:href="tickerUrl(item.ticker.tickerId)">${item.ticker.descr}</a></td>
+                        <td class="text-end">${printPercent(item.currentPercent)}</td>
+                        <td class="text-end">${ $prnCurrency(item.balance) }</td>
+                        <td class="text-end">${item.lots}</td>
+                        <td class="text-end" v-for="df in item.debugFactors">${df.value}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-lg-6">
+            <div ref="strategyChartRef" style="height:400px;width:100%"></div>
+        </div>
+        <div class="col-12 col-lg-6" v-if="obj.BaseIndex != null && obj.BaseIndex !='' ">
+            <div ref="PerformanceChartRef" style="height:400px;width:100%"></div>
+        </div>
+    </div>
+
+    <div class='row' v-if='results.profit!=null'>
+        <div class="row">
+            <div class="col-12 col-xl-5">
+                <h2>Рост стоимости по отраслям:<br />${ $prnCurrency(results.profit) }</h2>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Отрасль</th>
+                            <th class="text-right">Результат</th>
+                            <th class="text-right">Сделок</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for='item in results.simulation.industryTradeResults'>
+                            <td>
+                                <a v-bind:href="industryUrl(item.industry.industryId)">${item.industry.descr}</a>
+                            </td>
+                            <td class="text-end">${ $prnCurrency(item.profit) }</td>
+                            <td class="text-end">${item.dealsCount}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="col-12 col-xl-7">
+                <h2>Дивиденды по отраслям:<br />${ $prnCurrency(results.divsSum) } </h2>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Отрасль</th>
+                            <th class="text-right" v-for='y in results.yearsInResult'>${y}</th>
+                            <th class="text-right">Всего</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for='item in results.dividendIndustries'>
+                            <td><a v-bind:href="industryUrl(item.industryId)">${item.descr}</a></td>
+                            <td class="text-end" v-for='y in results.yearsInResult'>
+                                ${ $prnCurrency(sumDivByYearForIndustry(y, item.industryId)) }
+                            </td>
+                            <td class="text-end">${ $prnCurrency(sumDivForIndustry(item.industryId)) } </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+    <div class=row v-if='!results!=null && results.simulation!=null && results.simulation.tickerTradeResults!=null'>
+
+        <div class="col-12 col-xl-5">
+            <h2>Рост стоимости: ${ $prnCurrency(results.profit) }</h2>
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Тикер</th>
+                        <th class="text-right">Результат</th>
+                        <th class="text-right">Сделок</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for='item in results.simulation.tickerTradeResults'>
+                        <td><a v-bind:href="tickerUrl(item.ticker.tickerId)">${item.ticker.descr}</a></td>
+                        <td class='text-end'>${ $prnCurrency(item.profit) }</td>
+                        <td class='text-end'>${item.dealsCount}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-12 col-xl-7">
+            <h2>Дивиденды: ${ $prnCurrency(results.divsSum) }</h2>
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Тикер</th>
+                        <th class="text-end" v-for='y in results.yearsInResult'>${y}</th>
+                        <th class="text-right">Всего</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for='item in results.dividends'>
+                        <td><a v-bind:href="tickerUrl(item.ticker.tickerId)">${item.ticker.descr}</a></td>
+                        <td class="text-end" v-for='y in results.yearsInResult'>
+                            ${ $prnCurrency(sumDivByYearForTicker(y, item.ticker.tickerId)) }
+                        </td>
+                        <td class="text-end">${ $prnCurrency(item.dividends) }</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>Всего</td>
+                        <td class="text-end" v-for='y in results.yearsInResult'>
+                            ${ $prnCurrency(sumDivByYearForTickerAll(y)) }</td>
+                        <td class="text-end">${ $prnCurrency(results.divsSum) }</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="row" v-if='selectedYear != null'>
+        <div class="col">
+            <h2>Результаты симуляции</h2>
+
+            <div>
+                <button v-for='y in results.yearsInResult' class="btn btn-xs"
+                    v-bind:class="{ 'btn-primary': y==selectedYear, 'btn-link': y!=selectedYear }"
+                    v-on:click='setSelectedYear(y)'>
+                    ${y}
+                </button>
+            </div>
+            <small>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th class="text-end">Пополнение</th>
+                            <th>Сделки</th>
+                            <th class="text-end">Рубли</th>
+                            <th class="text-end">Портфель</th>
+                            <th class="text-end">Вложенное н.</th>
+                            <th class="text-end">Дивиденды н.</th>
+                            <th class="text-end">Результат н.</th>
+                            <th class="text-end">Доходность н.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for='item in daysForYear(selectedYear)'>
+                            <td>${new Date(item.d).toLocaleDateString()}</td>
+                            <td class="text-end">${ $prnCurrency(item.refill) }</td>
+                            <td>
+                                <div v-for='deal in item.deals'>
+                                    <span
+                                        v-bind:class="{'text-danger': deal.investResult<0, 'text-success': deal.investResult>=0 }"
+                                        v-if='deal.kind==0'>
+                                        продажа ${deal.tickerId} ${deal.lots} лот., ${ $prnCurrency(deal.investResult) }
+                                        р.
+                                    </span>
+                                    <span v-if='deal.kind!=0'>
+                                        покупка ${deal.tickerId} ${deal.lots} лот.
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="text-end">${ $prnCurrency(item.portfolioRUB) }</td>
+                            <td class="text-end">${ $prnCurrency(item.portfolioBalance) }</td>
+                            <td class="text-end">${ $prnCurrency(item.accu_Equity) }</td>
+                            <td class="text-end">${ $prnCurrency(item.accu_Dividends) }</td>
+                            <td class="text-end">${ $prnCurrency(item.accu_InvestResult) }</td>
+                            <td class="text-end">${ $prnCurrency(item.accu_Yield) }</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </small>
+        </div>
+    </div>
+
+</div>
+
+{% include "components/StrategyFilters.html" %}
+
+<script type="text/javascript">
+
+    window.strategyId = '{{pd.StrategyId}}';
+
+    const App = {
+        delimiters: ['${', '}'],
+        data() {
+            return {
+                obj: {
+                    edges: {
+                        FixedTickers: []
+                    }
+                },
+                results: {},
+                selectedYear: null,
+                selectedFactor: { IsUsed: false },
+                renderInfo: {
+                    ReportValues: [],
+                    SameEmitentPolicies: [],
+                    FilterValueKinds: [],
+                    FilterOps: [],
+                    FilterOpsShort: [], 
+                    Industries: [],
+                    ReportValueTypes: [],
+                }
+            }
+        },
+        components: { StrategyFilters: StrategyFilters },
+        created() {
+            this.$watch('results', () => {
+                this.$nextTick(function () {
+                    // we need to defer $refs.strategyChartRef with: watch + nextTick
+                    // otherwise $refs will empty due to lazy render in vue
+                    this.createStrategyChart(this.$refs.strategyChartRef, this.results.dates, this.results.equity, this.results.investResults, this.results.divs);
+                    if (this.obj.BaseIndex != null && this.obj.BaseIndex != '')
+                        this.createStrategyPerformanceChart(this.$refs.PerformanceChartRef, this.results.dates, this.results.strategyLevels, this.results.baseLevels);
+                });
+            })
+        },
+        async mounted() {
+            await this.getStrategy();
+            await this.getResults();
+        },
+        methods: {
+
+            createStrategyChart: function (element, dates, equity, results, alldivs) {
+
+                var myChart = echarts.init(element);
+
+                option = {
+                    legend: {
+                        data: ['Капитал', 'Дивиденды', 'Результат'],
+                        left: 10
+                    },
+                    tooltip: {},
+                    xAxis: {
+                        data: dates,
+                        name: 'Недели',
+                        axisLine: { onZero: true },
+                        splitLine: { show: false },
+                        splitArea: { show: false }
+                    },
+                    yAxis: {
+                        splitArea: { show: false }
+                    },
+                    grid: {
+                        left: 100
+                    },
+                    series: [
+                        {
+                            name: 'Капитал',
+                            type: 'bar',
+                            stack: 'one',
+                            data: equity
+                        },
+                        {
+                            name: 'Дивиденды',
+                            type: 'bar',
+                            stack: 'one',
+                            data: alldivs
+                        },
+                        {
+                            name: 'Результат',
+                            type: 'bar',
+                            stack: 'one',
+                            data: results
+                        }
+                    ]
+                };
+
+                myChart.setOption(option);
+
+            },
+            createStrategyPerformanceChart: function (element, dates, strategyLevels, baseLevels) {
+
+                var myChart = echarts.init(element);
+
+                option = {
+                    legend: {
+                        data: ['Стратегия', 'Базовый инструмент'],
+                        left: 10
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: dates
+                    },
+                    yAxis: { type: 'value' },
+                    grid: { left: 100 },
+                    series: [
+                        {
+                            name: 'Стратегия',
+                            data: strategyLevels,
+                            type: 'line',
+                            smooth: true,
+                            symbol: 'none'
+                        },
+                        {
+                            name: 'Базовый инструмент',
+                            data: baseLevels,
+                            type: 'line',
+                            smooth: true,
+                            symbol: 'none'
+                        }
+                    ]
+                };
+
+                myChart.setOption(option);
+
+            },
+
+            printPercent(val) { return new Intl.NumberFormat('ru-RU', { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(val / 100); },
+            tickerUrl(tickerId) { return '/ticker/' + tickerId + "?strategy=" + this.obj.strategyId.toString(); },
+            industryUrl(industryId) { return '/industry/' + industryId; },
+
+            daysForYear(year) {
+                return this.results.simulation.days.filter(item => item.d.startsWith(year.toString()) && (item.refill != 0 || item.deals.length > 0));
+            },
+
+            sumDivByYearForIndustry(aYear, aIndustryId) {
+                let s = 0;
+                this.results.simulation.industryDividendResults.forEach(
+                    function (el) {
+                        if (el.d.startsWith(aYear.toString()) && el.industry.industryId == aIndustryId) s = s + el.dividends;
+                    }
+                );
+                return s;
+            },
+
+            sumDivForIndustry(aIndustryId) {
+                let s = 0;
+                this.results.simulation.industryDividendResults.forEach(
+                    function (el) {
+                        if (el.industry.industryId == aIndustryId) s = s + el.dividends;
+                    }
+                );
+                return s;
+            },
+
+            sumDivByYearForTicker(aYear, aTickerId) {
+                let s = 0;
+                this.results.simulation.tickerDividendResults.forEach(
+                    function (el) {
+                        if (el.d.startsWith(aYear.toString()) && el.ticker.tickerId == aTickerId) s = s + el.dividends;
+                    }
+                );
+                return s;
+
+            },
+
+            sumDivByYearForTickerAll(aYear) {
+                let s = 0;
+                this.results.simulation.tickerDividendResults.forEach(
+                    function (el) {
+                        if (el.d.startsWith(aYear.toString())) s = s + el.dividends;
+                    }
+                );
+                return s;
+
+            },
+
+            async getStrategy() {
+
+                let res = await fetch(`?id=${window.strategyId}&mode=renderinfo`, { method: 'GET' });
+                if (await res.ok) {
+                    this.renderInfo = await res.json();
+                } else {
+                    alert("Проблема с получением данных рендеринга");
+                    return;
+                };
+
+                res = await fetch(`?id=${window.strategyId}&mode=obj`, { method: 'GET' });
+                if (await res.ok) {
+                    this.obj = await res.json();
+
+                    if (this.obj.edges.Filters == undefined)
+                        this.obj.edges.Filters = [];
+
+                    if (this.obj.edges.Factors == undefined)
+                        this.obj.edges.Factors = [];
+
+                    if (this.obj.edges.FixedTickers == undefined)
+                        this.obj.edges.FixedTickers = [];
+
+                }
+                else alert("Проблема с получением данных стратегии");
+
+            },
+
+            totalPreSelected() {
+                let sum = 0;
+                let activePreSels = this.obj.edges.FixedTickers.forEach(function (el) {
+                    if (el.IsUsed)
+                        sum = +sum + +el.Share;
+                });
+                return sum;
+            },
+
+            validateStrategy() {
+                if (this.totalPreSelected() > 100) {
+                    alert("Сумма всех фиксированных долей не может превышать 100")
+                    return false;
+                }
+                return true;
+            },
+
+            removePreSelected(item) {
+                this.obj.edges.FixedTickers.splice(this.obj.edges.FixedTickers.indexOf(item), 1);
+            },
+
+            addPreSelected() {
+                this.obj.edges.FixedTickers.push({ IsUsed: true, Ticker: null, Share: 1 });
+            },
+
+            addFactor() {
+                this.obj.edges.Factors.push({ IsUsed: true, RK: null, RVT: null, MinAcceptable: null, MaxAcceptable: null, Inverse: false, K: 1, Gist: 5 });
+            },
+
+            async putStrategy() {
+                if (!this.validateStrategy()) return;
+
+                this.obj.edges.FixedTickers.forEach(function (el) {
+                    el.Share = parseInt(el.Share); //range editor returns string
+                });
+
+                this.obj.edges.Factors.forEach(function (el) {
+                    el.MinAcceptable = el.MinAcceptable == "" || el.MinAcceptable == null ? null : parseInt(el.MinAcceptable);
+                    el.MaxAcceptable = el.maxAcceptable == "" || el.MaxAcceptable == null ? null : parseInt(el.MaxAcceptable);
+                });
+
+                let objAsJson = JSON.stringify(this.obj);
+                let res = await fetch(`?id=${window.strategyId}&mode=obj`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: objAsJson
+                });
+                if (await res.ok)
+                    this.getResults();
+                else
+                    alert("Проблема с записью данных стратегии");
+            },
+
+            async getResults() {
+                let response = await fetch(`?id=${window.strategyId}&mode=results`, { method: 'GET' });
+                if (await response.ok) {
+                    this.results = await response.json(); // charts will be rendered later by watch funcs
+                    if (this.results.YearsInResult.length > 0)
+                        this.selectedYear = this.results.YearsInResult[this.results.YearsInResult.length - 1];
+                }
+                else alert('Проблемы с чтениеv результатов симуляции');
+            },
+
+            setSelectedYear(y) { this.selectedYear = y; }
+        }
+    };
+
+    Vue.createApp(App).mount('#vueapp')
+
+</script>
+
+{% endblock %}

@@ -3,11 +3,10 @@
 package strategy
 
 import (
-	"time"
-
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/rs/xid"
+	"github.com/softilium/mb4/domains"
 	"github.com/softilium/mb4/ent/predicate"
 )
 
@@ -165,7 +164,7 @@ func StartAmount(v float64) predicate.Strategy {
 }
 
 // StartSimulation applies equality check predicate on the "StartSimulation" field. It's identical to StartSimulationEQ.
-func StartSimulation(v time.Time) predicate.Strategy {
+func StartSimulation(v *domains.JSDateOnly) predicate.Strategy {
 	return predicate.Strategy(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldStartSimulation), v))
 	})
@@ -185,10 +184,18 @@ func AllowLossWhenSell(v bool) predicate.Strategy {
 	})
 }
 
+// AllowSellToFit applies equality check predicate on the "AllowSellToFit" field. It's identical to AllowSellToFitEQ.
+func AllowSellToFit(v bool) predicate.Strategy {
+	return predicate.Strategy(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldAllowSellToFit), v))
+	})
+}
+
 // SameEmitent applies equality check predicate on the "SameEmitent" field. It's identical to SameEmitentEQ.
 func SameEmitent(v int) predicate.Strategy {
+	vc := int(v)
 	return predicate.Strategy(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSameEmitent), v))
+		s.Where(sql.EQ(s.C(FieldSameEmitent), vc))
 	})
 }
 
@@ -1037,21 +1044,21 @@ func StartAmountLTE(v float64) predicate.Strategy {
 }
 
 // StartSimulationEQ applies the EQ predicate on the "StartSimulation" field.
-func StartSimulationEQ(v time.Time) predicate.Strategy {
+func StartSimulationEQ(v *domains.JSDateOnly) predicate.Strategy {
 	return predicate.Strategy(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldStartSimulation), v))
 	})
 }
 
 // StartSimulationNEQ applies the NEQ predicate on the "StartSimulation" field.
-func StartSimulationNEQ(v time.Time) predicate.Strategy {
+func StartSimulationNEQ(v *domains.JSDateOnly) predicate.Strategy {
 	return predicate.Strategy(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldStartSimulation), v))
 	})
 }
 
 // StartSimulationIn applies the In predicate on the "StartSimulation" field.
-func StartSimulationIn(vs ...time.Time) predicate.Strategy {
+func StartSimulationIn(vs ...*domains.JSDateOnly) predicate.Strategy {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -1068,7 +1075,7 @@ func StartSimulationIn(vs ...time.Time) predicate.Strategy {
 }
 
 // StartSimulationNotIn applies the NotIn predicate on the "StartSimulation" field.
-func StartSimulationNotIn(vs ...time.Time) predicate.Strategy {
+func StartSimulationNotIn(vs ...*domains.JSDateOnly) predicate.Strategy {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -1085,28 +1092,28 @@ func StartSimulationNotIn(vs ...time.Time) predicate.Strategy {
 }
 
 // StartSimulationGT applies the GT predicate on the "StartSimulation" field.
-func StartSimulationGT(v time.Time) predicate.Strategy {
+func StartSimulationGT(v *domains.JSDateOnly) predicate.Strategy {
 	return predicate.Strategy(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldStartSimulation), v))
 	})
 }
 
 // StartSimulationGTE applies the GTE predicate on the "StartSimulation" field.
-func StartSimulationGTE(v time.Time) predicate.Strategy {
+func StartSimulationGTE(v *domains.JSDateOnly) predicate.Strategy {
 	return predicate.Strategy(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldStartSimulation), v))
 	})
 }
 
 // StartSimulationLT applies the LT predicate on the "StartSimulation" field.
-func StartSimulationLT(v time.Time) predicate.Strategy {
+func StartSimulationLT(v *domains.JSDateOnly) predicate.Strategy {
 	return predicate.Strategy(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldStartSimulation), v))
 	})
 }
 
 // StartSimulationLTE applies the LTE predicate on the "StartSimulation" field.
-func StartSimulationLTE(v time.Time) predicate.Strategy {
+func StartSimulationLTE(v *domains.JSDateOnly) predicate.Strategy {
 	return predicate.Strategy(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldStartSimulation), v))
 	})
@@ -1140,17 +1147,33 @@ func AllowLossWhenSellNEQ(v bool) predicate.Strategy {
 	})
 }
 
+// AllowSellToFitEQ applies the EQ predicate on the "AllowSellToFit" field.
+func AllowSellToFitEQ(v bool) predicate.Strategy {
+	return predicate.Strategy(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldAllowSellToFit), v))
+	})
+}
+
+// AllowSellToFitNEQ applies the NEQ predicate on the "AllowSellToFit" field.
+func AllowSellToFitNEQ(v bool) predicate.Strategy {
+	return predicate.Strategy(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldAllowSellToFit), v))
+	})
+}
+
 // SameEmitentEQ applies the EQ predicate on the "SameEmitent" field.
 func SameEmitentEQ(v int) predicate.Strategy {
+	vc := int(v)
 	return predicate.Strategy(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSameEmitent), v))
+		s.Where(sql.EQ(s.C(FieldSameEmitent), vc))
 	})
 }
 
 // SameEmitentNEQ applies the NEQ predicate on the "SameEmitent" field.
 func SameEmitentNEQ(v int) predicate.Strategy {
+	vc := int(v)
 	return predicate.Strategy(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldSameEmitent), v))
+		s.Where(sql.NEQ(s.C(FieldSameEmitent), vc))
 	})
 }
 
@@ -1158,7 +1181,7 @@ func SameEmitentNEQ(v int) predicate.Strategy {
 func SameEmitentIn(vs ...int) predicate.Strategy {
 	v := make([]interface{}, len(vs))
 	for i := range v {
-		v[i] = vs[i]
+		v[i] = int(vs[i])
 	}
 	return predicate.Strategy(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
@@ -1175,7 +1198,7 @@ func SameEmitentIn(vs ...int) predicate.Strategy {
 func SameEmitentNotIn(vs ...int) predicate.Strategy {
 	v := make([]interface{}, len(vs))
 	for i := range v {
-		v[i] = vs[i]
+		v[i] = int(vs[i])
 	}
 	return predicate.Strategy(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
@@ -1190,29 +1213,33 @@ func SameEmitentNotIn(vs ...int) predicate.Strategy {
 
 // SameEmitentGT applies the GT predicate on the "SameEmitent" field.
 func SameEmitentGT(v int) predicate.Strategy {
+	vc := int(v)
 	return predicate.Strategy(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldSameEmitent), v))
+		s.Where(sql.GT(s.C(FieldSameEmitent), vc))
 	})
 }
 
 // SameEmitentGTE applies the GTE predicate on the "SameEmitent" field.
 func SameEmitentGTE(v int) predicate.Strategy {
+	vc := int(v)
 	return predicate.Strategy(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldSameEmitent), v))
+		s.Where(sql.GTE(s.C(FieldSameEmitent), vc))
 	})
 }
 
 // SameEmitentLT applies the LT predicate on the "SameEmitent" field.
 func SameEmitentLT(v int) predicate.Strategy {
+	vc := int(v)
 	return predicate.Strategy(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldSameEmitent), v))
+		s.Where(sql.LT(s.C(FieldSameEmitent), vc))
 	})
 }
 
 // SameEmitentLTE applies the LTE predicate on the "SameEmitent" field.
 func SameEmitentLTE(v int) predicate.Strategy {
+	vc := int(v)
 	return predicate.Strategy(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldSameEmitent), v))
+		s.Where(sql.LTE(s.C(FieldSameEmitent), vc))
 	})
 }
 

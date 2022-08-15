@@ -1,25 +1,17 @@
 package schema
 
 import (
-	"time"
-
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/rs/xid"
+	"github.com/softilium/mb4/domains"
 )
 
 type Strategy struct {
 	ent.Schema
 }
-
-const (
-	SameEmitentPolicy_Allow        = 100
-	SameEmitentPolicy_PreferPrefs  = 200
-	SameEmitentPolicy_PreferOrd    = 300
-	SameEmitentPolicy_AllowOnlyOne = 400
-)
 
 func (Strategy) Fields() []ent.Field {
 	return []ent.Field{
@@ -34,10 +26,11 @@ func (Strategy) Fields() []ent.Field {
 		field.Float("Last3YearsYield").Default(0.0),
 		field.Float("WeekRefillAmount").Positive(),
 		field.Float("StartAmount").Positive(),
-		field.Time("StartSimulation").Default(time.Now()),
+		field.Time("StartSimulation").GoType(&domains.JSDateOnly{}),
 		field.Bool("BuyOnlyLowPrice").Default(false),
 		field.Bool("AllowLossWhenSell").Default(true),
-		field.Int("SameEmitent").Range(SameEmitentPolicy_Allow, SameEmitentPolicy_AllowOnlyOne).Default(SameEmitentPolicy_Allow),
+		field.Bool("AllowSellToFit").Default(true),
+		field.Int("SameEmitent").GoType(domains.SameEmitentPolicy(0)),
 	}
 }
 

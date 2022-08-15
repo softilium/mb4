@@ -15,6 +15,10 @@ const (
 	FieldLineNum = "line_num"
 	// FieldIsUsed holds the string denoting the isused field in the database.
 	FieldIsUsed = "is_used"
+	// FieldTicker holds the string denoting the ticker field in the database.
+	FieldTicker = "ticker"
+	// FieldShare holds the string denoting the share field in the database.
+	FieldShare = "share"
 	// EdgeStrategy holds the string denoting the strategy edge name in mutations.
 	EdgeStrategy = "Strategy"
 	// Table holds the table name of the strategyfixedticker in the database.
@@ -33,6 +37,8 @@ var Columns = []string{
 	FieldID,
 	FieldLineNum,
 	FieldIsUsed,
+	FieldTicker,
+	FieldShare,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "strategy_fixed_tickers"
@@ -63,6 +69,12 @@ var (
 	LineNumValidator func(int) error
 	// DefaultIsUsed holds the default value on creation for the "IsUsed" field.
 	DefaultIsUsed bool
+	// TickerValidator is a validator for the "Ticker" field. It is called by the builders before save.
+	TickerValidator func(string) error
+	// DefaultShare holds the default value on creation for the "Share" field.
+	DefaultShare int
+	// ShareValidator is a validator for the "Share" field. It is called by the builders before save.
+	ShareValidator func(int) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.

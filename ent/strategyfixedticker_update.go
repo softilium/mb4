@@ -64,6 +64,33 @@ func (sftu *StrategyFixedTickerUpdate) SetNillableIsUsed(b *bool) *StrategyFixed
 	return sftu
 }
 
+// SetTicker sets the "Ticker" field.
+func (sftu *StrategyFixedTickerUpdate) SetTicker(s string) *StrategyFixedTickerUpdate {
+	sftu.mutation.SetTicker(s)
+	return sftu
+}
+
+// SetShare sets the "Share" field.
+func (sftu *StrategyFixedTickerUpdate) SetShare(i int) *StrategyFixedTickerUpdate {
+	sftu.mutation.ResetShare()
+	sftu.mutation.SetShare(i)
+	return sftu
+}
+
+// SetNillableShare sets the "Share" field if the given value is not nil.
+func (sftu *StrategyFixedTickerUpdate) SetNillableShare(i *int) *StrategyFixedTickerUpdate {
+	if i != nil {
+		sftu.SetShare(*i)
+	}
+	return sftu
+}
+
+// AddShare adds i to the "Share" field.
+func (sftu *StrategyFixedTickerUpdate) AddShare(i int) *StrategyFixedTickerUpdate {
+	sftu.mutation.AddShare(i)
+	return sftu
+}
+
 // SetStrategyID sets the "Strategy" edge to the Strategy entity by ID.
 func (sftu *StrategyFixedTickerUpdate) SetStrategyID(id xid.ID) *StrategyFixedTickerUpdate {
 	sftu.mutation.SetStrategyID(id)
@@ -153,6 +180,16 @@ func (sftu *StrategyFixedTickerUpdate) check() error {
 			return &ValidationError{Name: "LineNum", err: fmt.Errorf(`ent: validator failed for field "StrategyFixedTicker.LineNum": %w`, err)}
 		}
 	}
+	if v, ok := sftu.mutation.Ticker(); ok {
+		if err := strategyfixedticker.TickerValidator(v); err != nil {
+			return &ValidationError{Name: "Ticker", err: fmt.Errorf(`ent: validator failed for field "StrategyFixedTicker.Ticker": %w`, err)}
+		}
+	}
+	if v, ok := sftu.mutation.Share(); ok {
+		if err := strategyfixedticker.ShareValidator(v); err != nil {
+			return &ValidationError{Name: "Share", err: fmt.Errorf(`ent: validator failed for field "StrategyFixedTicker.Share": %w`, err)}
+		}
+	}
 	if _, ok := sftu.mutation.StrategyID(); sftu.mutation.StrategyCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "StrategyFixedTicker.Strategy"`)
 	}
@@ -196,6 +233,27 @@ func (sftu *StrategyFixedTickerUpdate) sqlSave(ctx context.Context) (n int, err 
 			Type:   field.TypeBool,
 			Value:  value,
 			Column: strategyfixedticker.FieldIsUsed,
+		})
+	}
+	if value, ok := sftu.mutation.Ticker(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: strategyfixedticker.FieldTicker,
+		})
+	}
+	if value, ok := sftu.mutation.Share(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: strategyfixedticker.FieldShare,
+		})
+	}
+	if value, ok := sftu.mutation.AddedShare(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: strategyfixedticker.FieldShare,
 		})
 	}
 	if sftu.mutation.StrategyCleared() {
@@ -284,6 +342,33 @@ func (sftuo *StrategyFixedTickerUpdateOne) SetNillableIsUsed(b *bool) *StrategyF
 	if b != nil {
 		sftuo.SetIsUsed(*b)
 	}
+	return sftuo
+}
+
+// SetTicker sets the "Ticker" field.
+func (sftuo *StrategyFixedTickerUpdateOne) SetTicker(s string) *StrategyFixedTickerUpdateOne {
+	sftuo.mutation.SetTicker(s)
+	return sftuo
+}
+
+// SetShare sets the "Share" field.
+func (sftuo *StrategyFixedTickerUpdateOne) SetShare(i int) *StrategyFixedTickerUpdateOne {
+	sftuo.mutation.ResetShare()
+	sftuo.mutation.SetShare(i)
+	return sftuo
+}
+
+// SetNillableShare sets the "Share" field if the given value is not nil.
+func (sftuo *StrategyFixedTickerUpdateOne) SetNillableShare(i *int) *StrategyFixedTickerUpdateOne {
+	if i != nil {
+		sftuo.SetShare(*i)
+	}
+	return sftuo
+}
+
+// AddShare adds i to the "Share" field.
+func (sftuo *StrategyFixedTickerUpdateOne) AddShare(i int) *StrategyFixedTickerUpdateOne {
+	sftuo.mutation.AddShare(i)
 	return sftuo
 }
 
@@ -383,6 +468,16 @@ func (sftuo *StrategyFixedTickerUpdateOne) check() error {
 			return &ValidationError{Name: "LineNum", err: fmt.Errorf(`ent: validator failed for field "StrategyFixedTicker.LineNum": %w`, err)}
 		}
 	}
+	if v, ok := sftuo.mutation.Ticker(); ok {
+		if err := strategyfixedticker.TickerValidator(v); err != nil {
+			return &ValidationError{Name: "Ticker", err: fmt.Errorf(`ent: validator failed for field "StrategyFixedTicker.Ticker": %w`, err)}
+		}
+	}
+	if v, ok := sftuo.mutation.Share(); ok {
+		if err := strategyfixedticker.ShareValidator(v); err != nil {
+			return &ValidationError{Name: "Share", err: fmt.Errorf(`ent: validator failed for field "StrategyFixedTicker.Share": %w`, err)}
+		}
+	}
 	if _, ok := sftuo.mutation.StrategyID(); sftuo.mutation.StrategyCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "StrategyFixedTicker.Strategy"`)
 	}
@@ -443,6 +538,27 @@ func (sftuo *StrategyFixedTickerUpdateOne) sqlSave(ctx context.Context) (_node *
 			Type:   field.TypeBool,
 			Value:  value,
 			Column: strategyfixedticker.FieldIsUsed,
+		})
+	}
+	if value, ok := sftuo.mutation.Ticker(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: strategyfixedticker.FieldTicker,
+		})
+	}
+	if value, ok := sftuo.mutation.Share(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: strategyfixedticker.FieldShare,
+		})
+	}
+	if value, ok := sftuo.mutation.AddedShare(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: strategyfixedticker.FieldShare,
 		})
 	}
 	if sftuo.mutation.StrategyCleared() {

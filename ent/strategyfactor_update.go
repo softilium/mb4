@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/rs/xid"
+	"github.com/softilium/mb4/domains"
 	"github.com/softilium/mb4/ent/predicate"
 	"github.com/softilium/mb4/ent/strategy"
 	"github.com/softilium/mb4/ent/strategyfactor"
@@ -65,28 +66,28 @@ func (sfu *StrategyFactorUpdate) SetNillableIsUsed(b *bool) *StrategyFactorUpdat
 }
 
 // SetRK sets the "RK" field.
-func (sfu *StrategyFactorUpdate) SetRK(i int) *StrategyFactorUpdate {
+func (sfu *StrategyFactorUpdate) SetRK(dv domains.ReportValue) *StrategyFactorUpdate {
 	sfu.mutation.ResetRK()
-	sfu.mutation.SetRK(i)
+	sfu.mutation.SetRK(dv)
 	return sfu
 }
 
-// AddRK adds i to the "RK" field.
-func (sfu *StrategyFactorUpdate) AddRK(i int) *StrategyFactorUpdate {
-	sfu.mutation.AddRK(i)
+// AddRK adds dv to the "RK" field.
+func (sfu *StrategyFactorUpdate) AddRK(dv domains.ReportValue) *StrategyFactorUpdate {
+	sfu.mutation.AddRK(dv)
 	return sfu
 }
 
 // SetRVT sets the "RVT" field.
-func (sfu *StrategyFactorUpdate) SetRVT(i int) *StrategyFactorUpdate {
+func (sfu *StrategyFactorUpdate) SetRVT(dvt domains.ReportValueType) *StrategyFactorUpdate {
 	sfu.mutation.ResetRVT()
-	sfu.mutation.SetRVT(i)
+	sfu.mutation.SetRVT(dvt)
 	return sfu
 }
 
-// AddRVT adds i to the "RVT" field.
-func (sfu *StrategyFactorUpdate) AddRVT(i int) *StrategyFactorUpdate {
-	sfu.mutation.AddRVT(i)
+// AddRVT adds dvt to the "RVT" field.
+func (sfu *StrategyFactorUpdate) AddRVT(dvt domains.ReportValueType) *StrategyFactorUpdate {
+	sfu.mutation.AddRVT(dvt)
 	return sfu
 }
 
@@ -487,28 +488,28 @@ func (sfuo *StrategyFactorUpdateOne) SetNillableIsUsed(b *bool) *StrategyFactorU
 }
 
 // SetRK sets the "RK" field.
-func (sfuo *StrategyFactorUpdateOne) SetRK(i int) *StrategyFactorUpdateOne {
+func (sfuo *StrategyFactorUpdateOne) SetRK(dv domains.ReportValue) *StrategyFactorUpdateOne {
 	sfuo.mutation.ResetRK()
-	sfuo.mutation.SetRK(i)
+	sfuo.mutation.SetRK(dv)
 	return sfuo
 }
 
-// AddRK adds i to the "RK" field.
-func (sfuo *StrategyFactorUpdateOne) AddRK(i int) *StrategyFactorUpdateOne {
-	sfuo.mutation.AddRK(i)
+// AddRK adds dv to the "RK" field.
+func (sfuo *StrategyFactorUpdateOne) AddRK(dv domains.ReportValue) *StrategyFactorUpdateOne {
+	sfuo.mutation.AddRK(dv)
 	return sfuo
 }
 
 // SetRVT sets the "RVT" field.
-func (sfuo *StrategyFactorUpdateOne) SetRVT(i int) *StrategyFactorUpdateOne {
+func (sfuo *StrategyFactorUpdateOne) SetRVT(dvt domains.ReportValueType) *StrategyFactorUpdateOne {
 	sfuo.mutation.ResetRVT()
-	sfuo.mutation.SetRVT(i)
+	sfuo.mutation.SetRVT(dvt)
 	return sfuo
 }
 
-// AddRVT adds i to the "RVT" field.
-func (sfuo *StrategyFactorUpdateOne) AddRVT(i int) *StrategyFactorUpdateOne {
-	sfuo.mutation.AddRVT(i)
+// AddRVT adds dvt to the "RVT" field.
+func (sfuo *StrategyFactorUpdateOne) AddRVT(dvt domains.ReportValueType) *StrategyFactorUpdateOne {
+	sfuo.mutation.AddRVT(dvt)
 	return sfuo
 }
 

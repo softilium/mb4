@@ -4,6 +4,7 @@ package strategyfilter
 
 import (
 	"github.com/rs/xid"
+	"github.com/softilium/mb4/domains"
 )
 
 const (
@@ -17,14 +18,16 @@ const (
 	FieldIsUsed = "is_used"
 	// FieldLeftValueKind holds the string denoting the leftvaluekind field in the database.
 	FieldLeftValueKind = "left_value_kind"
-	// FieldLeftValue holds the string denoting the leftvalue field in the database.
-	FieldLeftValue = "left_value"
-	// FieldRVT holds the string denoting the rvt field in the database.
-	FieldRVT = "rvt"
+	// FieldLeftReportValue holds the string denoting the leftreportvalue field in the database.
+	FieldLeftReportValue = "left_report_value"
+	// FieldLeftReportValueType holds the string denoting the leftreportvaluetype field in the database.
+	FieldLeftReportValueType = "left_report_value_type"
 	// FieldOperation holds the string denoting the operation field in the database.
 	FieldOperation = "operation"
-	// FieldRightValue holds the string denoting the rightvalue field in the database.
-	FieldRightValue = "right_value"
+	// FieldRightValueStr holds the string denoting the rightvaluestr field in the database.
+	FieldRightValueStr = "right_value_str"
+	// FieldRightValueFloat holds the string denoting the rightvaluefloat field in the database.
+	FieldRightValueFloat = "right_value_float"
 	// EdgeStrategy holds the string denoting the strategy edge name in mutations.
 	EdgeStrategy = "Strategy"
 	// Table holds the table name of the strategyfilter in the database.
@@ -44,10 +47,11 @@ var Columns = []string{
 	FieldLineNum,
 	FieldIsUsed,
 	FieldLeftValueKind,
-	FieldLeftValue,
-	FieldRVT,
+	FieldLeftReportValue,
+	FieldLeftReportValueType,
 	FieldOperation,
-	FieldRightValue,
+	FieldRightValueStr,
+	FieldRightValueFloat,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "strategy_filters"
@@ -78,18 +82,16 @@ var (
 	LineNumValidator func(int) error
 	// DefaultIsUsed holds the default value on creation for the "IsUsed" field.
 	DefaultIsUsed bool
-	// DefaultLeftValueKind holds the default value on creation for the "LeftValueKind" field.
-	DefaultLeftValueKind int
-	// LeftValueKindValidator is a validator for the "LeftValueKind" field. It is called by the builders before save.
-	LeftValueKindValidator func(int) error
-	// LeftValueValidator is a validator for the "LeftValue" field. It is called by the builders before save.
-	LeftValueValidator func(string) error
-	// DefaultOperation holds the default value on creation for the "Operation" field.
-	DefaultOperation int
-	// OperationValidator is a validator for the "Operation" field. It is called by the builders before save.
-	OperationValidator func(int) error
-	// RightValueValidator is a validator for the "RightValue" field. It is called by the builders before save.
-	RightValueValidator func(string) error
+	// DefaultLeftReportValue holds the default value on creation for the "LeftReportValue" field.
+	DefaultLeftReportValue domains.ReportValue
+	// DefaultLeftReportValueType holds the default value on creation for the "LeftReportValueType" field.
+	DefaultLeftReportValueType domains.ReportValueType
+	// DefaultRightValueStr holds the default value on creation for the "RightValueStr" field.
+	DefaultRightValueStr string
+	// RightValueStrValidator is a validator for the "RightValueStr" field. It is called by the builders before save.
+	RightValueStrValidator func(string) error
+	// DefaultRightValueFloat holds the default value on creation for the "RightValueFloat" field.
+	DefaultRightValueFloat float64
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.

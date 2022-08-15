@@ -50,6 +50,7 @@ func initServer(listenAddr string) *http.Server {
 	router.HandleFunc("/ticker", pages.Ticker)
 	router.HandleFunc("/industry", pages.Industry)
 	router.HandleFunc("/strategies", pages.Strategies)
+	router.HandleFunc("/strategy", pages.Strategy)
 
 	router.HandleFunc("/api/users/login", api.UsersLogin)
 	router.HandleFunc("/api/users/register", api.UsersRegister)

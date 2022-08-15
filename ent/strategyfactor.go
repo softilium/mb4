@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/rs/xid"
+	"github.com/softilium/mb4/domains"
 	"github.com/softilium/mb4/ent/strategy"
 	"github.com/softilium/mb4/ent/strategyfactor"
 )
@@ -22,9 +23,9 @@ type StrategyFactor struct {
 	// IsUsed holds the value of the "IsUsed" field.
 	IsUsed bool `json:"IsUsed,omitempty"`
 	// RK holds the value of the "RK" field.
-	RK int `json:"RK,omitempty"`
+	RK domains.ReportValue `json:"RK,omitempty"`
 	// RVT holds the value of the "RVT" field.
-	RVT int `json:"RVT,omitempty"`
+	RVT domains.ReportValueType `json:"RVT,omitempty"`
 	// MinAcceptabe holds the value of the "MinAcceptabe" field.
 	MinAcceptabe float64 `json:"MinAcceptabe,omitempty"`
 	// MaxAcceptable holds the value of the "MaxAcceptable" field.
@@ -116,13 +117,13 @@ func (sf *StrategyFactor) assignValues(columns []string, values []interface{}) e
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field RK", values[i])
 			} else if value.Valid {
-				sf.RK = int(value.Int64)
+				sf.RK = domains.ReportValue(value.Int64)
 			}
 		case strategyfactor.FieldRVT:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field RVT", values[i])
 			} else if value.Valid {
-				sf.RVT = int(value.Int64)
+				sf.RVT = domains.ReportValueType(value.Int64)
 			}
 		case strategyfactor.FieldMinAcceptabe:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {

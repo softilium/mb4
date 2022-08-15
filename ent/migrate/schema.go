@@ -233,7 +233,8 @@ var (
 		{Name: "start_simulation", Type: field.TypeTime},
 		{Name: "buy_only_low_price", Type: field.TypeBool, Default: false},
 		{Name: "allow_loss_when_sell", Type: field.TypeBool, Default: true},
-		{Name: "same_emitent", Type: field.TypeInt, Default: 100},
+		{Name: "allow_sell_to_fit", Type: field.TypeBool, Default: true},
+		{Name: "same_emitent", Type: field.TypeInt},
 		{Name: "user_strategies", Type: field.TypeString, Size: 20},
 	}
 	// StrategiesTable holds the schema information for the "strategies" table.
@@ -244,7 +245,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "strategies_users_Strategies",
-				Columns:    []*schema.Column{StrategiesColumns[15]},
+				Columns:    []*schema.Column{StrategiesColumns[16]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -283,11 +284,12 @@ var (
 		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "line_num", Type: field.TypeInt, Default: 1},
 		{Name: "is_used", Type: field.TypeBool, Default: true},
-		{Name: "left_value_kind", Type: field.TypeInt, Default: 100},
-		{Name: "left_value", Type: field.TypeString, Size: 100},
-		{Name: "rvt", Type: field.TypeInt},
-		{Name: "operation", Type: field.TypeInt, Default: 10},
-		{Name: "right_value", Type: field.TypeString, Size: 100},
+		{Name: "left_value_kind", Type: field.TypeInt},
+		{Name: "left_report_value", Type: field.TypeInt, Default: 100},
+		{Name: "left_report_value_type", Type: field.TypeInt, Default: 500},
+		{Name: "operation", Type: field.TypeInt},
+		{Name: "right_value_str", Type: field.TypeString, Size: 100, Default: ""},
+		{Name: "right_value_float", Type: field.TypeFloat64, Default: 0},
 		{Name: "strategy_filters", Type: field.TypeString, Size: 20},
 	}
 	// StrategyFiltersTable holds the schema information for the "strategy_filters" table.
@@ -298,7 +300,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "strategy_filters_strategies_Filters",
-				Columns:    []*schema.Column{StrategyFiltersColumns[8]},
+				Columns:    []*schema.Column{StrategyFiltersColumns[9]},
 				RefColumns: []*schema.Column{StrategiesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -309,6 +311,8 @@ var (
 		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "line_num", Type: field.TypeInt, Default: 1},
 		{Name: "is_used", Type: field.TypeBool, Default: true},
+		{Name: "ticker", Type: field.TypeString, Size: 20},
+		{Name: "share", Type: field.TypeInt, Default: 1},
 		{Name: "strategy_fixed_tickers", Type: field.TypeString, Size: 20},
 	}
 	// StrategyFixedTickersTable holds the schema information for the "strategy_fixed_tickers" table.
@@ -319,7 +323,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "strategy_fixed_tickers_strategies_FixedTickers",
-				Columns:    []*schema.Column{StrategyFixedTickersColumns[3]},
+				Columns:    []*schema.Column{StrategyFixedTickersColumns[5]},
 				RefColumns: []*schema.Column{StrategiesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},

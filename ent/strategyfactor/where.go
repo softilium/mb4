@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/rs/xid"
+	"github.com/softilium/mb4/domains"
 	"github.com/softilium/mb4/ent/predicate"
 )
 
@@ -107,16 +108,18 @@ func IsUsed(v bool) predicate.StrategyFactor {
 }
 
 // RK applies equality check predicate on the "RK" field. It's identical to RKEQ.
-func RK(v int) predicate.StrategyFactor {
+func RK(v domains.ReportValue) predicate.StrategyFactor {
+	vc := int(v)
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldRK), v))
+		s.Where(sql.EQ(s.C(FieldRK), vc))
 	})
 }
 
 // RVT applies equality check predicate on the "RVT" field. It's identical to RVTEQ.
-func RVT(v int) predicate.StrategyFactor {
+func RVT(v domains.ReportValueType) predicate.StrategyFactor {
+	vc := int(v)
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldRVT), v))
+		s.Where(sql.EQ(s.C(FieldRVT), vc))
 	})
 }
 
@@ -246,24 +249,26 @@ func IsUsedNEQ(v bool) predicate.StrategyFactor {
 }
 
 // RKEQ applies the EQ predicate on the "RK" field.
-func RKEQ(v int) predicate.StrategyFactor {
+func RKEQ(v domains.ReportValue) predicate.StrategyFactor {
+	vc := int(v)
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldRK), v))
+		s.Where(sql.EQ(s.C(FieldRK), vc))
 	})
 }
 
 // RKNEQ applies the NEQ predicate on the "RK" field.
-func RKNEQ(v int) predicate.StrategyFactor {
+func RKNEQ(v domains.ReportValue) predicate.StrategyFactor {
+	vc := int(v)
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldRK), v))
+		s.Where(sql.NEQ(s.C(FieldRK), vc))
 	})
 }
 
 // RKIn applies the In predicate on the "RK" field.
-func RKIn(vs ...int) predicate.StrategyFactor {
+func RKIn(vs ...domains.ReportValue) predicate.StrategyFactor {
 	v := make([]interface{}, len(vs))
 	for i := range v {
-		v[i] = vs[i]
+		v[i] = int(vs[i])
 	}
 	return predicate.StrategyFactor(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
@@ -277,10 +282,10 @@ func RKIn(vs ...int) predicate.StrategyFactor {
 }
 
 // RKNotIn applies the NotIn predicate on the "RK" field.
-func RKNotIn(vs ...int) predicate.StrategyFactor {
+func RKNotIn(vs ...domains.ReportValue) predicate.StrategyFactor {
 	v := make([]interface{}, len(vs))
 	for i := range v {
-		v[i] = vs[i]
+		v[i] = int(vs[i])
 	}
 	return predicate.StrategyFactor(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
@@ -294,52 +299,58 @@ func RKNotIn(vs ...int) predicate.StrategyFactor {
 }
 
 // RKGT applies the GT predicate on the "RK" field.
-func RKGT(v int) predicate.StrategyFactor {
+func RKGT(v domains.ReportValue) predicate.StrategyFactor {
+	vc := int(v)
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldRK), v))
+		s.Where(sql.GT(s.C(FieldRK), vc))
 	})
 }
 
 // RKGTE applies the GTE predicate on the "RK" field.
-func RKGTE(v int) predicate.StrategyFactor {
+func RKGTE(v domains.ReportValue) predicate.StrategyFactor {
+	vc := int(v)
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldRK), v))
+		s.Where(sql.GTE(s.C(FieldRK), vc))
 	})
 }
 
 // RKLT applies the LT predicate on the "RK" field.
-func RKLT(v int) predicate.StrategyFactor {
+func RKLT(v domains.ReportValue) predicate.StrategyFactor {
+	vc := int(v)
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldRK), v))
+		s.Where(sql.LT(s.C(FieldRK), vc))
 	})
 }
 
 // RKLTE applies the LTE predicate on the "RK" field.
-func RKLTE(v int) predicate.StrategyFactor {
+func RKLTE(v domains.ReportValue) predicate.StrategyFactor {
+	vc := int(v)
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldRK), v))
+		s.Where(sql.LTE(s.C(FieldRK), vc))
 	})
 }
 
 // RVTEQ applies the EQ predicate on the "RVT" field.
-func RVTEQ(v int) predicate.StrategyFactor {
+func RVTEQ(v domains.ReportValueType) predicate.StrategyFactor {
+	vc := int(v)
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldRVT), v))
+		s.Where(sql.EQ(s.C(FieldRVT), vc))
 	})
 }
 
 // RVTNEQ applies the NEQ predicate on the "RVT" field.
-func RVTNEQ(v int) predicate.StrategyFactor {
+func RVTNEQ(v domains.ReportValueType) predicate.StrategyFactor {
+	vc := int(v)
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldRVT), v))
+		s.Where(sql.NEQ(s.C(FieldRVT), vc))
 	})
 }
 
 // RVTIn applies the In predicate on the "RVT" field.
-func RVTIn(vs ...int) predicate.StrategyFactor {
+func RVTIn(vs ...domains.ReportValueType) predicate.StrategyFactor {
 	v := make([]interface{}, len(vs))
 	for i := range v {
-		v[i] = vs[i]
+		v[i] = int(vs[i])
 	}
 	return predicate.StrategyFactor(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
@@ -353,10 +364,10 @@ func RVTIn(vs ...int) predicate.StrategyFactor {
 }
 
 // RVTNotIn applies the NotIn predicate on the "RVT" field.
-func RVTNotIn(vs ...int) predicate.StrategyFactor {
+func RVTNotIn(vs ...domains.ReportValueType) predicate.StrategyFactor {
 	v := make([]interface{}, len(vs))
 	for i := range v {
-		v[i] = vs[i]
+		v[i] = int(vs[i])
 	}
 	return predicate.StrategyFactor(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
@@ -370,30 +381,34 @@ func RVTNotIn(vs ...int) predicate.StrategyFactor {
 }
 
 // RVTGT applies the GT predicate on the "RVT" field.
-func RVTGT(v int) predicate.StrategyFactor {
+func RVTGT(v domains.ReportValueType) predicate.StrategyFactor {
+	vc := int(v)
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldRVT), v))
+		s.Where(sql.GT(s.C(FieldRVT), vc))
 	})
 }
 
 // RVTGTE applies the GTE predicate on the "RVT" field.
-func RVTGTE(v int) predicate.StrategyFactor {
+func RVTGTE(v domains.ReportValueType) predicate.StrategyFactor {
+	vc := int(v)
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldRVT), v))
+		s.Where(sql.GTE(s.C(FieldRVT), vc))
 	})
 }
 
 // RVTLT applies the LT predicate on the "RVT" field.
-func RVTLT(v int) predicate.StrategyFactor {
+func RVTLT(v domains.ReportValueType) predicate.StrategyFactor {
+	vc := int(v)
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldRVT), v))
+		s.Where(sql.LT(s.C(FieldRVT), vc))
 	})
 }
 
 // RVTLTE applies the LTE predicate on the "RVT" field.
-func RVTLTE(v int) predicate.StrategyFactor {
+func RVTLTE(v domains.ReportValueType) predicate.StrategyFactor {
+	vc := int(v)
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldRVT), v))
+		s.Where(sql.LTE(s.C(FieldRVT), vc))
 	})
 }
 

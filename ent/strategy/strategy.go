@@ -3,8 +3,6 @@
 package strategy
 
 import (
-	"time"
-
 	"github.com/rs/xid"
 )
 
@@ -39,6 +37,8 @@ const (
 	FieldBuyOnlyLowPrice = "buy_only_low_price"
 	// FieldAllowLossWhenSell holds the string denoting the allowlosswhensell field in the database.
 	FieldAllowLossWhenSell = "allow_loss_when_sell"
+	// FieldAllowSellToFit holds the string denoting the allowselltofit field in the database.
+	FieldAllowSellToFit = "allow_sell_to_fit"
 	// FieldSameEmitent holds the string denoting the sameemitent field in the database.
 	FieldSameEmitent = "same_emitent"
 	// EdgeUser holds the string denoting the user edge name in mutations.
@@ -97,6 +97,7 @@ var Columns = []string{
 	FieldStartSimulation,
 	FieldBuyOnlyLowPrice,
 	FieldAllowLossWhenSell,
+	FieldAllowSellToFit,
 	FieldSameEmitent,
 }
 
@@ -146,16 +147,12 @@ var (
 	WeekRefillAmountValidator func(float64) error
 	// StartAmountValidator is a validator for the "StartAmount" field. It is called by the builders before save.
 	StartAmountValidator func(float64) error
-	// DefaultStartSimulation holds the default value on creation for the "StartSimulation" field.
-	DefaultStartSimulation time.Time
 	// DefaultBuyOnlyLowPrice holds the default value on creation for the "BuyOnlyLowPrice" field.
 	DefaultBuyOnlyLowPrice bool
 	// DefaultAllowLossWhenSell holds the default value on creation for the "AllowLossWhenSell" field.
 	DefaultAllowLossWhenSell bool
-	// DefaultSameEmitent holds the default value on creation for the "SameEmitent" field.
-	DefaultSameEmitent int
-	// SameEmitentValidator is a validator for the "SameEmitent" field. It is called by the builders before save.
-	SameEmitentValidator func(int) error
+	// DefaultAllowSellToFit holds the default value on creation for the "AllowSellToFit" field.
+	DefaultAllowSellToFit bool
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.

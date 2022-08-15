@@ -21,6 +21,10 @@ type StrategyFixedTicker struct {
 	LineNum int `json:"LineNum,omitempty"`
 	// IsUsed holds the value of the "IsUsed" field.
 	IsUsed bool `json:"IsUsed,omitempty"`
+	// Ticker holds the value of the "Ticker" field.
+	Ticker string `json:"Ticker,omitempty"`
+	// Share holds the value of the "Share" field.
+	Share int `json:"Share,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the StrategyFixedTickerQuery when eager-loading is set.
 	Edges                  StrategyFixedTickerEdges `json:"edges"`
@@ -57,8 +61,10 @@ func (*StrategyFixedTicker) scanValues(columns []string) ([]interface{}, error) 
 		switch columns[i] {
 		case strategyfixedticker.FieldIsUsed:
 			values[i] = new(sql.NullBool)
-		case strategyfixedticker.FieldLineNum:
+		case strategyfixedticker.FieldLineNum, strategyfixedticker.FieldShare:
 			values[i] = new(sql.NullInt64)
+		case strategyfixedticker.FieldTicker:
+			values[i] = new(sql.NullString)
 		case strategyfixedticker.FieldID:
 			values[i] = new(xid.ID)
 		case strategyfixedticker.ForeignKeys[0]: // strategy_fixed_tickers
@@ -95,6 +101,18 @@ func (sft *StrategyFixedTicker) assignValues(columns []string, values []interfac
 				return fmt.Errorf("unexpected type %T for field IsUsed", values[i])
 			} else if value.Valid {
 				sft.IsUsed = value.Bool
+			}
+		case strategyfixedticker.FieldTicker:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field Ticker", values[i])
+			} else if value.Valid {
+				sft.Ticker = value.String
+			}
+		case strategyfixedticker.FieldShare:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field Share", values[i])
+			} else if value.Valid {
+				sft.Share = int(value.Int64)
 			}
 		case strategyfixedticker.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -140,6 +158,10 @@ func (sft *StrategyFixedTicker) String() string {
 	builder.WriteString(fmt.Sprintf("%v", sft.LineNum))
 	builder.WriteString(", IsUsed=")
 	builder.WriteString(fmt.Sprintf("%v", sft.IsUsed))
+	builder.WriteString(", Ticker=")
+	builder.WriteString(sft.Ticker)
+	builder.WriteString(", Share=")
+	builder.WriteString(fmt.Sprintf("%v", sft.Share))
 	builder.WriteByte(')')
 	return builder.String()
 }

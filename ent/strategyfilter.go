@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/rs/xid"
+	"github.com/softilium/mb4/domains"
 	"github.com/softilium/mb4/ent/strategy"
 	"github.com/softilium/mb4/ent/strategyfilter"
 )
@@ -22,15 +23,17 @@ type StrategyFilter struct {
 	// IsUsed holds the value of the "IsUsed" field.
 	IsUsed bool `json:"IsUsed,omitempty"`
 	// LeftValueKind holds the value of the "LeftValueKind" field.
-	LeftValueKind int `json:"LeftValueKind,omitempty"`
-	// LeftValue holds the value of the "LeftValue" field.
-	LeftValue string `json:"LeftValue,omitempty"`
-	// RVT holds the value of the "RVT" field.
-	RVT int `json:"RVT,omitempty"`
+	LeftValueKind domains.FilterValueKind `json:"LeftValueKind,omitempty"`
+	// LeftReportValue holds the value of the "LeftReportValue" field.
+	LeftReportValue domains.ReportValue `json:"LeftReportValue,omitempty"`
+	// LeftReportValueType holds the value of the "LeftReportValueType" field.
+	LeftReportValueType domains.ReportValueType `json:"LeftReportValueType,omitempty"`
 	// Operation holds the value of the "Operation" field.
-	Operation int `json:"Operation,omitempty"`
-	// RightValue holds the value of the "RightValue" field.
-	RightValue string `json:"RightValue,omitempty"`
+	Operation domains.FilterOp `json:"Operation,omitempty"`
+	// RightValueStr holds the value of the "RightValueStr" field.
+	RightValueStr string `json:"RightValueStr,omitempty"`
+	// RightValueFloat holds the value of the "RightValueFloat" field.
+	RightValueFloat float64 `json:"RightValueFloat,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the StrategyFilterQuery when eager-loading is set.
 	Edges            StrategyFilterEdges `json:"edges"`
@@ -67,9 +70,11 @@ func (*StrategyFilter) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case strategyfilter.FieldIsUsed:
 			values[i] = new(sql.NullBool)
-		case strategyfilter.FieldLineNum, strategyfilter.FieldLeftValueKind, strategyfilter.FieldRVT, strategyfilter.FieldOperation:
+		case strategyfilter.FieldRightValueFloat:
+			values[i] = new(sql.NullFloat64)
+		case strategyfilter.FieldLineNum, strategyfilter.FieldLeftValueKind, strategyfilter.FieldLeftReportValue, strategyfilter.FieldLeftReportValueType, strategyfilter.FieldOperation:
 			values[i] = new(sql.NullInt64)
-		case strategyfilter.FieldLeftValue, strategyfilter.FieldRightValue:
+		case strategyfilter.FieldRightValueStr:
 			values[i] = new(sql.NullString)
 		case strategyfilter.FieldID:
 			values[i] = new(xid.ID)
@@ -112,31 +117,37 @@ func (sf *StrategyFilter) assignValues(columns []string, values []interface{}) e
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field LeftValueKind", values[i])
 			} else if value.Valid {
-				sf.LeftValueKind = int(value.Int64)
+				sf.LeftValueKind = domains.FilterValueKind(value.Int64)
 			}
-		case strategyfilter.FieldLeftValue:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field LeftValue", values[i])
-			} else if value.Valid {
-				sf.LeftValue = value.String
-			}
-		case strategyfilter.FieldRVT:
+		case strategyfilter.FieldLeftReportValue:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field RVT", values[i])
+				return fmt.Errorf("unexpected type %T for field LeftReportValue", values[i])
 			} else if value.Valid {
-				sf.RVT = int(value.Int64)
+				sf.LeftReportValue = domains.ReportValue(value.Int64)
+			}
+		case strategyfilter.FieldLeftReportValueType:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field LeftReportValueType", values[i])
+			} else if value.Valid {
+				sf.LeftReportValueType = domains.ReportValueType(value.Int64)
 			}
 		case strategyfilter.FieldOperation:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field Operation", values[i])
 			} else if value.Valid {
-				sf.Operation = int(value.Int64)
+				sf.Operation = domains.FilterOp(value.Int64)
 			}
-		case strategyfilter.FieldRightValue:
+		case strategyfilter.FieldRightValueStr:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field RightValue", values[i])
+				return fmt.Errorf("unexpected type %T for field RightValueStr", values[i])
 			} else if value.Valid {
-				sf.RightValue = value.String
+				sf.RightValueStr = value.String
+			}
+		case strategyfilter.FieldRightValueFloat:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field RightValueFloat", values[i])
+			} else if value.Valid {
+				sf.RightValueFloat = value.Float64
 			}
 		case strategyfilter.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -184,14 +195,16 @@ func (sf *StrategyFilter) String() string {
 	builder.WriteString(fmt.Sprintf("%v", sf.IsUsed))
 	builder.WriteString(", LeftValueKind=")
 	builder.WriteString(fmt.Sprintf("%v", sf.LeftValueKind))
-	builder.WriteString(", LeftValue=")
-	builder.WriteString(sf.LeftValue)
-	builder.WriteString(", RVT=")
-	builder.WriteString(fmt.Sprintf("%v", sf.RVT))
+	builder.WriteString(", LeftReportValue=")
+	builder.WriteString(fmt.Sprintf("%v", sf.LeftReportValue))
+	builder.WriteString(", LeftReportValueType=")
+	builder.WriteString(fmt.Sprintf("%v", sf.LeftReportValueType))
 	builder.WriteString(", Operation=")
 	builder.WriteString(fmt.Sprintf("%v", sf.Operation))
-	builder.WriteString(", RightValue=")
-	builder.WriteString(sf.RightValue)
+	builder.WriteString(", RightValueStr=")
+	builder.WriteString(sf.RightValueStr)
+	builder.WriteString(", RightValueFloat=")
+	builder.WriteString(fmt.Sprintf("%v", sf.RightValueFloat))
 	builder.WriteByte(')')
 	return builder.String()
 }

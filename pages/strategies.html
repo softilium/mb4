@@ -23,7 +23,7 @@
         {% for item in pd.Items %}
         <tr>
             <td>
-                <a href="{{ '/strategy/' + item.ID }}">{{ item.Descr }}</a>
+                <a href="{{ '/strategy?id=' + item.ID }}">{{ item.Descr }}</a>
             </td>
             <td class="text-end">{{ item.StartAmount|rub0 }}</td>
             <td class="text-end">{{ item.WeekRefillAmount|rub0 }}</td>
