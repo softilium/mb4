@@ -177,6 +177,23 @@ func Strategy(w http.ResponseWriter, r *http.Request) {
 				HandleErr(err, w)
 			}
 
+			_, err = tx.StrategyFactor.Delete().Where(strategyfactor.HasStrategyWith(strategy.ID(obj.ID))).Exec(context.Background())
+			HandleErr(err, w)
+			for idx, v := range obj.Edges.Factors {
+				_, err = tx.StrategyFactor.Create().
+					SetStrategyID(obj.ID).
+					SetLineNum(idx + 1).
+					SetIsUsed(v.IsUsed).
+					SetRK(v.RK).
+					SetRVT(v.RVT).
+					SetMinAcceptable(v.MinAcceptable).
+					SetMaxAcceptable(v.MaxAcceptable).
+					SetInverse(v.Inverse).
+					SetK(v.K).
+					SetGist(v.Gist).
+					Save(context.Background())
+				HandleErr(err, w)
+			}
 			err = tx.Commit()
 			HandleErr(err, w)
 

@@ -13,11 +13,10 @@
                 <td>
                     <input class="form-check-input form-control-sm" type="checkbox" v-model='item.IsUsed' disabled />
                 </td>
-                <td>${filterDescr(item)}</td>
+                <td>
+                    <button class="btn" data-bs-toggle="modal" data-bs-target="#filterModal" v-on:click='selectedFilter=item'>${filterDescr(item)}</button>
+                </td>
                 <td class='text-end text-nowrap'>
-                    <button class="btn" data-bs-toggle="modal" data-bs-target="#filterModal" v-on:click='selectedFilter=item'>
-                        <i class="bi bi-pencil-square"></i>
-                    </button>
                     <button class="btn" v-on:click='removeFilter(item)'><i class="bi bi-trash3"></i></button>
                 </td>
             </tr>

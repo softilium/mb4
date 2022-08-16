@@ -258,7 +258,7 @@ var (
 		{Name: "is_used", Type: field.TypeBool, Default: true},
 		{Name: "rk", Type: field.TypeInt},
 		{Name: "rvt", Type: field.TypeInt},
-		{Name: "min_acceptabe", Type: field.TypeFloat64},
+		{Name: "min_acceptable", Type: field.TypeFloat64},
 		{Name: "max_acceptable", Type: field.TypeFloat64},
 		{Name: "inverse", Type: field.TypeBool, Default: false},
 		{Name: "k", Type: field.TypeFloat64, Default: 1},

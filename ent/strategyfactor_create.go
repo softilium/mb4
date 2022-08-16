@@ -62,9 +62,9 @@ func (sfc *StrategyFactorCreate) SetRVT(dvt domains.ReportValueType) *StrategyFa
 	return sfc
 }
 
-// SetMinAcceptabe sets the "MinAcceptabe" field.
-func (sfc *StrategyFactorCreate) SetMinAcceptabe(f float64) *StrategyFactorCreate {
-	sfc.mutation.SetMinAcceptabe(f)
+// SetMinAcceptable sets the "MinAcceptable" field.
+func (sfc *StrategyFactorCreate) SetMinAcceptable(f float64) *StrategyFactorCreate {
+	sfc.mutation.SetMinAcceptable(f)
 	return sfc
 }
 
@@ -257,8 +257,8 @@ func (sfc *StrategyFactorCreate) check() error {
 	if _, ok := sfc.mutation.RVT(); !ok {
 		return &ValidationError{Name: "RVT", err: errors.New(`ent: missing required field "StrategyFactor.RVT"`)}
 	}
-	if _, ok := sfc.mutation.MinAcceptabe(); !ok {
-		return &ValidationError{Name: "MinAcceptabe", err: errors.New(`ent: missing required field "StrategyFactor.MinAcceptabe"`)}
+	if _, ok := sfc.mutation.MinAcceptable(); !ok {
+		return &ValidationError{Name: "MinAcceptable", err: errors.New(`ent: missing required field "StrategyFactor.MinAcceptable"`)}
 	}
 	if _, ok := sfc.mutation.MaxAcceptable(); !ok {
 		return &ValidationError{Name: "MaxAcceptable", err: errors.New(`ent: missing required field "StrategyFactor.MaxAcceptable"`)}
@@ -348,13 +348,13 @@ func (sfc *StrategyFactorCreate) createSpec() (*StrategyFactor, *sqlgraph.Create
 		})
 		_node.RVT = value
 	}
-	if value, ok := sfc.mutation.MinAcceptabe(); ok {
+	if value, ok := sfc.mutation.MinAcceptable(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeFloat64,
 			Value:  value,
-			Column: strategyfactor.FieldMinAcceptabe,
+			Column: strategyfactor.FieldMinAcceptable,
 		})
-		_node.MinAcceptabe = value
+		_node.MinAcceptable = value
 	}
 	if value, ok := sfc.mutation.MaxAcceptable(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

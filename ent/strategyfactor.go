@@ -26,8 +26,8 @@ type StrategyFactor struct {
 	RK domains.ReportValue `json:"RK,omitempty"`
 	// RVT holds the value of the "RVT" field.
 	RVT domains.ReportValueType `json:"RVT,omitempty"`
-	// MinAcceptabe holds the value of the "MinAcceptabe" field.
-	MinAcceptabe float64 `json:"MinAcceptabe,omitempty"`
+	// MinAcceptable holds the value of the "MinAcceptable" field.
+	MinAcceptable float64 `json:"MinAcceptable,omitempty"`
 	// MaxAcceptable holds the value of the "MaxAcceptable" field.
 	MaxAcceptable float64 `json:"MaxAcceptable,omitempty"`
 	// Inverse holds the value of the "Inverse" field.
@@ -72,7 +72,7 @@ func (*StrategyFactor) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case strategyfactor.FieldIsUsed, strategyfactor.FieldInverse:
 			values[i] = new(sql.NullBool)
-		case strategyfactor.FieldMinAcceptabe, strategyfactor.FieldMaxAcceptable, strategyfactor.FieldK, strategyfactor.FieldGist:
+		case strategyfactor.FieldMinAcceptable, strategyfactor.FieldMaxAcceptable, strategyfactor.FieldK, strategyfactor.FieldGist:
 			values[i] = new(sql.NullFloat64)
 		case strategyfactor.FieldLineNum, strategyfactor.FieldRK, strategyfactor.FieldRVT:
 			values[i] = new(sql.NullInt64)
@@ -125,11 +125,11 @@ func (sf *StrategyFactor) assignValues(columns []string, values []interface{}) e
 			} else if value.Valid {
 				sf.RVT = domains.ReportValueType(value.Int64)
 			}
-		case strategyfactor.FieldMinAcceptabe:
+		case strategyfactor.FieldMinAcceptable:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
-				return fmt.Errorf("unexpected type %T for field MinAcceptabe", values[i])
+				return fmt.Errorf("unexpected type %T for field MinAcceptable", values[i])
 			} else if value.Valid {
-				sf.MinAcceptabe = value.Float64
+				sf.MinAcceptable = value.Float64
 			}
 		case strategyfactor.FieldMaxAcceptable:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
@@ -203,8 +203,8 @@ func (sf *StrategyFactor) String() string {
 	builder.WriteString(fmt.Sprintf("%v", sf.RK))
 	builder.WriteString(", RVT=")
 	builder.WriteString(fmt.Sprintf("%v", sf.RVT))
-	builder.WriteString(", MinAcceptabe=")
-	builder.WriteString(fmt.Sprintf("%v", sf.MinAcceptabe))
+	builder.WriteString(", MinAcceptable=")
+	builder.WriteString(fmt.Sprintf("%v", sf.MinAcceptable))
 	builder.WriteString(", MaxAcceptable=")
 	builder.WriteString(fmt.Sprintf("%v", sf.MaxAcceptable))
 	builder.WriteString(", Inverse=")

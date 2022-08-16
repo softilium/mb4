@@ -123,10 +123,10 @@ func RVT(v domains.ReportValueType) predicate.StrategyFactor {
 	})
 }
 
-// MinAcceptabe applies equality check predicate on the "MinAcceptabe" field. It's identical to MinAcceptabeEQ.
-func MinAcceptabe(v float64) predicate.StrategyFactor {
+// MinAcceptable applies equality check predicate on the "MinAcceptable" field. It's identical to MinAcceptableEQ.
+func MinAcceptable(v float64) predicate.StrategyFactor {
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldMinAcceptabe), v))
+		s.Where(sql.EQ(s.C(FieldMinAcceptable), v))
 	})
 }
 
@@ -412,22 +412,22 @@ func RVTLTE(v domains.ReportValueType) predicate.StrategyFactor {
 	})
 }
 
-// MinAcceptabeEQ applies the EQ predicate on the "MinAcceptabe" field.
-func MinAcceptabeEQ(v float64) predicate.StrategyFactor {
+// MinAcceptableEQ applies the EQ predicate on the "MinAcceptable" field.
+func MinAcceptableEQ(v float64) predicate.StrategyFactor {
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldMinAcceptabe), v))
+		s.Where(sql.EQ(s.C(FieldMinAcceptable), v))
 	})
 }
 
-// MinAcceptabeNEQ applies the NEQ predicate on the "MinAcceptabe" field.
-func MinAcceptabeNEQ(v float64) predicate.StrategyFactor {
+// MinAcceptableNEQ applies the NEQ predicate on the "MinAcceptable" field.
+func MinAcceptableNEQ(v float64) predicate.StrategyFactor {
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldMinAcceptabe), v))
+		s.Where(sql.NEQ(s.C(FieldMinAcceptable), v))
 	})
 }
 
-// MinAcceptabeIn applies the In predicate on the "MinAcceptabe" field.
-func MinAcceptabeIn(vs ...float64) predicate.StrategyFactor {
+// MinAcceptableIn applies the In predicate on the "MinAcceptable" field.
+func MinAcceptableIn(vs ...float64) predicate.StrategyFactor {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -439,12 +439,12 @@ func MinAcceptabeIn(vs ...float64) predicate.StrategyFactor {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldMinAcceptabe), v...))
+		s.Where(sql.In(s.C(FieldMinAcceptable), v...))
 	})
 }
 
-// MinAcceptabeNotIn applies the NotIn predicate on the "MinAcceptabe" field.
-func MinAcceptabeNotIn(vs ...float64) predicate.StrategyFactor {
+// MinAcceptableNotIn applies the NotIn predicate on the "MinAcceptable" field.
+func MinAcceptableNotIn(vs ...float64) predicate.StrategyFactor {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -456,35 +456,35 @@ func MinAcceptabeNotIn(vs ...float64) predicate.StrategyFactor {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldMinAcceptabe), v...))
+		s.Where(sql.NotIn(s.C(FieldMinAcceptable), v...))
 	})
 }
 
-// MinAcceptabeGT applies the GT predicate on the "MinAcceptabe" field.
-func MinAcceptabeGT(v float64) predicate.StrategyFactor {
+// MinAcceptableGT applies the GT predicate on the "MinAcceptable" field.
+func MinAcceptableGT(v float64) predicate.StrategyFactor {
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldMinAcceptabe), v))
+		s.Where(sql.GT(s.C(FieldMinAcceptable), v))
 	})
 }
 
-// MinAcceptabeGTE applies the GTE predicate on the "MinAcceptabe" field.
-func MinAcceptabeGTE(v float64) predicate.StrategyFactor {
+// MinAcceptableGTE applies the GTE predicate on the "MinAcceptable" field.
+func MinAcceptableGTE(v float64) predicate.StrategyFactor {
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldMinAcceptabe), v))
+		s.Where(sql.GTE(s.C(FieldMinAcceptable), v))
 	})
 }
 
-// MinAcceptabeLT applies the LT predicate on the "MinAcceptabe" field.
-func MinAcceptabeLT(v float64) predicate.StrategyFactor {
+// MinAcceptableLT applies the LT predicate on the "MinAcceptable" field.
+func MinAcceptableLT(v float64) predicate.StrategyFactor {
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldMinAcceptabe), v))
+		s.Where(sql.LT(s.C(FieldMinAcceptable), v))
 	})
 }
 
-// MinAcceptabeLTE applies the LTE predicate on the "MinAcceptabe" field.
-func MinAcceptabeLTE(v float64) predicate.StrategyFactor {
+// MinAcceptableLTE applies the LTE predicate on the "MinAcceptable" field.
+func MinAcceptableLTE(v float64) predicate.StrategyFactor {
 	return predicate.StrategyFactor(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldMinAcceptabe), v))
+		s.Where(sql.LTE(s.C(FieldMinAcceptable), v))
 	})
 }
 

@@ -8354,8 +8354,8 @@ type StrategyFactorMutation struct {
 	add_RK            *domains.ReportValue
 	_RVT              *domains.ReportValueType
 	add_RVT           *domains.ReportValueType
-	_MinAcceptabe     *float64
-	add_MinAcceptabe  *float64
+	_MinAcceptable    *float64
+	add_MinAcceptable *float64
 	_MaxAcceptable    *float64
 	add_MaxAcceptable *float64
 	_Inverse          *bool
@@ -8679,60 +8679,60 @@ func (m *StrategyFactorMutation) ResetRVT() {
 	m.add_RVT = nil
 }
 
-// SetMinAcceptabe sets the "MinAcceptabe" field.
-func (m *StrategyFactorMutation) SetMinAcceptabe(f float64) {
-	m._MinAcceptabe = &f
-	m.add_MinAcceptabe = nil
+// SetMinAcceptable sets the "MinAcceptable" field.
+func (m *StrategyFactorMutation) SetMinAcceptable(f float64) {
+	m._MinAcceptable = &f
+	m.add_MinAcceptable = nil
 }
 
-// MinAcceptabe returns the value of the "MinAcceptabe" field in the mutation.
-func (m *StrategyFactorMutation) MinAcceptabe() (r float64, exists bool) {
-	v := m._MinAcceptabe
+// MinAcceptable returns the value of the "MinAcceptable" field in the mutation.
+func (m *StrategyFactorMutation) MinAcceptable() (r float64, exists bool) {
+	v := m._MinAcceptable
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldMinAcceptabe returns the old "MinAcceptabe" field's value of the StrategyFactor entity.
+// OldMinAcceptable returns the old "MinAcceptable" field's value of the StrategyFactor entity.
 // If the StrategyFactor object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *StrategyFactorMutation) OldMinAcceptabe(ctx context.Context) (v float64, err error) {
+func (m *StrategyFactorMutation) OldMinAcceptable(ctx context.Context) (v float64, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldMinAcceptabe is only allowed on UpdateOne operations")
+		return v, errors.New("OldMinAcceptable is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldMinAcceptabe requires an ID field in the mutation")
+		return v, errors.New("OldMinAcceptable requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldMinAcceptabe: %w", err)
+		return v, fmt.Errorf("querying old value for OldMinAcceptable: %w", err)
 	}
-	return oldValue.MinAcceptabe, nil
+	return oldValue.MinAcceptable, nil
 }
 
-// AddMinAcceptabe adds f to the "MinAcceptabe" field.
-func (m *StrategyFactorMutation) AddMinAcceptabe(f float64) {
-	if m.add_MinAcceptabe != nil {
-		*m.add_MinAcceptabe += f
+// AddMinAcceptable adds f to the "MinAcceptable" field.
+func (m *StrategyFactorMutation) AddMinAcceptable(f float64) {
+	if m.add_MinAcceptable != nil {
+		*m.add_MinAcceptable += f
 	} else {
-		m.add_MinAcceptabe = &f
+		m.add_MinAcceptable = &f
 	}
 }
 
-// AddedMinAcceptabe returns the value that was added to the "MinAcceptabe" field in this mutation.
-func (m *StrategyFactorMutation) AddedMinAcceptabe() (r float64, exists bool) {
-	v := m.add_MinAcceptabe
+// AddedMinAcceptable returns the value that was added to the "MinAcceptable" field in this mutation.
+func (m *StrategyFactorMutation) AddedMinAcceptable() (r float64, exists bool) {
+	v := m.add_MinAcceptable
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetMinAcceptabe resets all changes to the "MinAcceptabe" field.
-func (m *StrategyFactorMutation) ResetMinAcceptabe() {
-	m._MinAcceptabe = nil
-	m.add_MinAcceptabe = nil
+// ResetMinAcceptable resets all changes to the "MinAcceptable" field.
+func (m *StrategyFactorMutation) ResetMinAcceptable() {
+	m._MinAcceptable = nil
+	m.add_MinAcceptable = nil
 }
 
 // SetMaxAcceptable sets the "MaxAcceptable" field.
@@ -9010,8 +9010,8 @@ func (m *StrategyFactorMutation) Fields() []string {
 	if m._RVT != nil {
 		fields = append(fields, strategyfactor.FieldRVT)
 	}
-	if m._MinAcceptabe != nil {
-		fields = append(fields, strategyfactor.FieldMinAcceptabe)
+	if m._MinAcceptable != nil {
+		fields = append(fields, strategyfactor.FieldMinAcceptable)
 	}
 	if m._MaxAcceptable != nil {
 		fields = append(fields, strategyfactor.FieldMaxAcceptable)
@@ -9041,8 +9041,8 @@ func (m *StrategyFactorMutation) Field(name string) (ent.Value, bool) {
 		return m.RK()
 	case strategyfactor.FieldRVT:
 		return m.RVT()
-	case strategyfactor.FieldMinAcceptabe:
-		return m.MinAcceptabe()
+	case strategyfactor.FieldMinAcceptable:
+		return m.MinAcceptable()
 	case strategyfactor.FieldMaxAcceptable:
 		return m.MaxAcceptable()
 	case strategyfactor.FieldInverse:
@@ -9068,8 +9068,8 @@ func (m *StrategyFactorMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldRK(ctx)
 	case strategyfactor.FieldRVT:
 		return m.OldRVT(ctx)
-	case strategyfactor.FieldMinAcceptabe:
-		return m.OldMinAcceptabe(ctx)
+	case strategyfactor.FieldMinAcceptable:
+		return m.OldMinAcceptable(ctx)
 	case strategyfactor.FieldMaxAcceptable:
 		return m.OldMaxAcceptable(ctx)
 	case strategyfactor.FieldInverse:
@@ -9115,12 +9115,12 @@ func (m *StrategyFactorMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRVT(v)
 		return nil
-	case strategyfactor.FieldMinAcceptabe:
+	case strategyfactor.FieldMinAcceptable:
 		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetMinAcceptabe(v)
+		m.SetMinAcceptable(v)
 		return nil
 	case strategyfactor.FieldMaxAcceptable:
 		v, ok := value.(float64)
@@ -9167,8 +9167,8 @@ func (m *StrategyFactorMutation) AddedFields() []string {
 	if m.add_RVT != nil {
 		fields = append(fields, strategyfactor.FieldRVT)
 	}
-	if m.add_MinAcceptabe != nil {
-		fields = append(fields, strategyfactor.FieldMinAcceptabe)
+	if m.add_MinAcceptable != nil {
+		fields = append(fields, strategyfactor.FieldMinAcceptable)
 	}
 	if m.add_MaxAcceptable != nil {
 		fields = append(fields, strategyfactor.FieldMaxAcceptable)
@@ -9193,8 +9193,8 @@ func (m *StrategyFactorMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedRK()
 	case strategyfactor.FieldRVT:
 		return m.AddedRVT()
-	case strategyfactor.FieldMinAcceptabe:
-		return m.AddedMinAcceptabe()
+	case strategyfactor.FieldMinAcceptable:
+		return m.AddedMinAcceptable()
 	case strategyfactor.FieldMaxAcceptable:
 		return m.AddedMaxAcceptable()
 	case strategyfactor.FieldK:
@@ -9231,12 +9231,12 @@ func (m *StrategyFactorMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddRVT(v)
 		return nil
-	case strategyfactor.FieldMinAcceptabe:
+	case strategyfactor.FieldMinAcceptable:
 		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddMinAcceptabe(v)
+		m.AddMinAcceptable(v)
 		return nil
 	case strategyfactor.FieldMaxAcceptable:
 		v, ok := value.(float64)
@@ -9298,8 +9298,8 @@ func (m *StrategyFactorMutation) ResetField(name string) error {
 	case strategyfactor.FieldRVT:
 		m.ResetRVT()
 		return nil
-	case strategyfactor.FieldMinAcceptabe:
-		m.ResetMinAcceptabe()
+	case strategyfactor.FieldMinAcceptable:
+		m.ResetMinAcceptable()
 		return nil
 	case strategyfactor.FieldMaxAcceptable:
 		m.ResetMaxAcceptable()

@@ -145,11 +145,11 @@
                                     <td>Инверс.</td>
                                     <td>К</td>
                                     <td>Гистерезис</td>
-                                    <td></td>
+                                    <td> <button class="btn" v-on:click='addFactor()'> <i class="bi bi-file-earmark-plus"></i></i> </button> </td>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for='item in obj.factors'>
+                                <tr v-for='item in obj.edges.Factors'>
                                     <td> <input class="form-check-input form-control-sm" type="checkbox" v-model='item.IsUsed' disabled /> </td>
                                     <td>
                                         <select class="form-select form-control-sm" v-model='item.RK' disabled>
@@ -160,7 +160,7 @@
                                     <td>
                                         <select class="form-select form-control-sm" v-model='item.RVT' disabled>
                                             <option></option>
-                                            <option v-for="item2 in renderInfo.ReportValueTypes" value="item2.Id"> ${item2.Descr} </option>
+                                            <option v-for="item3 in renderInfo.ReportValueTypes" v-bind:value="item3.Id"> ${item3.Descr} </option>
                                         </select>
                                     </td>
                                     <td>${item.MinAcceptable}..${item.MaxAcceptable}</td>
@@ -172,110 +172,98 @@
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
                                         <button class="btn"><i class="bi bi-trash3"></i></button>
-
-                                        <!-- редактор фактора стратегии -->
-                                        <div class="modal fade" id="factorModal" tabindex="-1" aria-labelledby="factorModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="factorModalLabel"> Редактирование фактора стратегии </h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-
-                                                        <div class="mb-3 row">
-                                                            <label class="col-sm-3 col-form-label">Используется</label>
-                                                            <div class="col-sm-9">
-                                                                <input class="form-check-input form-control-sm" type="checkbox"
-                                                                    v-model='selectedFactor.IsUsed' />
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="mb-3 row">
-                                                            <label class="col-sm-3 col-form-label">
-                                                                Параметр отчета
-                                                            </label>
-                                                            <div class="col-sm-9">
-                                                                <select class="form-select form-control-sm" v-model='selectedFactor.RK'>
-                                                                    <option></option>
-                                                                    <option v-for="item2 in renderInfo.ReportValues" v-bind:value="item2.Id">
-                                                                        ${item2.Descr}</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="mb-3 row">
-                                                            <label class="col-sm-3 col-form-label">
-                                                                Расчет параметра
-                                                            </label>
-                                                            <div class="col-sm-9">
-                                                                <select class="form-select form-control-sm" v-model='selectedFactor.RVT'>
-                                                                    <option></option>
-                                                                    <option v-for="item2 in renderInfo.ReportValueTypes" v-bind:value="item2.Id">
-                                                                        ${item2.Descr}</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="mb-3 row">
-                                                            <label class="col-sm-3 col-form-label">Мин.значение</label>
-                                                            <div class="col-sm-9">
-                                                                <input class="form-control form-control-sm" type="number"
-                                                                    v-model='selectedFactor.MinAcceptable' />
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="mb-3 row">
-                                                            <label class="col-sm-3 col-form-label">Макс.значение</label>
-                                                            <div class="col-sm-9">
-                                                                <input class="form-control form-control-sm" type="number"
-                                                                    v-model='selectedFactor.MaxAcceptable' />
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="mb-3 row">
-                                                            <label class="col-sm-3 col-form-label">Инвертировать</label>
-                                                            <div class="col-sm-9">
-                                                                <input class="form-check-input form-control-sm" type="checkbox"
-                                                                    v-model='selectedFactor.Inverse' />
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="mb-3 row">
-                                                            <label class="col-sm-3 col-form-label">Коэффициент</label>
-                                                            <div class="col-sm-9">
-                                                                <input class="form-control form-control-sm" type="number"
-                                                                    v-model='selectedFactor.K' />
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="mb-3 row">
-                                                            <label class="col-sm-3 col-form-label">Гистерезис</label>
-                                                            <div class="col-sm-9">
-                                                                <input class="form-control form-control-sm" type="number"
-                                                                    v-model='selectedFactor.Gist' />
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                            Закрыть
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
                                     </td>
                                 </tr>
                             </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td> <button class="btn" v-on:click='addFactor()'> <i class="bi bi-file-earmark-plus"></i></i> </button> </td>
-                                </tr>
-                            </tfoot>
                         </table>
+
+                        <!-- редактор фактора стратегии -->
+                        <div class="modal fade" id="factorModal" tabindex="-1" aria-labelledby="factorModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="factorModalLabel"> Редактирование фактора стратегии </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+
+                                        <div class="mb-3 row">
+                                            <label class="col-sm-3 col-form-label">Используется</label>
+                                            <div class="col-sm-9">
+                                                <input class="form-check-input form-control-sm" type="checkbox" v-model='selectedFactor.IsUsed' />
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3 row">
+                                            <label class="col-sm-3 col-form-label">
+                                                Параметр отчета
+                                            </label>
+                                            <div class="col-sm-9">
+                                                <select class="form-select form-control-sm" v-model='selectedFactor.RK'>
+                                                    <option></option>
+                                                    <option v-for="item2 in renderInfo.ReportValues" v-bind:value="item2.Id">
+                                                        ${item2.Descr}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3 row">
+                                            <label class="col-sm-3 col-form-label">
+                                                Расчет параметра
+                                            </label>
+                                            <div class="col-sm-9">
+                                                <select class="form-select form-control-sm" v-model='selectedFactor.RVT'>
+                                                    <option></option>
+                                                    <option v-for="item2 in renderInfo.ReportValueTypes" v-bind:value="item2.Id">
+                                                        ${item2.Descr}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3 row">
+                                            <label class="col-sm-3 col-form-label">Мин.значение</label>
+                                            <div class="col-sm-9">
+                                                <input class="form-control form-control-sm" type="number" v-model='selectedFactor.MinAcceptable' />
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3 row">
+                                            <label class="col-sm-3 col-form-label">Макс.значение</label>
+                                            <div class="col-sm-9">
+                                                <input class="form-control form-control-sm" type="number" v-model='selectedFactor.MaxAcceptable' />
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3 row">
+                                            <label class="col-sm-3 col-form-label">Инвертировать</label>
+                                            <div class="col-sm-9">
+                                                <input class="form-check-input form-control-sm" type="checkbox" v-model='selectedFactor.Inverse' />
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3 row">
+                                            <label class="col-sm-3 col-form-label">Коэффициент</label>
+                                            <div class="col-sm-9">
+                                                <input class="form-control form-control-sm" type="number" v-model='selectedFactor.K' />
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3 row">
+                                            <label class="col-sm-3 col-form-label">Гистерезис</label>
+                                            <div class="col-sm-9">
+                                                <input class="form-control form-control-sm" type="number" v-model='selectedFactor.Gist' />
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                            Закрыть
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                     </small>
                 </div>

@@ -19,8 +19,8 @@ const (
 	FieldRK = "rk"
 	// FieldRVT holds the string denoting the rvt field in the database.
 	FieldRVT = "rvt"
-	// FieldMinAcceptabe holds the string denoting the minacceptabe field in the database.
-	FieldMinAcceptabe = "min_acceptabe"
+	// FieldMinAcceptable holds the string denoting the minacceptable field in the database.
+	FieldMinAcceptable = "min_acceptable"
 	// FieldMaxAcceptable holds the string denoting the maxacceptable field in the database.
 	FieldMaxAcceptable = "max_acceptable"
 	// FieldInverse holds the string denoting the inverse field in the database.
@@ -49,7 +49,7 @@ var Columns = []string{
 	FieldIsUsed,
 	FieldRK,
 	FieldRVT,
-	FieldMinAcceptabe,
+	FieldMinAcceptable,
 	FieldMaxAcceptable,
 	FieldInverse,
 	FieldK,

@@ -5,8 +5,8 @@
             <tr>
                 <td>Исп.</td>
                 <td>Тикер</td>
-                <td class='text-end'>Доля</td>
-                <td></td>
+                <td class="text-end">Доля</td>
+                <td class="text-end"><button class="btn" v-on:click='addFixedTickers()'> <i class="bi bi-file-earmark-plus"></i> </button></td>
             </tr>
         </thead>
         <tbody>
@@ -19,7 +19,7 @@
                     </select>
                 </td>
                 <td class='text-end'> <input type='range' v-model='item.Share' />${item.Share}% </td>
-                <td> <button class="btn" v-on:click='removeFixedTickers(item)'> <i class="bi bi-trash3"></i> </button> </td>
+                <td class="text-end"> <button class="btn" v-on:click='removeFixedTickers(item)'> <i class="bi bi-trash3"></i> </button> </td>
             </tr>
         </tbody>
         <tfoot>
@@ -27,8 +27,7 @@
                 <td></td>
                 <td></td>
                 <td class='text-end'> ${totalFixedTickers()}%</td>
-                <td> <button class="btn" v-on:click='addFixedTickers()'> <i class="bi bi-file-earmark-plus"></i></i> </button>
-                </td>
+                <td> </td>
             </tr>
         </tfoot>
     </table>

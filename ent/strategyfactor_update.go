@@ -91,16 +91,16 @@ func (sfu *StrategyFactorUpdate) AddRVT(dvt domains.ReportValueType) *StrategyFa
 	return sfu
 }
 
-// SetMinAcceptabe sets the "MinAcceptabe" field.
-func (sfu *StrategyFactorUpdate) SetMinAcceptabe(f float64) *StrategyFactorUpdate {
-	sfu.mutation.ResetMinAcceptabe()
-	sfu.mutation.SetMinAcceptabe(f)
+// SetMinAcceptable sets the "MinAcceptable" field.
+func (sfu *StrategyFactorUpdate) SetMinAcceptable(f float64) *StrategyFactorUpdate {
+	sfu.mutation.ResetMinAcceptable()
+	sfu.mutation.SetMinAcceptable(f)
 	return sfu
 }
 
-// AddMinAcceptabe adds f to the "MinAcceptabe" field.
-func (sfu *StrategyFactorUpdate) AddMinAcceptabe(f float64) *StrategyFactorUpdate {
-	sfu.mutation.AddMinAcceptabe(f)
+// AddMinAcceptable adds f to the "MinAcceptable" field.
+func (sfu *StrategyFactorUpdate) AddMinAcceptable(f float64) *StrategyFactorUpdate {
+	sfu.mutation.AddMinAcceptable(f)
 	return sfu
 }
 
@@ -335,18 +335,18 @@ func (sfu *StrategyFactorUpdate) sqlSave(ctx context.Context) (n int, err error)
 			Column: strategyfactor.FieldRVT,
 		})
 	}
-	if value, ok := sfu.mutation.MinAcceptabe(); ok {
+	if value, ok := sfu.mutation.MinAcceptable(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeFloat64,
 			Value:  value,
-			Column: strategyfactor.FieldMinAcceptabe,
+			Column: strategyfactor.FieldMinAcceptable,
 		})
 	}
-	if value, ok := sfu.mutation.AddedMinAcceptabe(); ok {
+	if value, ok := sfu.mutation.AddedMinAcceptable(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
 			Type:   field.TypeFloat64,
 			Value:  value,
-			Column: strategyfactor.FieldMinAcceptabe,
+			Column: strategyfactor.FieldMinAcceptable,
 		})
 	}
 	if value, ok := sfu.mutation.MaxAcceptable(); ok {
@@ -513,16 +513,16 @@ func (sfuo *StrategyFactorUpdateOne) AddRVT(dvt domains.ReportValueType) *Strate
 	return sfuo
 }
 
-// SetMinAcceptabe sets the "MinAcceptabe" field.
-func (sfuo *StrategyFactorUpdateOne) SetMinAcceptabe(f float64) *StrategyFactorUpdateOne {
-	sfuo.mutation.ResetMinAcceptabe()
-	sfuo.mutation.SetMinAcceptabe(f)
+// SetMinAcceptable sets the "MinAcceptable" field.
+func (sfuo *StrategyFactorUpdateOne) SetMinAcceptable(f float64) *StrategyFactorUpdateOne {
+	sfuo.mutation.ResetMinAcceptable()
+	sfuo.mutation.SetMinAcceptable(f)
 	return sfuo
 }
 
-// AddMinAcceptabe adds f to the "MinAcceptabe" field.
-func (sfuo *StrategyFactorUpdateOne) AddMinAcceptabe(f float64) *StrategyFactorUpdateOne {
-	sfuo.mutation.AddMinAcceptabe(f)
+// AddMinAcceptable adds f to the "MinAcceptable" field.
+func (sfuo *StrategyFactorUpdateOne) AddMinAcceptable(f float64) *StrategyFactorUpdateOne {
+	sfuo.mutation.AddMinAcceptable(f)
 	return sfuo
 }
 
@@ -781,18 +781,18 @@ func (sfuo *StrategyFactorUpdateOne) sqlSave(ctx context.Context) (_node *Strate
 			Column: strategyfactor.FieldRVT,
 		})
 	}
-	if value, ok := sfuo.mutation.MinAcceptabe(); ok {
+	if value, ok := sfuo.mutation.MinAcceptable(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeFloat64,
 			Value:  value,
-			Column: strategyfactor.FieldMinAcceptabe,
+			Column: strategyfactor.FieldMinAcceptable,
 		})
 	}
-	if value, ok := sfuo.mutation.AddedMinAcceptabe(); ok {
+	if value, ok := sfuo.mutation.AddedMinAcceptable(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
 			Type:   field.TypeFloat64,
 			Value:  value,
-			Column: strategyfactor.FieldMinAcceptabe,
+			Column: strategyfactor.FieldMinAcceptable,
 		})
 	}
 	if value, ok := sfuo.mutation.MaxAcceptable(); ok {

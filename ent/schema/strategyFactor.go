@@ -19,7 +19,7 @@ func (StrategyFactor) Fields() []ent.Field {
 		field.Bool("IsUsed").Default(true),
 		field.Int("RK").GoType(domains.ReportValue(0)),
 		field.Int("RVT").GoType(domains.ReportValueType(0)),
-		field.Float("MinAcceptabe"),
+		field.Float("MinAcceptable"),
 		field.Float("MaxAcceptable"),
 		field.Bool("Inverse").Default(false),
 		field.Float("K").Default(1.0),
