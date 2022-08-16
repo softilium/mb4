@@ -168,8 +168,6 @@ func Strategy(w http.ResponseWriter, r *http.Request) {
 					SetLineNum(idx + 1).
 					SetIsUsed(v.IsUsed).
 					SetLeftValueKind(v.LeftValueKind).
-					//SetLeftTickerValue(v.LeftTickerValue).
-					//SetLeftIndustryValue(v.LeftIndustryValue).
 					SetLeftReportValue(v.LeftReportValue).
 					SetLeftReportValueType(v.LeftReportValueType).
 					SetOperation(v.Operation).
