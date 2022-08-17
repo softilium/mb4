@@ -391,18 +391,8 @@ func (sc *StrategyCreate) check() error {
 	if _, ok := sc.mutation.MaxTickers(); !ok {
 		return &ValidationError{Name: "MaxTickers", err: errors.New(`ent: missing required field "Strategy.MaxTickers"`)}
 	}
-	if v, ok := sc.mutation.MaxTickers(); ok {
-		if err := strategy.MaxTickersValidator(v); err != nil {
-			return &ValidationError{Name: "MaxTickers", err: fmt.Errorf(`ent: validator failed for field "Strategy.MaxTickers": %w`, err)}
-		}
-	}
 	if _, ok := sc.mutation.MaxTickersPerIndustry(); !ok {
 		return &ValidationError{Name: "MaxTickersPerIndustry", err: errors.New(`ent: missing required field "Strategy.MaxTickersPerIndustry"`)}
-	}
-	if v, ok := sc.mutation.MaxTickersPerIndustry(); ok {
-		if err := strategy.MaxTickersPerIndustryValidator(v); err != nil {
-			return &ValidationError{Name: "MaxTickersPerIndustry", err: fmt.Errorf(`ent: validator failed for field "Strategy.MaxTickersPerIndustry": %w`, err)}
-		}
 	}
 	if v, ok := sc.mutation.BaseIndex(); ok {
 		if err := strategy.BaseIndexValidator(v); err != nil {

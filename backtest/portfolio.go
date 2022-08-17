@@ -34,7 +34,7 @@ func (p *Portfolio) CurrentBalance() float64 {
 func (p *Portfolio) BuyLots(Cell *cube.Cell, LotsToBuy int) []*Deal {
 
 	lots := LotsToBuy
-	maxLots := int(math.Trunc(p.RUB / float64(Cell.Emission.LotSize*int(Cell.Quote.C))))
+	maxLots := int(math.Trunc(p.RUB / (float64(Cell.Emission.LotSize) * Cell.Quote.C)))
 	if lots > maxLots {
 		lots = maxLots
 	}

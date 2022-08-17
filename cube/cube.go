@@ -81,38 +81,109 @@ func (r *Cell) CalcAfterLoad(cb *Cube) {
 
 }
 
-func (r *Cell) RepValue(market *Cube, rv domains.ReportValue, rvt domains.ReportValueType) float64 {
+func (c *Cell) RepValue(market *Cube, rv domains.ReportValue, rvt domains.ReportValueType) float64 {
 
-	var r1 *Report2
+	var r2 *Report2
+	var r3 *Cell
 
 	switch rvt {
 	case domains.RVT_Src, domains.RVT_YtdAdj, domains.RVT_Ltm, domains.RVT_AG, domains.RVT_AG_Ltm:
-		r1 = r.R2
+		r2 = c.R2
+		r3 = c
 	case domains.RVT_Ind_Src, domains.RVT_Ind_YtdAdj, domains.RVT_Ind_Ltm, domains.RVT_Ind_AG, domains.RVT_Ind_AG_Ltm:
-		r1 = market.cellsByIndustryByDate[r.Industry.ID][r.D].R2
+		r3 = market.cellsByIndustryByDate[c.Industry.ID][c.D]
+		r2 = r3.R2
 	}
 
-	var r2 RepV
+	var rc RepV
 
 	switch rv {
 	case domains.RK_Revenue:
-		r2 = r1.Revenue
+		rc = r2.Revenue
 	case domains.RK_Amortization:
-		r2 = r1.Amortization
+		rc = r2.Amortization
+	case domains.RK_OperatingIncome:
+		rc = r2.OperatingIncome
+	case domains.RK_InterestIncome:
+		rc = r2.InterestIncome
+	case domains.RK_InterestExpenses:
+		rc = r2.InterestExpenses
+	case domains.RK_IncomeTax:
+		rc = r2.IncomeTax
+	case domains.RK_NetIncome:
+		rc = r2.NetIncome
+	case domains.RK_OIBDA:
+		rc = r2.OIBDA
+	case domains.RK_EBITDA:
+		rc = r2.EBITDA
+	case domains.RK_OIBDAMargin:
+		rc = r2.OIBDAMargin
+	case domains.RK_EBITDAMargin:
+		rc = r2.EBITDAMargin
+	case domains.RK_OperationalMargin:
+		rc = r2.OperationalMargin
+	case domains.RK_NetMargin:
+		rc = r2.NetMargin
+	case domains.RK_Debt_on_EBITDA:
+		rc = r2.Debt_on_EBITDA
+	case domains.RK_EV_on_EBITDA:
+		rc = r2.EV_on_EBITDA
+	case domains.RK_ROE:
+		rc = r2.ROE
+	case domains.RK_Cash:
+		rc = r2.Cash
+	case domains.RK_NonCurrentLiabilities:
+		rc = r2.NonCurrentLiabilities
+	case domains.RK_CurrentLiabilities:
+		rc = r2.CurrentLiabilities
+	case domains.RK_NonControlling:
+		rc = r2.NonControlling
+	case domains.RK_Equity:
+		rc = r2.Equity
+	case domains.RK_Total:
+		rc = r2.Total
+	case domains.RK_NetDebt:
+		rc = r2.NetDebt
+	case domains.RK_EV:
+		rc = r2.EV
+	case domains.RK_BookValue:
+		rc = r3.BookValue
+	case domains.RK_P_on_E:
+		rc = r3.P_on_E
+	case domains.RK_P_on_BV:
+		rc = r3.P_on_BV
+	case domains.RK_Cap:
+		rc = r3.Cap
+	case domains.RK_P_on_S:
+		rc = r3.P_on_S
+	case domains.RK_DivSum5Y:
+		rc = r3.DivSum5Y
+	case domains.RK_DivSum3Y:
+		rc = r3.DivSum3Y
+	case domains.RK_DivYield5Y:
+		rc = r3.DivYield5Y
+	case domains.RK_DivYield3Y:
+		rc = r3.DivYield3Y
+	case domains.RK_DSI:
+		rc = r3.DSI
+
+	default:
+		log.Fatalf("Unable to get report value for %v", rv)
 	}
 
 	switch rvt {
 	case domains.RVT_Src, domains.RVT_Ind_Src:
-		return r2.V
+		return rc.V
 	case domains.RVT_YtdAdj, domains.RVT_Ind_YtdAdj:
-		return r2.YtdAdj
+		return rc.YtdAdj
 	case domains.RVT_Ltm, domains.RVT_Ind_Ltm:
-		return r2.Ltm
+		return rc.Ltm
 	case domains.RVT_AG, domains.RVT_Ind_AG:
-		return r2.AG
+		return rc.AG
 	case domains.RVT_AG_Ltm, domains.RVT_Ind_AG_Ltm:
-		return r2.AGLtm
+		return rc.AGLtm
 	default:
+		log.Fatalf("Unable to get report value for %v (%v)", rv, rvt)
 		return 0.0
 	}
 

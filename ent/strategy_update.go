@@ -469,16 +469,6 @@ func (su *StrategyUpdate) check() error {
 			return &ValidationError{Name: "Descr", err: fmt.Errorf(`ent: validator failed for field "Strategy.Descr": %w`, err)}
 		}
 	}
-	if v, ok := su.mutation.MaxTickers(); ok {
-		if err := strategy.MaxTickersValidator(v); err != nil {
-			return &ValidationError{Name: "MaxTickers", err: fmt.Errorf(`ent: validator failed for field "Strategy.MaxTickers": %w`, err)}
-		}
-	}
-	if v, ok := su.mutation.MaxTickersPerIndustry(); ok {
-		if err := strategy.MaxTickersPerIndustryValidator(v); err != nil {
-			return &ValidationError{Name: "MaxTickersPerIndustry", err: fmt.Errorf(`ent: validator failed for field "Strategy.MaxTickersPerIndustry": %w`, err)}
-		}
-	}
 	if v, ok := su.mutation.BaseIndex(); ok {
 		if err := strategy.BaseIndexValidator(v); err != nil {
 			return &ValidationError{Name: "BaseIndex", err: fmt.Errorf(`ent: validator failed for field "Strategy.BaseIndex": %w`, err)}
@@ -1349,16 +1339,6 @@ func (suo *StrategyUpdateOne) check() error {
 	if v, ok := suo.mutation.Descr(); ok {
 		if err := strategy.DescrValidator(v); err != nil {
 			return &ValidationError{Name: "Descr", err: fmt.Errorf(`ent: validator failed for field "Strategy.Descr": %w`, err)}
-		}
-	}
-	if v, ok := suo.mutation.MaxTickers(); ok {
-		if err := strategy.MaxTickersValidator(v); err != nil {
-			return &ValidationError{Name: "MaxTickers", err: fmt.Errorf(`ent: validator failed for field "Strategy.MaxTickers": %w`, err)}
-		}
-	}
-	if v, ok := suo.mutation.MaxTickersPerIndustry(); ok {
-		if err := strategy.MaxTickersPerIndustryValidator(v); err != nil {
-			return &ValidationError{Name: "MaxTickersPerIndustry", err: fmt.Errorf(`ent: validator failed for field "Strategy.MaxTickersPerIndustry": %w`, err)}
 		}
 	}
 	if v, ok := suo.mutation.BaseIndex(); ok {

@@ -309,14 +309,10 @@ func init() {
 	strategyDescMaxTickers := strategyFields[2].Descriptor()
 	// strategy.DefaultMaxTickers holds the default value on creation for the MaxTickers field.
 	strategy.DefaultMaxTickers = strategyDescMaxTickers.Default.(int)
-	// strategy.MaxTickersValidator is a validator for the "MaxTickers" field. It is called by the builders before save.
-	strategy.MaxTickersValidator = strategyDescMaxTickers.Validators[0].(func(int) error)
 	// strategyDescMaxTickersPerIndustry is the schema descriptor for MaxTickersPerIndustry field.
 	strategyDescMaxTickersPerIndustry := strategyFields[3].Descriptor()
 	// strategy.DefaultMaxTickersPerIndustry holds the default value on creation for the MaxTickersPerIndustry field.
 	strategy.DefaultMaxTickersPerIndustry = strategyDescMaxTickersPerIndustry.Default.(int)
-	// strategy.MaxTickersPerIndustryValidator is a validator for the "MaxTickersPerIndustry" field. It is called by the builders before save.
-	strategy.MaxTickersPerIndustryValidator = strategyDescMaxTickersPerIndustry.Validators[0].(func(int) error)
 	// strategyDescBaseIndex is the schema descriptor for BaseIndex field.
 	strategyDescBaseIndex := strategyFields[4].Descriptor()
 	// strategy.BaseIndexValidator is a validator for the "BaseIndex" field. It is called by the builders before save.

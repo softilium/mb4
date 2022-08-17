@@ -127,12 +127,8 @@ var (
 	DescrValidator func(string) error
 	// DefaultMaxTickers holds the default value on creation for the "MaxTickers" field.
 	DefaultMaxTickers int
-	// MaxTickersValidator is a validator for the "MaxTickers" field. It is called by the builders before save.
-	MaxTickersValidator func(int) error
 	// DefaultMaxTickersPerIndustry holds the default value on creation for the "MaxTickersPerIndustry" field.
 	DefaultMaxTickersPerIndustry int
-	// MaxTickersPerIndustryValidator is a validator for the "MaxTickersPerIndustry" field. It is called by the builders before save.
-	MaxTickersPerIndustryValidator func(int) error
 	// BaseIndexValidator is a validator for the "BaseIndex" field. It is called by the builders before save.
 	BaseIndexValidator func(string) error
 	// DefaultLastYearInventResult holds the default value on creation for the "LastYearInventResult" field.

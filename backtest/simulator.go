@@ -1,6 +1,7 @@
 package backtest
 
 import (
+	"log"
 	"math"
 	"sort"
 	"time"
@@ -16,9 +17,11 @@ func ActualPortfolio(Strategy ent.Strategy, Market *cube.Cube, D time.Time, Sour
 	//TODO samepolicy
 
 	fixedTickersShare := 0
+	fixedTickersCnt := 0
 	for _, r := range Strategy.Edges.FixedTickers {
 		if r.IsUsed {
 			fixedTickersShare += r.Share
+			fixedTickersCnt++
 		}
 	}
 
@@ -96,7 +99,8 @@ func ActualPortfolio(Strategy ent.Strategy, Market *cube.Cube, D time.Time, Sour
 		}
 
 		sort.Slice(pieces, func(i, j int) bool { return pieces[i].w > pieces[j].w })
-		pieces = pieces[:Strategy.MaxTickers]
+
+		//step 1 - all tickers
 		ws := 0.0
 		for _, p := range pieces {
 			ws += p.w
@@ -104,13 +108,35 @@ func ActualPortfolio(Strategy ent.Strategy, Market *cube.Cube, D time.Time, Sour
 		for idx, p := range pieces {
 			pieces[idx].sum = p.w / ws * flexRUB
 		}
-		for _, sp := range pieces {
-			lotprice := float64(sp.c.Emission.LotSize) * sp.c.Quote.C
-			if lotprice > sp.sum {
+		pieces2 := make([]piece, 0, len(pieces))
+		for _, p := range pieces {
+			lotprice := float64(p.c.Emission.LotSize) * p.c.Quote.C
+			if lotprice > p.sum {
 				continue
 			}
+			pieces2 = append(pieces2, p)
+			if len(pieces2) >= (Strategy.MaxTickers - fixedTickersCnt) {
+				break
+			}
+
+		}
+
+		//step 2 - needed tickers
+		ws = 0.0
+		for _, p := range pieces2 {
+			ws += p.w
+		}
+		for idx, p := range pieces2 {
+			pieces2[idx].sum = p.w / ws * flexRUB
+		}
+
+		for _, sp := range pieces2 {
+			lotprice := float64(sp.c.Emission.LotSize) * sp.c.Quote.C
 			lots := int(math.Trunc(sp.sum / lotprice))
-			result.BuyLots(sp.c, lots)
+			deals := result.BuyLots(sp.c, lots)
+			if len(deals) == 0 {
+				log.Println("no deals for " + sp.c.TickerId())
+			}
 		}
 
 	}
