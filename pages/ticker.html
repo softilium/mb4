@@ -72,7 +72,8 @@
 </div>
 
 <script type="text/javascript">
-    window.tickerid = "{{ pd.TRI.Cell.Quote.Edges.Ticker.ID }}";
+    //window.tickerid = "{{ pd.TRI.Cell.Quote.Edges.Ticker.ID }}";
+    window.tickerid = "{{ pd.TRI.Cell.TickerId() }}";
     window.tickerDescr = "{{ pd.TRI.Cell.Quote.Edges.Ticker.Descr }}";
 
     const App = {

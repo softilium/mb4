@@ -63,7 +63,7 @@ func (c *Cube) TopFallenRaise(HowMany int, Raise bool) []ItemPriceChange {
 
 	changes := make([]ItemPriceChange, len(sliceNow))
 	for idx, v := range sliceNow {
-		prevPrice := c.cellsByTickerByDate[v.Quote.Edges.Ticker.ID][oneMonthAgo].Quote.C
+		prevPrice := c.cellsByTickerByDate[v.TickerId()][oneMonthAgo].Quote.C
 		changes[idx] = ItemPriceChange{v, RoundX((v.Quote.C-prevPrice)/prevPrice*100, 1)}
 	}
 	if !Raise {
@@ -138,7 +138,7 @@ func (c *Cube) CellsByTickerByDate(ticker string, d time.Time, lookLast bool) *C
 
 }
 
-func (c *Cube) GetAllTickers(d time.Time) map[string]*ent.Ticker {
+func (c *Cube) GetAllTickers() map[string]*ent.Ticker {
 
 	c.l.Lock()
 	defer c.l.Unlock()
@@ -161,4 +161,13 @@ func (c *Cube) LastDate() time.Time {
 	defer c.l.Unlock()
 
 	return c.allDays[len(c.allDays)-1]
+}
+
+func (c *Cube) GetCellsByDate(D time.Time) []*Cell {
+
+	c.l.Lock()
+	defer c.l.Unlock()
+
+	return c.cellsByDate[D]
+
 }

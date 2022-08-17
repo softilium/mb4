@@ -67,7 +67,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	pd.TopY = make([]*TopItem, len(topYield5Y))
 	for k, v := range topYield5Y {
 		pd.TopY[k] = &TopItem{
-			Ticker: "/ticker?id=" + v.Quote.Edges.Ticker.ID,
+			Ticker: "/ticker?id=" + v.TickerId(),
 			Descr:  v.Quote.Edges.Ticker.Descr,
 			V:      fmt.Sprintf("%.1f", v.DivYield5Y.V),
 			V1:     fmt.Sprintf("%.1f", v.DSI.V),
@@ -76,7 +76,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	pd.TopDSI = make([]*TopItem, len(topDSI))
 	for k, v := range topDSI {
 		pd.TopDSI[k] = &TopItem{
-			Ticker: "/ticker?id=" + v.Quote.Edges.Ticker.ID,
+			Ticker: "/ticker?id=" + v.TickerId(),
 			Descr:  v.Quote.Edges.Ticker.Descr,
 			V:      fmt.Sprintf("%.1f", v.DivYield5Y.V),
 			V1:     fmt.Sprintf("%.1f", v.DSI.V),
@@ -85,7 +85,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	pd.TopFallen = make([]*TopItem, len(topFallen))
 	for k, v := range topFallen {
 		pd.TopFallen[k] = &TopItem{
-			Ticker: "/ticker?id=" + v.Cell.Quote.Edges.Ticker.ID,
+			Ticker: "/ticker?id=" + v.Cell.TickerId(),
 			Descr:  v.Cell.Quote.Edges.Ticker.Descr,
 			V:      fmt.Sprintf("%.1f", -v.PercentPriceChange),
 		}
@@ -93,7 +93,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	pd.TopRaise = make([]*TopItem, len(topRaise))
 	for k, v := range topRaise {
 		pd.TopRaise[k] = &TopItem{
-			Ticker: "/ticker?id=" + v.Cell.Quote.Edges.Ticker.ID,
+			Ticker: "/ticker?id=" + v.Cell.TickerId(),
 			Descr:  v.Cell.Quote.Edges.Ticker.Descr,
 			V:      fmt.Sprintf("%.1f", v.PercentPriceChange),
 		}

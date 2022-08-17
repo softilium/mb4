@@ -10,6 +10,7 @@ import (
 
 	"github.com/rs/xid"
 	"github.com/softilium/mb4/db"
+	"github.com/softilium/mb4/domains"
 	"github.com/softilium/mb4/ent"
 	"github.com/softilium/mb4/ent/schema"
 	"github.com/softilium/mb4/ent/ticker"
@@ -49,6 +50,10 @@ type Cell struct {
 	DSI        RepV
 }
 
+func (r *Cell) TickerId() string {
+	return r.Quote.Edges.Ticker.ID
+}
+
 func (r *Cell) CalcAfterLoad(cb *Cube) {
 
 	r.BookValue.V = 0
@@ -73,6 +78,43 @@ func (r *Cell) CalcAfterLoad(cb *Cube) {
 
 	r.P_on_S.V = r.Cap.V / r.R2.Revenue.V
 	r.P_on_S.Ltm = r.Cap.V / r.R2.Revenue.Ltm
+
+}
+
+func (r *Cell) RepValue(market *Cube, rv domains.ReportValue, rvt domains.ReportValueType) float64 {
+
+	var r1 *Report2
+
+	switch rvt {
+	case domains.RVT_Src, domains.RVT_YtdAdj, domains.RVT_Ltm, domains.RVT_AG, domains.RVT_AG_Ltm:
+		r1 = r.R2
+	case domains.RVT_Ind_Src, domains.RVT_Ind_YtdAdj, domains.RVT_Ind_Ltm, domains.RVT_Ind_AG, domains.RVT_Ind_AG_Ltm:
+		r1 = market.cellsByIndustryByDate[r.Industry.ID][r.D].R2
+	}
+
+	var r2 RepV
+
+	switch rv {
+	case domains.RK_Revenue:
+		r2 = r1.Revenue
+	case domains.RK_Amortization:
+		r2 = r1.Amortization
+	}
+
+	switch rvt {
+	case domains.RVT_Src, domains.RVT_Ind_Src:
+		return r2.V
+	case domains.RVT_YtdAdj, domains.RVT_Ind_YtdAdj:
+		return r2.YtdAdj
+	case domains.RVT_Ltm, domains.RVT_Ind_Ltm:
+		return r2.Ltm
+	case domains.RVT_AG, domains.RVT_Ind_AG:
+		return r2.AG
+	case domains.RVT_AG_Ltm, domains.RVT_Ind_AG_Ltm:
+		return r2.AGLtm
+	default:
+		return 0.0
+	}
 
 }
 
@@ -134,7 +176,6 @@ func (c *Cube) LoadCube() (err error) {
 		}
 
 		oneCell := &Cell{Quote: v, D: v.D}
-		//oneCell.MakeR3()
 		oneCell.Industry = v.Edges.Ticker.Edges.Emitent.Edges.Industry
 
 		tdm[v.D] = oneCell
@@ -338,8 +379,8 @@ func (c *Cube) loadDivsAndCaps() error {
 			if cell.Quote != nil && cell.Emission != nil {
 				cell.Cap.V = cell.Quote.C * float64(cell.Emission.Size) / 1000000 // in mln. according to report values
 			}
-			if _, ok := dsimap[cell.Quote.Edges.Ticker.ID]; ok {
-				if dsi, ok := dsimap[cell.Quote.Edges.Ticker.ID][day.Year()-1]; ok {
+			if _, ok := dsimap[cell.TickerId()]; ok {
+				if dsi, ok := dsimap[cell.TickerId()][day.Year()-1]; ok {
 					cell.DSI.V = RoundX(dsi.dsi, 1)
 				}
 			}

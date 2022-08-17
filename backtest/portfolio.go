@@ -12,6 +12,17 @@ type Portfolio struct {
 	Items []*PortfolioItem
 }
 
+func (p *Portfolio) FindByTickerId(TickerId string) *PortfolioItem {
+
+	for _, item := range p.Items {
+		if item.Ticker.ID == TickerId {
+			return item
+		}
+	}
+	return nil
+
+}
+
 func (p *Portfolio) CurrentBalance() float64 {
 	res := 0.0
 	for _, item := range p.Items {
@@ -33,7 +44,7 @@ func (p *Portfolio) BuyLots(Cell *cube.Cell, LotsToBuy int) []*Deal {
 
 	tIdx := -1
 	for idx, item := range p.Items {
-		if item.Ticker.ID == Cell.Quote.Edges.Ticker.ID {
+		if item.Ticker.ID == Cell.TickerId() {
 			tIdx = idx
 			break
 		}
@@ -57,7 +68,7 @@ func (p *Portfolio) SellLots(Cell *cube.Cell, lots int) []*Deal {
 
 	tIdx := -1
 	for idx, item := range p.Items {
-		if item.Ticker.ID == Cell.Quote.Edges.Ticker.ID {
+		if item.Ticker.ID == Cell.TickerId() {
 			tIdx = idx
 			break
 		}

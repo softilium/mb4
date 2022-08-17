@@ -38,7 +38,7 @@ func Industry(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rows := make([]*emitentRow, 0)
-	for _, t := range cube.Market.GetAllTickers(ld) {
+	for _, t := range cube.Market.GetAllTickers() {
 		if t.Edges.Emitent.Edges.Industry.ID != iid {
 			continue
 		}

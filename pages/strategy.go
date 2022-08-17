@@ -50,7 +50,7 @@ func Strategy(w http.ResponseWriter, r *http.Request) {
 
 					strategy := getStrategyObj(xid, w)
 
-					apf := backtest.ActualPortfolio(*strategy, *cube.Market, cube.Market.LastDate(), &backtest.Portfolio{RUB: strategy.StartAmount})
+					apf := backtest.ActualPortfolio(*strategy, cube.Market, cube.Market.LastDate(), &backtest.Portfolio{RUB: strategy.StartAmount})
 					apf.ApplyCurrentPrices(cube.Market, cube.Market.LastDate())
 
 					obj := struct {
