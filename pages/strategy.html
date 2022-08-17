@@ -276,11 +276,11 @@
 
         </div>
 
-        <div class="col-12 col-xl-6" v-if="results != null && results.actualPortfolio != null">
+        <div class="col-12 col-xl-6" v-if="results != null && results.ActualPortfolio != null">
 
             <h2>Актуальный состав портфеля на сегодня</h2>
 
-            <p>Денежные средства: ${ $prnCurrency(results.actualPortfolio.rub) } </p>
+            <p>Денежные средства: ${ $prnCurrency(results.ActualPortfolio.RUB) } </p>
             <table class="table table-sm">
                 <thead>
                     <tr>
@@ -288,22 +288,22 @@
                         <th class="text-end">Доля</th>
                         <th class="text-end">Сумма</th>
                         <th class="text-end">Лоты</th>
-                        <th class="text-end" v-for="factor in results.actualPortfolio.factors">${factor.RK}</th>
+                        <!--<th class="text-end" v-for="factor in results.ActualPortfolio.factors">${factor.RK}</th>-->
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="item in results.actualPortfolio.itemsForJson">
-                        <td><a v-bind:href="tickerUrl(item.ticker.tickerId)">${item.ticker.descr}</a></td>
-                        <td class="text-end">${printPercent(item.currentPercent)}</td>
-                        <td class="text-end">${ $prnCurrency(item.balance) }</td>
-                        <td class="text-end">${item.lots}</td>
-                        <td class="text-end" v-for="df in item.debugFactors">${df.value}</td>
+                    <tr v-for="item in results.ActualPortfolio.Items">
+                        <td><a v-bind:href="tickerUrl(item.Ticker.Id)">${item.Ticker.Descr}</a></td>
+                        <td class="text-end">${ $prnPercent1(item.CurrentPercent) }</td>
+                        <td class="text-end">${ $prnCurrency(item.Balance) }</td>
+                        <td class="text-end">${ item.Lots }</td>
+                        <!--<td class="text-end" v-for="df in item.debugFactors">${df.value}</td>-->
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
-
+    <br></br>
     <div class="row">
         <div class="col-12 col-lg-6">
             <div ref="strategyChartRef" style="height:400px;width:100%"></div>
@@ -606,7 +606,7 @@
             },
 
             printPercent(val) { return new Intl.NumberFormat('ru-RU', { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(val / 100); },
-            tickerUrl(tickerId) { return '/ticker/' + tickerId + "?strategy=" + this.obj.strategyId.toString(); },
+            tickerUrl(tickerId) { return '/ticker/' + tickerId + "?strategy=" + window.strategyId; },
             industryUrl(industryId) { return '/industry/' + industryId; },
 
             daysForYear(year) {
@@ -739,7 +739,9 @@
         }
     };
 
-    Vue.createApp(App).mount('#vueapp')
+    let app = Vue.createApp(App)
+    applyVueFuncs(app);
+    app.mount('#vueapp')
 
 </script>
 

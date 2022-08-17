@@ -7,6 +7,8 @@ import (
 
 	"github.com/flosch/pongo2/v6"
 	"github.com/rs/xid"
+	"github.com/softilium/mb4/backtest"
+	"github.com/softilium/mb4/cube"
 	"github.com/softilium/mb4/db"
 	"github.com/softilium/mb4/domains"
 	"github.com/softilium/mb4/ent"
@@ -32,17 +34,7 @@ func Strategy(w http.ResponseWriter, r *http.Request) {
 					xid, err := xid.FromString(id)
 					HandleErr(err, w)
 
-					obj, err := db.DB.Strategy.
-						Query().
-						WithFactors(
-							func(q *ent.StrategyFactorQuery) { q.Order(ent.Asc(strategyfactor.FieldLineNum)) }).
-						WithFilters(
-							func(q *ent.StrategyFilterQuery) { q.Order(ent.Asc(strategyfactor.FieldLineNum)) }).
-						WithFixedTickers(
-							func(q *ent.StrategyFixedTickerQuery) { q.Order(ent.Asc(strategyfixedticker.FieldLineNum)) }).
-						Where(strategy.ID(xid)).
-						Only(context.Background())
-					HandleErr(err, w)
+					obj := getStrategyObj(xid, w)
 
 					w.Header().Set("Content-Type", "application/json")
 					err = json.NewEncoder(w).Encode(obj)
@@ -51,11 +43,25 @@ func Strategy(w http.ResponseWriter, r *http.Request) {
 				}
 			case "results":
 				{
+
+					id := r.URL.Query().Get("id")
+					xid, err := xid.FromString(id)
+					HandleErr(err, w)
+
+					strategy := getStrategyObj(xid, w)
+
+					apf := backtest.ActualPortfolio(*strategy, *cube.Market, cube.Market.LastDate(), &backtest.Portfolio{RUB: strategy.StartAmount})
+					apf.ApplyCurrentPrices(cube.Market, cube.Market.LastDate())
+
 					obj := struct {
-						YearsInResult []int
-					}{YearsInResult: []int{}}
+						ActualPortfolio *backtest.Portfolio
+						YearsInResult   []int
+					}{
+						ActualPortfolio: apf,
+						YearsInResult:   []int{},
+					}
 					w.Header().Set("Content-Type", "application/json")
-					err := json.NewEncoder(w).Encode(obj)
+					err = json.NewEncoder(w).Encode(obj)
 					HandleErr(err, w)
 				}
 			case "renderinfo":
@@ -201,5 +207,22 @@ func Strategy(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
+
+}
+
+func getStrategyObj(xid xid.ID, w http.ResponseWriter) *ent.Strategy {
+
+	obj, err := db.DB.Strategy.
+		Query().
+		WithFactors(
+			func(q *ent.StrategyFactorQuery) { q.Order(ent.Asc(strategyfactor.FieldLineNum)) }).
+		WithFilters(
+			func(q *ent.StrategyFilterQuery) { q.Order(ent.Asc(strategyfactor.FieldLineNum)) }).
+		WithFixedTickers(
+			func(q *ent.StrategyFixedTickerQuery) { q.Order(ent.Asc(strategyfixedticker.FieldLineNum)) }).
+		Where(strategy.ID(xid)).
+		Only(context.Background())
+	HandleErr(err, w)
+	return obj
 
 }
