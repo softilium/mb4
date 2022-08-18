@@ -2,6 +2,7 @@ package backtest
 
 import (
 	"encoding/json"
+	"log"
 	"sort"
 	"time"
 
@@ -69,6 +70,10 @@ func (p *PortfolioItem) Refresh() {
 }
 
 func (p *PortfolioItem) Buy(Cell *cube.Cell, Delta int) []*Deal {
+
+	if Cell.Emission.LotSize == 0 {
+		log.Fatalf("LotSize is 0 (ticker=%v, date=%v)", Cell.TickerId(), Cell.D)
+	}
 
 	newDial := Deal{
 		D:            Cell.D,

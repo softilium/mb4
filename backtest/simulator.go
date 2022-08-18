@@ -110,6 +110,10 @@ func ActualPortfolio(Strategy ent.Strategy, Market *cube.Cube, D time.Time, Sour
 		}
 		pieces2 := make([]piece, 0, len(pieces))
 		for _, p := range pieces {
+			if p.c.Emission.LotSize == 0 {
+				log.Printf("LotSize is 0 for %s", p.c.Quote.Edges.Ticker.ID)
+				continue
+			}
 			lotprice := float64(p.c.Emission.LotSize) * p.c.Quote.C
 			if lotprice > p.sum {
 				continue
