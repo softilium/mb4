@@ -66,7 +66,7 @@ func initServer(listenAddr string) *http.Server {
 		Addr:    listenAddr,
 		Handler: router,
 	}
-	if config.C.Debug {
+	if !config.C.Debug {
 		server.ReadTimeout = 5 * time.Second
 		server.WriteTimeout = 10 * time.Second
 		server.IdleTimeout = 15 * time.Second

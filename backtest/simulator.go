@@ -45,7 +45,7 @@ func ActualPortfolio(Strategy ent.Strategy, Market *cube.Cube, D time.Time, Sour
 			if c.R2 == nil {
 				continue
 			}
-			if k := c.Quote.Edges.Ticker.Kind; k != schema.TickerKind_Stock && k != schema.TickerKind_Bond || k == schema.TickerKind_StockPref {
+			if k := c.Quote.Edges.Ticker.Kind; !(k == schema.TickerKind_Stock || k == schema.TickerKind_StockPref) {
 				continue
 			}
 			if !Filter(c, Strategy, Market, D) {
@@ -98,7 +98,12 @@ func ActualPortfolio(Strategy ent.Strategy, Market *cube.Cube, D time.Time, Sour
 			idx++
 		}
 
-		sort.Slice(pieces, func(i, j int) bool { return pieces[i].w > pieces[j].w })
+		sort.Slice(pieces, func(i, j int) bool {
+			if pieces[i].w == pieces[j].w {
+				return pieces[i].c.Quote.C < pieces[j].c.Quote.C
+			}
+			return pieces[i].w > pieces[j].w
+		})
 
 		//step 1 - all tickers
 		ws := 0.0
@@ -109,6 +114,10 @@ func ActualPortfolio(Strategy ent.Strategy, Market *cube.Cube, D time.Time, Sour
 			pieces[idx].sum = p.w / ws * flexRUB
 		}
 		pieces2 := make([]piece, 0, len(pieces))
+
+		stocks := make(map[*ent.Emitent]int, 0)
+		prefs := make(map[*ent.Emitent]int, 0)
+
 		for _, p := range pieces {
 			if p.c.Emission.LotSize == 0 {
 				log.Printf("LotSize is 0 for %s", p.c.Quote.Edges.Ticker.ID)
@@ -118,6 +127,50 @@ func ActualPortfolio(Strategy ent.Strategy, Market *cube.Cube, D time.Time, Sour
 			if lotprice > p.sum {
 				continue
 			}
+
+			// apply sameEmitent policy
+			switch Strategy.SameEmitent {
+			case domains.SameEmitentPolicy_PreferPrefs:
+				if p.c.Quote.Edges.Ticker.Kind == schema.TickerKind_StockPref {
+					idx, ok := stocks[p.c.Quote.Edges.Ticker.Edges.Emitent]
+					if ok {
+						pieces2 = append(pieces2[:idx], pieces2[idx+1:]...)
+					}
+				} else if p.c.Quote.Edges.Ticker.Kind == schema.TickerKind_Stock {
+					_, ok := prefs[p.c.Quote.Edges.Ticker.Edges.Emitent]
+					if ok {
+						continue
+					}
+				}
+			case domains.SameEmitentPolicy_PreferOrd:
+				if p.c.Quote.Edges.Ticker.Kind == schema.TickerKind_Stock {
+					idx, ok := prefs[p.c.Quote.Edges.Ticker.Edges.Emitent]
+					if ok {
+						pieces2 = append(pieces2[:idx], pieces2[idx+1:]...)
+					}
+				} else if p.c.Quote.Edges.Ticker.Kind == schema.TickerKind_StockPref {
+					_, ok := stocks[p.c.Quote.Edges.Ticker.Edges.Emitent]
+					if ok {
+						continue
+					}
+				}
+			case domains.SameEmitentPolicy_AllowOnlyOne:
+				{
+					_, oks := stocks[p.c.Quote.Edges.Ticker.Edges.Emitent]
+					_, okp := prefs[p.c.Quote.Edges.Ticker.Edges.Emitent]
+					if oks || okp {
+						continue
+					}
+				}
+			}
+
+			switch p.c.Quote.Edges.Ticker.Kind {
+			case schema.TickerKind_Stock:
+				stocks[p.c.Quote.Edges.Ticker.Edges.Emitent] = len(pieces2)
+			case schema.TickerKind_StockPref:
+				prefs[p.c.Quote.Edges.Ticker.Edges.Emitent] = len(pieces2)
+			}
+
 			pieces2 = append(pieces2, p)
 			if len(pieces2) >= (Strategy.MaxTickers - fixedTickersCnt) {
 				break
@@ -159,6 +212,9 @@ func ActualPortfolio(Strategy ent.Strategy, Market *cube.Cube, D time.Time, Sour
 		}
 	}
 
+	result.ApplyCurrentPrices(Market, Market.LastDate())
+
+	sort.Slice(result.Items, func(i, j int) bool { return result.Items[i].CurrentPercent > result.Items[j].CurrentPercent })
 	return &result
 
 }
