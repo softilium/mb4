@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/flosch/pongo2/v6"
 	"github.com/rs/xid"
@@ -50,18 +51,10 @@ func Strategy(w http.ResponseWriter, r *http.Request) {
 
 					strategy := getStrategyObj(xid, w)
 
-					apf := backtest.ActualPortfolio(*strategy, cube.Market, cube.Market.LastDate(), &backtest.Portfolio{RUB: strategy.StartAmount})
-					apf.ApplyCurrentPrices(cube.Market, cube.Market.LastDate())
+					res := backtest.Simulate(strategy, cube.Market, (*time.Time)(strategy.StartSimulation), strategy.StartAmount, strategy.WeekRefillAmount, nil)
 
-					obj := struct {
-						ActualPortfolio *backtest.Portfolio
-						YearsInResult   []int
-					}{
-						ActualPortfolio: apf,
-						YearsInResult:   []int{},
-					}
 					w.Header().Set("Content-Type", "application/json")
-					err = json.NewEncoder(w).Encode(obj)
+					err = json.NewEncoder(w).Encode(res)
 					HandleErr(err, w)
 				}
 			case "renderinfo":

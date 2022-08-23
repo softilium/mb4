@@ -237,7 +237,7 @@ func handleGetDivPayouts(w http.ResponseWriter, r *http.Request, tickerId string
 			dp2[idx] = dpData{CloseDate: d.CloseDate, SrcPeriod: fmt.Sprintf("%v.Q%v", d.ForYear, d.ForQuarter), DPS: d.DPS, Yield: d.DPS / q.Quote.C * 100}
 		} else {
 			dp2[idx] = dpData{CloseDate: d.CloseDate, SrcPeriod: fmt.Sprintf("%v.Q%v", d.ForYear, d.ForQuarter), DPS: d.DPS, Yield: 0}
-			log.Printf("ERR. Divpayout, but no quote for %v in %v", tickerId, d.CloseDate)
+			log.Printf("Divpayout, but no quote for %v in %v", tickerId, d.CloseDate)
 		}
 	}
 

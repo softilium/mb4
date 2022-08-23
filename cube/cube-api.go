@@ -123,10 +123,12 @@ func (c *Cube) GetReports2(ticker string) []*Report2 {
 }
 
 func (c *Cube) CellsByTickerByDate(ticker string, d time.Time, lookLast bool) *Cell {
-
 	c.l.Lock()
 	defer c.l.Unlock()
+	return c._cellsByTickerByDate(d, ticker, lookLast)
+}
 
+func (c *Cube) _cellsByTickerByDate(d time.Time, ticker string, lookLast bool) *Cell {
 	minDate := c.allDays[0]
 	d0 := d
 	r, ok := c.cellsByTickerByDate[ticker][d0]
@@ -135,7 +137,6 @@ func (c *Cube) CellsByTickerByDate(ticker string, d time.Time, lookLast bool) *C
 		r, ok = c.cellsByTickerByDate[ticker][d0]
 	}
 	return r
-
 }
 
 func (c *Cube) GetAllTickers() map[string]*ent.Ticker {
@@ -145,6 +146,23 @@ func (c *Cube) GetAllTickers() map[string]*ent.Ticker {
 
 	return c.allTickets
 
+}
+
+func (c *Cube) GetAllDates(Min *time.Time, Max *time.Time) []time.Time {
+	c.l.Lock()
+	defer c.l.Unlock()
+
+	res := make([]time.Time, 0)
+	for _, v := range c.allDays {
+		if Min != nil && v.Before(*Min) {
+			continue
+		}
+		if Max != nil && v.After(*Max) {
+			continue
+		}
+		res = append(res, v)
+	}
+	return res
 }
 
 func (c *Cube) GetIndustryCell(industry string, d time.Time) *Cell {

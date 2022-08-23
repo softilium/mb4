@@ -313,10 +313,10 @@
         </div>
     </div>
 
-    <div class='row' v-if='results.profit!=null'>
+    <div class='row' v-if='results.IndustryTradeResults!=null'>
         <div class="row">
             <div class="col-12 col-xl-5">
-                <h2>Рост стоимости по отраслям:<br />${ $prnCurrency(results.profit) }</h2>
+                <h2>Рост стоимости по отраслям:<br />${ $prnCurrency(results.Profit) }</h2>
                 <table class="table table-sm">
                     <thead>
                         <tr>
@@ -326,32 +326,32 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for='item in results.simulation.industryTradeResults'>
-                            <td> <a v-bind:href="industryUrl(item.industry.industryId)">${item.industry.descr}</a> </td>
-                            <td class="text-end">${ $prnCurrency(item.profit) }</td>
-                            <td class="text-end">${item.dealsCount}</td>
+                        <tr v-for='item in results.IndustryTradeResults'>
+                            <td> <a v-bind:href="industryUrl(item.Industry.industryId)">${item.industry.descr}</a> </td>
+                            <td class="text-end">${ $prnCurrency(item.Profit) }</td>
+                            <td class="text-end">${item.DealsCount}</td>
                         </tr>
                     </tbody>
                 </table>
 
             </div>
             <div class="col-12 col-xl-7">
-                <h2>Дивиденды по отраслям:<br />${ $prnCurrency(results.divsSum) } </h2>
+                <h2>Дивиденды по отраслям:<br />${ $prnCurrency(results.DivsSum) } </h2>
                 <table class="table table-sm">
                     <thead>
                         <tr>
                             <th>Отрасль</th>
-                            <th class="text-right" v-for='y in results.yearsInResult'>${y}</th>
+                            <th class="text-right" v-for='y in results.YearsInResult'>${y}</th>
                             <th class="text-right">Всего</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for='item in results.dividendIndustries'>
+                        <tr v-for='item in results.DividendIndustries'>
                             <td><a v-bind:href="industryUrl(item.industryId)">${item.descr}</a></td>
-                            <td class="text-end" v-for='y in results.yearsInResult'>
-                                ${ $prnCurrency(sumDivByYearForIndustry(y, item.industryId)) }
+                            <td class="text-end" v-for='y in results.YearsInResult'>
+                                ${ $prnCurrency(sumDivByYearForIndustry(y, item.YndustryId)) }
                             </td>
-                            <td class="text-end">${ $prnCurrency(sumDivForIndustry(item.industryId)) } </td>
+                            <td class="text-end">${ $prnCurrency(sumDivForIndustry(item.IndustryId)) } </td>
                         </tr>
                     </tbody>
                 </table>
@@ -360,10 +360,10 @@
         </div>
     </div>
 
-    <div class=row v-if='!results!=null && results.simulation!=null && results.simulation.tickerTradeResults!=null'>
+    <div class=row v-if='!results!=null && results.TickerTradeResults != null'>
 
         <div class="col-12 col-xl-5">
-            <h2>Рост стоимости: ${ $prnCurrency(results.profit) }</h2>
+            <h2>Рост стоимости: ${ $prnCurrency(results.Profit) }</h2>
             <table class="table table-sm">
                 <thead>
                     <tr>
@@ -373,40 +373,40 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for='item in results.simulation.tickerTradeResults'>
-                        <td><a v-bind:href="tickerUrl(item.ticker.tickerId)">${item.ticker.descr}</a></td>
-                        <td class='text-end'>${ $prnCurrency(item.profit) }</td>
-                        <td class='text-end'>${item.dealsCount}</td>
+                    <tr v-for='item in results.TickerTradeResults'>
+                        <td><a v-bind:href="tickerUrl(item.TickerId)">${item.TickerId}</a></td>
+                        <td class='text-end'>${ $prnCurrency(item.Profit) }</td>
+                        <td class='text-end'>${item.DealsCount}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
         <div class="col-12 col-xl-7">
-            <h2>Дивиденды: ${ $prnCurrency(results.divsSum) }</h2>
+            <h2>Дивиденды: ${ $prnCurrency(results.DivsSum) }</h2>
             <table class="table table-sm">
                 <thead>
                     <tr>
                         <th>Тикер</th>
-                        <th class="text-end" v-for='y in results.yearsInResult'>${y}</th>
+                        <th class="text-end" v-for='y in results.YearsInResult'>${y}</th>
                         <th class="text-right">Всего</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for='item in results.dividends'>
-                        <td><a v-bind:href="tickerUrl(item.ticker.tickerId)">${item.ticker.descr}</a></td>
-                        <td class="text-end" v-for='y in results.yearsInResult'>
-                            ${ $prnCurrency(sumDivByYearForTicker(y, item.ticker.tickerId)) }
+                    <tr v-for='item in results.Dividends'>
+                        <td><a v-bind:href="tickerUrl(item.TickerId)">${item.TickerId}</a></td>
+                        <td class="text-end" v-for='y in results.YearsInResult'>
+                            ${ $prnCurrency(sumDivByYearForTicker(y, item.TickerId)) }
                         </td>
-                        <td class="text-end">${ $prnCurrency(item.dividends) }</td>
+                        <td class="text-end">${ $prnCurrency(item.Dividends) }</td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr>
                         <td>Всего</td>
-                        <td class="text-end" v-for='y in results.yearsInResult'>
+                        <td class="text-end" v-for='y in results.YearsInResult'>
                             ${ $prnCurrency(sumDivByYearForTickerAll(y)) }</td>
-                        <td class="text-end">${ $prnCurrency(results.divsSum) }</td>
+                        <td class="text-end">${ $prnCurrency(results.DivsSum) }</td>
                     </tr>
                 </tfoot>
             </table>
@@ -418,7 +418,7 @@
             <h2>Результаты симуляции</h2>
 
             <div>
-                <button v-for='y in results.yearsInResult' class="btn btn-xs"
+                <button v-for='y in results.YearsInResult' class="btn btn-xs"
                     v-bind:class="{ 'btn-primary': y==selectedYear, 'btn-link': y!=selectedYear }" v-on:click='setSelectedYear(y)'>
                     ${y}
                 </button>
@@ -440,26 +440,26 @@
                     </thead>
                     <tbody>
                         <tr v-for='item in daysForYear(selectedYear)'>
-                            <td>${new Date(item.d).toLocaleDateString()}</td>
-                            <td class="text-end">${ $prnCurrency(item.refill) }</td>
+                            <td>${new Date(item.D).toLocaleDateString()}</td>
+                            <td class="text-end">${ $prnCurrency(item.Refill) }</td>
                             <td>
-                                <div v-for='deal in item.deals'>
-                                    <span v-bind:class="{'text-danger': deal.investResult<0, 'text-success': deal.investResult>=0 }"
-                                        v-if='deal.kind==0'>
-                                        продажа ${deal.tickerId} ${deal.lots} лот., ${ $prnCurrency(deal.investResult) }
+                                <div v-for='deal in item.Deals'>
+                                    <span v-bind:class="{'text-danger': deal.InvestResult<0, 'text-success': deal.InvestResult>=0 }"
+                                        v-if='deal.Kind==0'>
+                                        продажа ${deal.TickerId} ${deal.Lots} лот., ${ $prnCurrency(deal.InvestResult) }
                                         р.
                                     </span>
-                                    <span v-if='deal.kind!=0'>
-                                        покупка ${deal.tickerId} ${deal.lots} лот.
+                                    <span v-if='deal.Kind!=0'>
+                                        покупка ${deal.TickerId} ${deal.Lots} лот.
                                     </span>
                                 </div>
                             </td>
-                            <td class="text-end">${ $prnCurrency(item.portfolioRUB) }</td>
-                            <td class="text-end">${ $prnCurrency(item.portfolioBalance) }</td>
-                            <td class="text-end">${ $prnCurrency(item.accu_Equity) }</td>
-                            <td class="text-end">${ $prnCurrency(item.accu_Dividends) }</td>
-                            <td class="text-end">${ $prnCurrency(item.accu_InvestResult) }</td>
-                            <td class="text-end">${ $prnCurrency(item.accu_Yield) }</td>
+                            <td class="text-end">${ $prnCurrency(item.PortfolioRUB) }</td>
+                            <td class="text-end">${ $prnCurrency(item.PortfolioBalance) }</td>
+                            <td class="text-end">${ $prnCurrency(item.Accu_Equity) }</td>
+                            <td class="text-end">${ $prnCurrency(item.Accu_Dividends) }</td>
+                            <td class="text-end">${ $prnCurrency(item.Accu_InvestResult) }</td>
+                            <td class="text-end">${ $prnCurrency(item.Accu_Yield) }</td>
                         </tr>
                     </tbody>
                 </table>
@@ -512,9 +512,9 @@
             results: {
                 async handler(newVal, oldVal) {
                     await this.$nextTick();
-                    this.createStrategyChart(this.$refs.strategyChartRef, this.results.dates, this.results.equity, this.results.investResults, this.results.divs);
+                    this.createStrategyChart(this.$refs.strategyChartRef, this.results.Dates, this.results.Equity, this.results.InvestResults, this.results.Divs);
                     if (this.obj.BaseIndex != null && this.obj.BaseIndex != '')
-                        this.createStrategyPerformanceChart(this.$refs.PerformanceChartRef, this.results.dates, this.results.strategyLevels, this.results.baseLevels);
+                        this.createStrategyPerformanceChart(this.$refs.PerformanceChartRef, this.results.Dates, this.results.StrategyLevels, this.results.BaseLevels);
                 }
             }
         },
@@ -610,7 +610,7 @@
             industryUrl(industryId) { return '/industry/' + industryId; },
 
             daysForYear(year) {
-                return this.results.simulation.days.filter(item => item.d.startsWith(year.toString()) && (item.refill != 0 || item.deals.length > 0));
+                return this.results.Days.filter(item => item.D.startsWith(year.toString()) && (item.Refill != 0 || (item.Deals != null && item.Deals.length > 0)));
             },
 
             sumDivByYearForIndustry(aYear, aIndustryId) {
@@ -625,9 +625,9 @@
 
             sumDivForIndustry(aIndustryId) {
                 let s = 0;
-                this.results.simulation.industryDividendResults.forEach(
+                this.results.IndustryDividendResults.forEach(
                     function (el) {
-                        if (el.industry.industryId == aIndustryId) s = s + el.dividends;
+                        if (el.Industry.ID == aIndustryId) s = s + el.Dividends;
                     }
                 );
                 return s;
@@ -635,9 +635,9 @@
 
             sumDivByYearForTicker(aYear, aTickerId) {
                 let s = 0;
-                this.results.simulation.tickerDividendResults.forEach(
+                this.results.TickerDividendResults.forEach(
                     function (el) {
-                        if (el.d.startsWith(aYear.toString()) && el.ticker.tickerId == aTickerId) s = s + el.dividends;
+                        if (el.D.startsWith(aYear.toString()) && el.ticker.TickerId == aTickerId) s = s + el.Dividends;
                     }
                 );
                 return s;
@@ -646,9 +646,9 @@
 
             sumDivByYearForTickerAll(aYear) {
                 let s = 0;
-                this.results.simulation.tickerDividendResults.forEach(
+                this.results.TickerDividendResults.forEach(
                     function (el) {
-                        if (el.d.startsWith(aYear.toString())) s = s + el.dividends;
+                        if (el.D.startsWith(aYear.toString())) s = s + el.Dividends;
                     }
                 );
                 return s;

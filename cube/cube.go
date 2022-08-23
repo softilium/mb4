@@ -12,6 +12,7 @@ import (
 	"github.com/softilium/mb4/db"
 	"github.com/softilium/mb4/domains"
 	"github.com/softilium/mb4/ent"
+	"github.com/softilium/mb4/ent/emission"
 	"github.com/softilium/mb4/ent/schema"
 	"github.com/softilium/mb4/ent/ticker"
 )
@@ -30,12 +31,14 @@ func Avg(arr []float64) float64 {
 }
 
 type Cell struct {
-	D        time.Time
-	Quote    *ent.Quote //nil means industry card for day
-	Emission *ent.Emission
-	R2       *Report2      //same report for all cells between published IFRS reports
-	Industry *ent.Industry // flat industry from quote
-	IsMissed bool          //indicates than cell was copied for missing quotes from prevous days
+	D                       time.Time
+	Quote                   *ent.Quote //nil means industry card for day
+	emission                *ent.Emission
+	emission_lotsize_cached int
+	R2                      *Report2      //same report for all cells between published IFRS reports
+	Industry                *ent.Industry // flat industry from quote
+	IsMissed                bool          //indicates than cell was copied for missing quotes from prevous days
+	DivPayout               float64       //div payout for day
 
 	//R3
 	BookValue  RepV
@@ -48,6 +51,41 @@ type Cell struct {
 	DivYield5Y RepV
 	DivYield3Y RepV
 	DSI        RepV
+}
+
+func (r *Cell) LotSize() int {
+	if r.emission != nil {
+		ls := r.emission.LotSize
+		if ls == 0 {
+
+			// emissions can contains 0 in lotsSize. We scan for different non-zero lots sizes.
+			// If we found 1 non-zero value, we will use it in
+
+			if r.emission_lotsize_cached != 0 {
+				return r.emission_lotsize_cached
+			}
+			minls := 1000000000
+			maxls := 0
+			for _, rec := range r.Quote.Edges.Ticker.Edges.Emissions {
+				if rec.LotSize < minls && rec.LotSize > 0 {
+					minls = rec.LotSize
+				}
+				if rec.LotSize > maxls {
+					maxls = rec.LotSize
+				}
+			}
+			if minls == maxls {
+				r.emission_lotsize_cached = minls
+				return minls
+			} else {
+				log.Fatalf("LotSize is not uniform for ticker %s", r.Quote.Edges.Ticker.ID)
+				return 0
+			}
+		}
+		return ls
+	}
+	return 1
+
 }
 
 func (r *Cell) TickerId() string {
@@ -224,13 +262,21 @@ func (c *Cube) LoadCube() (err error) {
 		c.prefTickers[pref.Edges.Emitent.ID] = pref
 	}
 
-	q, err := db.DB.Quote.Query().WithTicker(
-		func(q *ent.TickerQuery) {
-			q.WithEmitent(
-				func(q *ent.EmitentQuery) {
-					q.WithIndustry()
-				})
-		}).All(context.Background())
+	q, err := db.DB.Quote.Query().
+		WithTicker(
+			func(q *ent.TickerQuery) {
+				q.
+					WithEmitent(
+						func(q *ent.EmitentQuery) {
+							q.WithIndustry()
+						}).
+					WithEmissions(
+						func(q *ent.EmissionQuery) {
+							q.Order(ent.Desc(emission.FieldRecDate))
+						})
+
+			}).
+		All(context.Background())
 	if err != nil {
 		return err
 	}
@@ -331,7 +377,7 @@ func (c *Cube) linkEmissions() error {
 		for _, v := range c.cellsByTickerByDate[tKey] {
 			for i := 0; i < len(em); i++ {
 				if v.D.Unix() >= em[i].RecDate.Unix() && (em[i].endDate == nil || v.D.Unix() <= em[i].endDate.Unix()) {
-					v.Emission = &em[i].Emission
+					v.emission = &em[i].Emission
 					break
 				}
 			}
@@ -342,7 +388,7 @@ func (c *Cube) linkEmissions() error {
 	for tickerket, tickermap := range c.cellsByTickerByDate {
 		for _, cell := range tickermap {
 			to := c.allTickets[tickerket]
-			if cell.Emission == nil && (to.Kind == schema.TickerKind_Stock || to.Kind == schema.TickerKind_StockPref) {
+			if cell.emission == nil && (to.Kind == schema.TickerKind_Stock || to.Kind == schema.TickerKind_StockPref) {
 				log.Panicf("Ticker %v, quote for %v has no emission info\n", tickerket, cell.D)
 			}
 		}
@@ -357,6 +403,16 @@ func (c *Cube) loadDivsAndCaps() error {
 	dpRaw, err := db.DB.DivPayout.Query().WithTickers().All(context.Background())
 	if err != nil {
 		return err
+	}
+
+	for _, v := range dpRaw {
+		cell := c._cellsByTickerByDate(v.CloseDate, v.Edges.Tickers.ID, true)
+		if cell == nil {
+			log.Println("No cell for div payout", v.CloseDate, v.Edges.Tickers.ID)
+			_ = c._cellsByTickerByDate(v.CloseDate, v.Edges.Tickers.ID, true)
+		} else {
+			cell.DivPayout = v.DPS
+		}
 	}
 
 	divPayoutMap := make(map[string]map[int]float64) // tickerID -> year -> divpayout
@@ -447,8 +503,8 @@ func (c *Cube) loadDivsAndCaps() error {
 
 	for _, day := range c.allDays {
 		for _, cell := range c.cellsByDate[day] {
-			if cell.Quote != nil && cell.Emission != nil {
-				cell.Cap.V = cell.Quote.C * float64(cell.Emission.Size) / 1000000 // in mln. according to report values
+			if cell.Quote != nil && cell.emission != nil {
+				cell.Cap.V = cell.Quote.C * float64(cell.emission.Size) / 1000000 // in mln. according to report values
 			}
 			if _, ok := dsimap[cell.TickerId()]; ok {
 				if dsi, ok := dsimap[cell.TickerId()][day.Year()-1]; ok {
@@ -472,7 +528,7 @@ func (c *Cube) addMissingCells() error {
 			if !ok && lk[ticker.ID] != nil {
 				sc := lk[ticker.ID]
 
-				newCell := &Cell{D: day, Quote: sc.Quote, Emission: sc.Emission, R2: sc.R2, IsMissed: true}
+				newCell := &Cell{D: day, Quote: sc.Quote, emission: sc.emission, R2: sc.R2, IsMissed: true}
 
 				c.cellsByDate[day] = append(c.cellsByDate[day], newCell)
 				c.cellsByTickerByDate[ticker.ID][day] = sc

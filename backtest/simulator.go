@@ -12,9 +12,19 @@ import (
 	"github.com/softilium/mb4/ent/schema"
 )
 
-func ActualPortfolio(Strategy ent.Strategy, Market *cube.Cube, D time.Time, Source *Portfolio) *Portfolio {
+func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Source *Portfolio, ImplicitTicker *ent.Ticker) *Portfolio {
 
-	//TODO samepolicy
+	if ImplicitTicker != nil {
+		ir := Portfolio{RUB: Source.CurrentBalance() + Source.RUB}
+		cell := Market.CellsByTickerByDate(ImplicitTicker.ID, D, true)
+		if cell == nil {
+			log.Fatalf("ActualPortfolio: no cell for %s on %s\n", ImplicitTicker.Descr, D)
+			return nil
+		}
+		lots := int(math.Trunc(Source.CurrentBalance() + Source.RUB/(float64(cell.LotSize())+cell.Quote.C)))
+		ir.BuyLots(cell, lots)
+		return &ir
+	}
 
 	fixedTickersShare := 0
 	fixedTickersCnt := 0
@@ -90,6 +100,7 @@ func ActualPortfolio(Strategy ent.Strategy, Market *cube.Cube, D time.Time, Sour
 
 		pieces := make([]piece, len(buffer))
 		idx := 0
+
 		for t, v := range buffer {
 			pieces[idx].c = t
 			for _, r2 := range v {
@@ -119,11 +130,7 @@ func ActualPortfolio(Strategy ent.Strategy, Market *cube.Cube, D time.Time, Sour
 		prefs := make(map[*ent.Emitent]int, 0)
 
 		for _, p := range pieces {
-			if p.c.Emission.LotSize == 0 {
-				log.Printf("LotSize is 0 for %s", p.c.Quote.Edges.Ticker.ID)
-				continue
-			}
-			lotprice := float64(p.c.Emission.LotSize) * p.c.Quote.C
+			lotprice := float64(p.c.LotSize()) * p.c.Quote.C
 			if lotprice > p.sum {
 				continue
 			}
@@ -188,7 +195,7 @@ func ActualPortfolio(Strategy ent.Strategy, Market *cube.Cube, D time.Time, Sour
 		}
 
 		for _, sp := range pieces2 {
-			lotprice := float64(sp.c.Emission.LotSize) * sp.c.Quote.C
+			lotprice := float64(sp.c.LotSize()) * sp.c.Quote.C
 			lots := int(math.Trunc(sp.sum / lotprice))
 			deals := result.BuyLots(sp.c, lots)
 			if len(deals) == 0 {
@@ -205,7 +212,7 @@ func ActualPortfolio(Strategy ent.Strategy, Market *cube.Cube, D time.Time, Sour
 		}
 		cell := Market.CellsByTickerByDate(r.Ticker, D, true)
 		if cell != nil {
-			lots := int(math.Trunc((Source.CurrentBalance() + Source.RUB) / 100 * float64(r.Share) / (float64(cell.Emission.LotSize) * cell.Quote.C)))
+			lots := int(math.Trunc((Source.CurrentBalance() + Source.RUB) / 100 * float64(r.Share) / (float64(cell.LotSize()) * cell.Quote.C)))
 			if lots > 0 {
 				result.BuyLots(cell, lots)
 			}
@@ -219,7 +226,7 @@ func ActualPortfolio(Strategy ent.Strategy, Market *cube.Cube, D time.Time, Sour
 
 }
 
-func Filter(Src *cube.Cell, Strategy ent.Strategy, Market *cube.Cube, D time.Time) bool {
+func Filter(Src *cube.Cell, Strategy *ent.Strategy, Market *cube.Cube, D time.Time) bool {
 
 	for _, f := range Strategy.Edges.Filters {
 
@@ -272,4 +279,188 @@ func Filter(Src *cube.Cell, Strategy ent.Strategy, Market *cube.Cube, D time.Tim
 		}
 	}
 	return true
+}
+
+func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartAmount float64, WeekRefillAmount float64, Implicit *ent.Ticker) *SimulationResult {
+
+	if StartAmount < 0 {
+		StartAmount = Strategy.StartAmount
+	}
+	if WeekRefillAmount < 0 {
+		WeekRefillAmount = Strategy.WeekRefillAmount
+	}
+
+	result := &SimulationResult{}
+	prtf := &Portfolio{RUB: StartAmount}
+
+	AllTime_Equity := StartAmount
+	AllTime_Dividends := 0.0
+
+	today := time.Now()
+	for _, D := range Market.GetAllDates(From, &today) {
+
+		Refill := 0.0
+		if D.Weekday() == time.Thursday {
+			Refill = WeekRefillAmount
+		}
+		AllTime_Equity += Refill
+		Divs := 0.0
+		for _, item := range prtf.Items {
+			c := Market.CellsByTickerByDate(item.Ticker.ID, D, false)
+			if c != nil {
+				continue
+			}
+			Divs += c.DivPayout
+			result.TickerDividendResults = append(result.TickerDividendResults, &SimulationTickerDividendResultItem{
+				Ticker:    c.Quote.Edges.Ticker,
+				D:         D,
+				Dividends: c.DivPayout * float64(item.Position),
+			})
+		}
+		AllTime_Dividends += Divs
+
+		prtf.RUB += Refill + Divs
+
+		SD := &SimulationDay{D: D, Dividends: Divs, Refill: Refill}
+
+		prtf.ApplyCurrentPrices(Market, D)
+
+		var Ideal = ActualPortfolio(Strategy, Market, D, prtf, Implicit)
+		Ideal.ApplyCurrentPrices(Market, D)
+
+		// close missing positions
+		for _, c := range prtf.Items {
+
+			var found *PortfolioItem
+			for _, idealItem := range Ideal.Items {
+				if idealItem.Ticker.ID == c.Ticker.ID {
+					found = idealItem
+					break
+				}
+			}
+			if found == nil {
+
+				if Strategy.AllowLossWhenSell || c.balPrice < c.CurrentPrice {
+					qc := Market.CellsByTickerByDate(c.Ticker.ID, D, true)
+					if qc == nil {
+						log.Printf("Simulation fail. Close position. No quote for %s for date %s\n", c.Ticker.ID, D)
+					} else {
+						deals := prtf.SellLots(qc, c.Position/c.LotSize)
+						SD.Deals = append(SD.Deals, deals...)
+					}
+				}
+			} else {
+				if Strategy.AllowSellToFit {
+					if found.Lots() > c.Lots() {
+						if Strategy.AllowLossWhenSell || c.balPrice > found.balPrice {
+							qc := Market.CellsByTickerByDate(c.Ticker.ID, D, true)
+							if qc == nil {
+								log.Printf("Simulation fail. Sell position. No quote for %s for date %s\n", c.Ticker.ID, D)
+							} else {
+								deals := prtf.SellLots(qc, found.Lots()-c.Lots())
+								SD.Deals = append(SD.Deals, deals...)
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// open/update positions
+
+		for _, idealItem := range Ideal.Items {
+
+			var found *PortfolioItem
+			for _, c := range prtf.Items {
+				if c.Ticker.ID == idealItem.Ticker.ID {
+					found = c
+					break
+				}
+			}
+			if found == nil {
+				qc := Market.CellsByTickerByDate(idealItem.Ticker.ID, D, true)
+				if qc == nil {
+					log.Printf("Simulation fail. Open position. No quote for %s for date %s\n", idealItem.Ticker.ID, D)
+				} else {
+					deals := prtf.BuyLots(qc, idealItem.Position/idealItem.LotSize)
+					SD.Deals = append(SD.Deals, deals...)
+				}
+			} else {
+				if idealItem.Lots() > found.Lots() {
+					qc := Market.CellsByTickerByDate(idealItem.Ticker.ID, D, true)
+					if qc == nil {
+						log.Printf("Simulation fail. No quote for %s for date %s\n", idealItem.Ticker.ID, D)
+					} else {
+						deals := prtf.BuyLots(qc, idealItem.Lots()-found.Lots())
+						SD.Deals = append(SD.Deals, deals...)
+					}
+				}
+			}
+		}
+
+		prtf.ApplyCurrentPrices(Market, D)
+		SD.PortfolioRUB = prtf.RUB
+		SD.PortfolioBalance = prtf.CurrentBalance()
+
+		SD.Accu_InvestResult = SD.PortfolioBalance + SD.PortfolioRUB - AllTime_Equity - AllTime_Dividends
+		SD.Accu_Equity = AllTime_Equity
+		SD.Accu_Dividends = AllTime_Dividends
+
+		result.Days = append(result.Days, SD)
+	}
+
+	result.Dates = make([]string, 0)
+	result.Equity = make([]float64, 0)
+	result.InvestResults = make([]float64, 0)
+	result.Divs = make([]float64, 0)
+	result.StrategyLevels = make([]float64, 0)
+
+	for _, d := range result.Days {
+		if d.D.Weekday() != time.Thursday {
+			continue
+		}
+		result.Dates = append(result.Dates, d.D.Format("2006-01-02"))
+		result.Equity = append(result.Equity, d.Accu_Equity)
+		result.InvestResults = append(result.InvestResults, d.Accu_InvestResult)
+		result.Divs = append(result.Divs, d.Accu_Dividends)
+		result.StrategyLevels = append(result.StrategyLevels, d.PortfolioBalance+d.PortfolioRUB)
+
+	}
+
+	result.BaseLevels = make([]float64, len(result.StrategyLevels))
+	if Strategy.BaseIndex != "" {
+		BaseStrategy := &ent.Strategy{
+			StartAmount:      Strategy.StartAmount,
+			WeekRefillAmount: Strategy.WeekRefillAmount,
+			StartSimulation:  Strategy.StartSimulation,
+		}
+
+		BaseResult := Simulate(
+			BaseStrategy,
+			Market,
+			(*time.Time)(Strategy.StartSimulation),
+			BaseStrategy.StartAmount,
+			BaseStrategy.WeekRefillAmount,
+			Market.GetAllTickers()[Strategy.BaseIndex],
+		)
+
+		idx := 0
+		for _, d := range result.Days {
+			if d.D.Weekday() != time.Thursday {
+				continue
+			}
+			result.BaseLevels[idx] = BaseResult.Days[idx].PortfolioBalance + BaseResult.Days[idx].PortfolioRUB
+			idx++
+		}
+
+	}
+
+	result.Calc(Market, prtf)
+
+	EmptyPortfolio := &Portfolio{RUB: Strategy.StartAmount}
+	result.ActualPortfolio = ActualPortfolio(Strategy, Market, Market.LastDate(), EmptyPortfolio, nil)
+	result.ActualPortfolio.ApplyCurrentPrices(Market, Market.LastDate())
+
+	return result
+
 }

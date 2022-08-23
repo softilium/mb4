@@ -34,7 +34,7 @@ func (p *Portfolio) CurrentBalance() float64 {
 func (p *Portfolio) BuyLots(Cell *cube.Cell, LotsToBuy int) []*Deal {
 
 	lots := LotsToBuy
-	maxLots := int(math.Trunc(p.RUB / (float64(Cell.Emission.LotSize) * Cell.Quote.C)))
+	maxLots := int(math.Trunc(p.RUB / (float64(Cell.LotSize()) * Cell.Quote.C)))
 	if lots > maxLots {
 		lots = maxLots
 	}
@@ -52,11 +52,11 @@ func (p *Portfolio) BuyLots(Cell *cube.Cell, LotsToBuy int) []*Deal {
 	if tIdx == -1 {
 		p.Items = append(p.Items, &PortfolioItem{
 			Ticker:  Cell.Quote.Edges.Ticker,
-			LotSize: Cell.Emission.LotSize,
+			LotSize: Cell.LotSize(),
 		})
 		tIdx = len(p.Items) - 1
 	}
-	deals := p.Items[tIdx].Buy(Cell, lots*Cell.Emission.LotSize)
+	deals := p.Items[tIdx].Buy(Cell, lots*Cell.LotSize())
 	for _, deal := range deals {
 		p.RUB -= deal.Sum()
 	}

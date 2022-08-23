@@ -71,8 +71,9 @@ func (p *PortfolioItem) Refresh() {
 
 func (p *PortfolioItem) Buy(Cell *cube.Cell, Delta int) []*Deal {
 
-	if Cell.Emission.LotSize == 0 {
-		log.Fatalf("LotSize is 0 (ticker=%v, date=%v)", Cell.TickerId(), Cell.D)
+	if Cell.LotSize() == 0 {
+		log.Fatalf("Lot size is 0 for %s (%v)", p.Ticker.ID, Cell.LotSize())
+		return nil
 	}
 
 	newDial := Deal{
@@ -81,7 +82,7 @@ func (p *PortfolioItem) Buy(Cell *cube.Cell, Delta int) []*Deal {
 		Price:        Cell.Quote.C,
 		TickerId:     p.Ticker.ID,
 		Volume:       Delta,
-		Lots:         Delta / Cell.Emission.LotSize,
+		Lots:         Delta / Cell.LotSize(),
 		InvestResult: 0,
 	}
 
@@ -98,6 +99,7 @@ func (p *PortfolioItem) Sell(Cell *cube.Cell, Delta int) []*Deal {
 	if p.Position < Delta {
 		return make([]*Deal, 0)
 	}
+
 	toProcess := Delta
 	result := make([]*Deal, 0)
 	restsSorted := make([]*PortfolioItemRest, len(p.Rests))
@@ -119,13 +121,18 @@ func (p *PortfolioItem) Sell(Cell *cube.Cell, Delta int) []*Deal {
 		}
 		toProcess -= piece
 
+		if Cell.LotSize() == 0 {
+			log.Fatalf("Lot size is 0 for %s (%v)", p.Ticker.ID, Cell.LotSize())
+			return nil
+		}
+
 		newDial := Deal{
 			D:            Cell.D,
 			Kind:         Sell,
 			TickerId:     p.Ticker.ID,
 			Volume:       piece,
 			Price:        Cell.Quote.C,
-			Lots:         piece / Cell.Emission.LotSize,
+			Lots:         piece / Cell.LotSize(),
 			InvestResult: (Cell.Quote.C - rest.Price) * float64(piece),
 		}
 		result = append(result, &newDial)
