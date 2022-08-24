@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
@@ -26,7 +27,7 @@ func (Strategy) Fields() []ent.Field {
 		field.Float("Last3YearsYield").Default(0.0),
 		field.Float("WeekRefillAmount").Positive(),
 		field.Float("StartAmount").Positive(),
-		field.Time("StartSimulation").GoType(&domains.JSDateOnly{}),
+		field.Time("StartSimulation").GoType(&domains.JSDateOnly{}).SchemaType(map[string]string{dialect.Postgres: "date"}),
 		field.Bool("BuyOnlyLowPrice").Default(false),
 		field.Bool("AllowLossWhenSell").Default(true),
 		field.Bool("AllowSellToFit").Default(true),

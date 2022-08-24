@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/rs/xid"
@@ -16,7 +17,7 @@ type Emission struct {
 func (Emission) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").GoType(xid.ID{}).DefaultFunc(xid.New).MaxLen(20).Immutable().NotEmpty(),
-		field.Time("RecDate"),
+		field.Time("RecDate").SchemaType(map[string]string{dialect.Postgres: "date"}),
 		field.Int64("Size"),
 		field.Int("FreeFloat").Optional(),
 		field.Int("LotSize").Optional(),

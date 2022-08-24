@@ -18,8 +18,6 @@ func (StrategyFilter) Fields() []ent.Field {
 		field.Int("LineNum").Range(1, 10000).Default(1),
 		field.Bool("IsUsed").Default(true),
 		field.Int("LeftValueKind").GoType(domains.FilterValueKind(0)),
-		//field.String("LeftTickerValue").MaxLen(20).NotEmpty(),               //applicable when LeftValueKind == FVK_Ticker
-		//field.String("LeftIndustryValue").MaxLen(100).NotEmpty(),            //applicable when LeftValueKind == FVK_Industry
 		field.Int("LeftReportValue").GoType(domains.ReportValue(0)).Default(int(domains.RK_Revenue)),         //applicable when LeftValueKind == FVK_ReportValue
 		field.Int("LeftReportValueType").GoType(domains.ReportValueType(0)).Default(int(domains.RVT_AG_Ltm)), //applicable when LeftValueKind == FVK_ReportValue
 		field.Int("Operation").GoType(domains.FilterOp(0)),

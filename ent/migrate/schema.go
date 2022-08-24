@@ -13,7 +13,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "for_year", Type: field.TypeInt},
 		{Name: "for_quarter", Type: field.TypeInt},
-		{Name: "close_date", Type: field.TypeTime},
+		{Name: "close_date", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "date"}},
 		{Name: "status", Type: field.TypeInt},
 		{Name: "dps", Type: field.TypeFloat64},
 		{Name: "ticker_div_payouts", Type: field.TypeString, Size: 20},
@@ -35,7 +35,7 @@ var (
 	// EmissionsColumns holds the columns for the "emissions" table.
 	EmissionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
-		{Name: "rec_date", Type: field.TypeTime},
+		{Name: "rec_date", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "date"}},
 		{Name: "size", Type: field.TypeInt64},
 		{Name: "free_float", Type: field.TypeInt, Nullable: true},
 		{Name: "lot_size", Type: field.TypeInt, Nullable: true},
@@ -110,7 +110,7 @@ var (
 	// InvestAccountCashflowsColumns holds the columns for the "invest_account_cashflows" table.
 	InvestAccountCashflowsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
-		{Name: "rec_date", Type: field.TypeTime},
+		{Name: "rec_date", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "date"}},
 		{Name: "qty", Type: field.TypeFloat64},
 		{Name: "invest_account_cashflows", Type: field.TypeString, Size: 20},
 	}
@@ -131,7 +131,7 @@ var (
 	// InvestAccountValuationsColumns holds the columns for the "invest_account_valuations" table.
 	InvestAccountValuationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
-		{Name: "rec_date", Type: field.TypeTime},
+		{Name: "rec_date", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "date"}},
 		{Name: "value", Type: field.TypeFloat64},
 		{Name: "invest_account_valuations", Type: field.TypeString, Size: 20},
 	}
@@ -152,7 +152,7 @@ var (
 	// QuotesColumns holds the columns for the "quotes" table.
 	QuotesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
-		{Name: "d", Type: field.TypeTime},
+		{Name: "d", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "date"}},
 		{Name: "o", Type: field.TypeFloat64},
 		{Name: "c", Type: field.TypeFloat64},
 		{Name: "h", Type: field.TypeFloat64},
@@ -186,7 +186,7 @@ var (
 		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "report_year", Type: field.TypeInt},
 		{Name: "report_quarter", Type: field.TypeInt},
-		{Name: "report_date", Type: field.TypeTime},
+		{Name: "report_date", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "date"}},
 		{Name: "pnl_revenue_ytd", Type: field.TypeFloat64},
 		{Name: "pnl_amortization_ytd", Type: field.TypeFloat64},
 		{Name: "pnl_operating_income_ytd", Type: field.TypeFloat64},
@@ -230,7 +230,7 @@ var (
 		{Name: "last3years_yield", Type: field.TypeFloat64, Default: 0},
 		{Name: "week_refill_amount", Type: field.TypeFloat64},
 		{Name: "start_amount", Type: field.TypeFloat64},
-		{Name: "start_simulation", Type: field.TypeTime},
+		{Name: "start_simulation", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "date"}},
 		{Name: "buy_only_low_price", Type: field.TypeBool, Default: false},
 		{Name: "allow_loss_when_sell", Type: field.TypeBool, Default: true},
 		{Name: "allow_sell_to_fit", Type: field.TypeBool, Default: true},
@@ -356,7 +356,7 @@ var (
 		{Name: "user_name", Type: field.TypeString, Unique: true, Size: 50},
 		{Name: "password_hash", Type: field.TypeString},
 		{Name: "admin", Type: field.TypeBool, Default: false},
-		{Name: "start_invest_accounts_flow", Type: field.TypeTime, Nullable: true},
+		{Name: "start_invest_accounts_flow", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"postgres": "date"}},
 		{Name: "how_many_tickers_on_homepage", Type: field.TypeInt, Default: 20},
 	}
 	// UsersTable holds the schema information for the "users" table.

@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
@@ -18,7 +19,7 @@ func (User) Fields() []ent.Field {
 		field.String("UserName").NotEmpty().MinLen(3).MaxLen(50).Unique(),
 		field.String("PasswordHash"),
 		field.Bool("Admin").Default(false),
-		field.Time("StartInvestAccountsFlow").Optional(),
+		field.Time("StartInvestAccountsFlow").Optional().SchemaType(map[string]string{dialect.Postgres: "date"}),
 		field.Int("HowManyTickersOnHomepage").Range(10, 100).Default(20),
 	}
 }

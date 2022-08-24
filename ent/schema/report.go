@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/rs/xid"
@@ -18,7 +19,7 @@ func (Report) Fields() []ent.Field {
 		field.String("id").GoType(xid.ID{}).DefaultFunc(xid.New).MaxLen(20).Immutable().NotEmpty(),
 		field.Int("ReportYear").Range(1999, 2999),
 		field.Int("ReportQuarter").Range(1, 4),
-		field.Time("ReportDate"),
+		field.Time("ReportDate").SchemaType(map[string]string{dialect.Postgres: "date"}),
 		field.Float("PnlRevenueYtd"),
 		field.Float("PnlAmortizationYtd"),
 		field.Float("PnlOperatingIncomeYtd"),

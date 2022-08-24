@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -23,7 +24,7 @@ func (DivPayout) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("ForYear").Range(1900, 2999),
 		field.Int("ForQuarter").Range(1, 4),
-		field.Time("CloseDate"),
+		field.Time("CloseDate").SchemaType(map[string]string{dialect.Postgres: "date"}),
 		field.Int("Status").Range(DivPayoutStatus_CompanyCharter, DivPayoutStatus_Fact),
 		field.Float("DPS"),
 	}

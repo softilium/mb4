@@ -408,7 +408,6 @@ func (c *Cube) loadDivsAndCaps() error {
 	for _, v := range dpRaw {
 		cell := c._cellsByTickerByDate(v.CloseDate, v.Edges.Tickers.ID, LookAhead)
 		if cell == nil {
-			//TODO 4 strings there !
 			log.Println("No cell for div payout", v.CloseDate, v.Edges.Tickers.ID)
 			_ = c._cellsByTickerByDate(v.CloseDate, v.Edges.Tickers.ID, LookAhead)
 		} else {
