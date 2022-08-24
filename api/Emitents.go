@@ -104,9 +104,11 @@ func Emitents(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-		tx.Commit()
+		err = tx.Commit()
+		pages.HandleErr(err, w)
 
-		w.Write([]byte(newdata.ID.String()))
+		_, err = w.Write([]byte(newdata.ID.String()))
+		pages.HandleErr(err, w)
 		return
 
 	}

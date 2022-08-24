@@ -90,14 +90,17 @@ func filterRub0(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.E
 
 func main() {
 
-	pongo2.RegisterFilter("rub0", filterRub0)
+	err := pongo2.RegisterFilter("rub0", filterRub0)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
 
 	if config.C.Debug {
 		f, err := os.Create("cpu.prof")
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal(err.Error())
 		}
-		pprof.StartCPUProfile(f)
+		_ = pprof.StartCPUProfile(f)
 		defer pprof.StopCPUProfile()
 	}
 
@@ -112,7 +115,7 @@ func main() {
 	clRoutine := func() {
 		err := cube.Market.LoadCube()
 		if err != nil {
-			log.Fatalf("Could not load market cube: %v\n", err)
+			log.Fatalf("Could not load market cube: %v\n", err.Error())
 		}
 		log.Println("Market cube loaded.")
 	}
@@ -124,7 +127,7 @@ func main() {
 	log.Println("Server is ready to handle requests at", listenAddr)
 
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("could not listen on %s: %v\n", listenAddr, err)
+		log.Fatalf("could not listen on %s: %v\n", listenAddr, err.Error())
 	}
 
 	<-done
@@ -132,9 +135,9 @@ func main() {
 	if config.C.Debug {
 		f, err := os.Create("mem.prof")
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal(err.Error())
 		}
-		pprof.WriteHeapProfile(f)
+		_ = pprof.WriteHeapProfile(f)
 		f.Close()
 	}
 

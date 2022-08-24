@@ -21,6 +21,7 @@ func InvestAccounts(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	tmpl.ExecuteWriter(pongo2.Context{"pd": pd}, w)
+	err = tmpl.ExecuteWriter(pongo2.Context{"pd": pd}, w)
+	HandleErr(err, w)
 
 }

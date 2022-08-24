@@ -330,9 +330,15 @@ func (c *Cube) LoadCube() (err error) {
 		return err
 	}
 
-	c.loadReports()
+	err = c.loadReports()
+	if err != nil {
+		return err
+	}
 
-	c.loadIndustries()
+	err = c.loadIndustries()
+	if err != nil {
+		return err
+	}
 
 	//TODO считать положение котировки на 52-недельном цикле
 

@@ -49,11 +49,14 @@ func init() {
 		log.Fatalf("Failed creating schema resources: %v", err)
 	} else {
 		if len(admins) == 0 {
-			DB.User.Create().
+			_, err = DB.User.Create().
 				SetUserName("admin").
 				SetPasswordHash(PasswordHash("admin")).
 				SetAdmin(true).
 				Save(context.Background())
+			if err != nil {
+				log.Fatalln(err.Error())
+			}
 			log.Println("Created admin user")
 		}
 

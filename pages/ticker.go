@@ -40,7 +40,8 @@ func Ticker(w http.ResponseWriter, r *http.Request) {
 						http.Error(w, err.Error(), http.StatusInternalServerError)
 						return
 					}
-					tmpl.ExecuteWriter(pongo2.Context{"pd": pageData}, w)
+					err = tmpl.ExecuteWriter(pongo2.Context{"pd": pageData}, w)
+					HandleErr(err, w)
 
 				}
 			case "candles":

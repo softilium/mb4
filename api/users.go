@@ -59,7 +59,9 @@ func UsersLogin(w http.ResponseWriter, r *http.Request) {
 		session, _ := pages.SessionsStore.Get(r, config.C.SessionCookieName)
 		session.Values["userId"] = u[0].ID.String()
 		session.Values["authenticated"] = true
-		session.Save(r, w)
+		err = session.Save(r, w)
+		pages.HandleErr(err, w)
+
 		w.WriteHeader(http.StatusOK)
 		return
 	}
@@ -68,7 +70,7 @@ func UsersLogin(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//UsersLogout clears session and redirects to login page
+// UsersLogout clears session and redirects to login page
 func UsersLogout(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
@@ -79,12 +81,14 @@ func UsersLogout(w http.ResponseWriter, r *http.Request) {
 	session, _ := pages.SessionsStore.Get(r, config.C.SessionCookieName)
 	session.Values["userId"] = ""
 	session.Values["authenticated"] = false
-	session.Save(r, w)
+	err := session.Save(r, w)
+	pages.HandleErr(err, w)
+
 	w.WriteHeader(http.StatusOK)
 
 }
 
-//UsersRegister registers new user
+// UsersRegister registers new user
 func UsersRegister(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
@@ -116,7 +120,9 @@ func UsersRegister(w http.ResponseWriter, r *http.Request) {
 	session, _ := pages.SessionsStore.Get(r, config.C.SessionCookieName)
 	session.Values["userId"] = nu.ID.String()
 	session.Values["authenticated"] = true
-	session.Save(r, w)
+	err = session.Save(r, w)
+	pages.HandleErr(err, w)
+
 	w.WriteHeader(http.StatusOK)
 
 }
@@ -144,7 +150,8 @@ func UsersStartInvestAccountsFlow(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		if !session.GetUser().StartInvestAccountsFlow.IsZero() {
 			res := session.GetUser().StartInvestAccountsFlow.Format("2006-01-02")
-			w.Write([]byte(res))
+			_, err := w.Write([]byte(res))
+			pages.HandleErr(err, w)
 		}
 	}
 }

@@ -13,6 +13,7 @@ func Login(w http.ResponseWriter, _ *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	tmpl.ExecuteWriter(pongo2.Context{}, w)
+	err = tmpl.ExecuteWriter(pongo2.Context{}, w)
+	HandleErr(err, w)
 
 }

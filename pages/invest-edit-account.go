@@ -34,7 +34,8 @@ func InvestAccount(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			tmpl.ExecuteWriter(pongo2.Context{"pd": pd}, w)
+			err = tmpl.ExecuteWriter(pongo2.Context{"pd": pd}, w)
+			HandleErr(err, w)
 		}
 	case http.MethodPut:
 		{
@@ -119,7 +120,8 @@ func InvestAccount(w http.ResponseWriter, r *http.Request) {
 						SetOwner(db.DB.InvestAccount.GetX(context.Background(), owner)).
 						Save(context.Background())
 					HandleErr(err, w)
-					w.Write([]byte(newObj.ID.String()))
+					_, err = w.Write([]byte(newObj.ID.String()))
+					HandleErr(err, w)
 				}
 			case "val":
 				{
@@ -137,7 +139,8 @@ func InvestAccount(w http.ResponseWriter, r *http.Request) {
 						SetOwner(db.DB.InvestAccount.GetX(context.Background(), owner)).
 						Save(context.Background())
 					HandleErr(err, w)
-					w.Write([]byte(newObj.ID.String()))
+					_, err = w.Write([]byte(newObj.ID.String()))
+					HandleErr(err, w)
 				}
 			default:
 				http.Error(w, "mode not allowed", http.StatusInternalServerError)
