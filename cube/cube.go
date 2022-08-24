@@ -406,10 +406,10 @@ func (c *Cube) loadDivsAndCaps() error {
 	}
 
 	for _, v := range dpRaw {
-		cell := c._cellsByTickerByDate(v.CloseDate, v.Edges.Tickers.ID, true)
+		cell := c._cellsByTickerByDate(v.CloseDate, v.Edges.Tickers.ID, LookAhead)
 		if cell == nil {
 			log.Println("No cell for div payout", v.CloseDate, v.Edges.Tickers.ID)
-			_ = c._cellsByTickerByDate(v.CloseDate, v.Edges.Tickers.ID, true)
+			_ = c._cellsByTickerByDate(v.CloseDate, v.Edges.Tickers.ID, LookAhead)
 		} else {
 			cell.DivPayout = v.DPS
 		}

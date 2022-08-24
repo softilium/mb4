@@ -122,19 +122,36 @@ func (c *Cube) GetReports2(ticker string) []*Report2 {
 
 }
 
-func (c *Cube) CellsByTickerByDate(ticker string, d time.Time, lookLast bool) *Cell {
+type LookDirection int
+
+const (
+	LookBack  LookDirection = -1
+	LookNone  LookDirection = 0
+	LookAhead LookDirection = 1
+)
+
+func (c *Cube) CellsByTickerByDate(ticker string, d time.Time, lookDir LookDirection) *Cell {
 	c.l.Lock()
 	defer c.l.Unlock()
-	return c._cellsByTickerByDate(d, ticker, lookLast)
+	return c._cellsByTickerByDate(d, ticker, lookDir)
 }
 
-func (c *Cube) _cellsByTickerByDate(d time.Time, ticker string, lookLast bool) *Cell {
-	minDate := c.allDays[0]
+func (c *Cube) _cellsByTickerByDate(d time.Time, ticker string, lookDir LookDirection) *Cell {
 	d0 := d
 	r, ok := c.cellsByTickerByDate[ticker][d0]
-	for !ok && lookLast && d0.After(minDate) {
-		d0 = d0.AddDate(0, 0, -1)
-		r, ok = c.cellsByTickerByDate[ticker][d0]
+	if lookDir == LookBack {
+		minDate := c.allDays[0]
+		for !ok && d0.After(minDate) {
+			d0 = d0.AddDate(0, 0, -1)
+			r, ok = c.cellsByTickerByDate[ticker][d0]
+		}
+	}
+	if lookDir == LookAhead {
+		maxDate := c.allDays[len(c.allDays)-1]
+		for !ok && d0.Before(maxDate) {
+			d0 = d0.AddDate(0, 0, 1)
+			r, ok = c.cellsByTickerByDate[ticker][d0]
+		}
 	}
 	return r
 }

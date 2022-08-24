@@ -43,7 +43,7 @@ func Industry(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		q := cube.Market.CellsByTickerByDate(t.ID, ld, true)
+		q := cube.Market.CellsByTickerByDate(t.ID, ld, cube.LookBack)
 		if q.R2 == nil {
 			rows = append(rows, &emitentRow{Ticker: t, Cap: q.Cap.Ltm})
 		} else {

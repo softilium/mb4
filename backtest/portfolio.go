@@ -101,7 +101,7 @@ func (p *Portfolio) ApplyCurrentPrices(market *cube.Cube, D time.Time) {
 
 	// step one: apply current prices to all items
 	for _, item := range p.Items {
-		cell := market.CellsByTickerByDate(item.Ticker.ID, D, true)
+		cell := market.CellsByTickerByDate(item.Ticker.ID, D, cube.LookBack)
 		item.CurrentPrice = 0
 		if cell != nil {
 			item.CurrentPrice = cell.Quote.C

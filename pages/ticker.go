@@ -105,7 +105,7 @@ func handleGetMult(w http.ResponseWriter, r *http.Request, tickerId string) {
 	multres.EBITDAMarginInd = make([]float64, len(reps))
 	for idx, rep := range reps {
 
-		cell := cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate, true)
+		cell := cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate, cube.LookBack)
 		indCell := cube.Market.GetIndustryCell(cell.Industry.ID, cell.D)
 
 		if rep.ReportQuarter == 4 {
@@ -154,8 +154,8 @@ func handleGetCF(w http.ResponseWriter, r *http.Request, tickerId string) {
 		cfres.Cash[idx] = rep.Cash.V
 		cfres.Debt[idx] = rep.NetDebt.V
 		cfres.Equity[idx] = rep.Equity.V
-		cfres.MCap[idx] = cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate, true).Cap.V
-		cfres.BookValue[idx] = cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate, true).BookValue.V
+		cfres.MCap[idx] = cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate, cube.LookBack).Cap.V
+		cfres.BookValue[idx] = cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate, cube.LookBack).BookValue.V
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -232,7 +232,7 @@ func handleGetDivPayouts(w http.ResponseWriter, r *http.Request, tickerId string
 	for idx, d := range dp {
 
 		// if we do not have quote in close date, find nearest before
-		q := cube.Market.CellsByTickerByDate(tickerId, d.CloseDate, true)
+		q := cube.Market.CellsByTickerByDate(tickerId, d.CloseDate, cube.LookBack)
 		if q != nil {
 			dp2[idx] = dpData{CloseDate: d.CloseDate, SrcPeriod: fmt.Sprintf("%v.Q%v", d.ForYear, d.ForQuarter), DPS: d.DPS, Yield: d.DPS / q.Quote.C * 100}
 		} else {

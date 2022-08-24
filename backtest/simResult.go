@@ -78,8 +78,6 @@ func (t *SimulationResult) Calc(Market *cube.Cube, FinalPortfolio *Portfolio) {
 	}
 
 	t.TickerTradeResults = make([]*SimulationTickerTradeResultItem, 0)
-	//t.IndustryTradeResults = make([]*SimulationIndustryTradeResultItem, 0)
-
 	t.TickerDividendResults = make([]*SimulationTickerDividendResultItem, 0)
 
 	yearsMap := make(map[int]bool)
@@ -100,11 +98,7 @@ func (t *SimulationResult) Calc(Market *cube.Cube, FinalPortfolio *Portfolio) {
 			}
 			if ttrIdx == -1 {
 				t.TickerTradeResults = append(t.TickerTradeResults, &SimulationTickerTradeResultItem{TickerId: Deal.TickerId})
-				//ttrIdx = len(t.TickerTradeResults) - 1
 			}
-			//t.IndustryTradeResults = append(t.IndustryTradeResults, &SimulationIndustryTradeResultItem{IndustryId: Deal.TickerId, Profit: Deal.InvestResult, DealsCount: 1})
-			//t.IndustryTradeResults[ttrIdx].Profit += Deal.InvestResult
-			//t.IndustryTradeResults[ttrIdx].DealsCount++
 		}
 		ti_days := D.D.Sub(min).Hours() / 24
 		D.Accu_Yield = 0
@@ -125,7 +119,7 @@ func (t *SimulationResult) Calc(Market *cube.Cube, FinalPortfolio *Portfolio) {
 	for _, R := range t.TickerTradeResults {
 		for _, item := range FinalPortfolio.Items {
 			if item.Ticker.ID == R.TickerId {
-				cell := Market.CellsByTickerByDate(item.Ticker.ID, Market.LastDate(), true)
+				cell := Market.CellsByTickerByDate(item.Ticker.ID, Market.LastDate(), cube.LookBack)
 				for _, q := range item.Rests {
 					R.Profit += (cell.Quote.C - q.Price) * float64(q.Position)
 				}

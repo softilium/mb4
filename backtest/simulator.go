@@ -16,13 +16,14 @@ func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Sou
 
 	if ImplicitTicker != nil {
 		ir := Portfolio{RUB: Source.CurrentBalance() + Source.RUB}
-		cell := Market.CellsByTickerByDate(ImplicitTicker.ID, D, true)
+		cell := Market.CellsByTickerByDate(ImplicitTicker.ID, D, cube.LookBack)
 		if cell == nil {
 			log.Fatalf("ActualPortfolio: no cell for %s on %s\n", ImplicitTicker.Descr, D)
 			return nil
 		}
 		lots := int(math.Trunc(Source.CurrentBalance() + Source.RUB/(float64(cell.LotSize())+cell.Quote.C)))
 		ir.BuyLots(cell, lots)
+		ir.ApplyCurrentPrices(Market, D)
 		return &ir
 	}
 
@@ -210,7 +211,7 @@ func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Sou
 		if !r.IsUsed {
 			continue
 		}
-		cell := Market.CellsByTickerByDate(r.Ticker, D, true)
+		cell := Market.CellsByTickerByDate(r.Ticker, D, cube.LookBack)
 		if cell != nil {
 			lots := int(math.Trunc((Source.CurrentBalance() + Source.RUB) / 100 * float64(r.Share) / (float64(cell.LotSize()) * cell.Quote.C)))
 			if lots > 0 {
@@ -219,7 +220,7 @@ func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Sou
 		}
 	}
 
-	result.ApplyCurrentPrices(Market, Market.LastDate())
+	result.ApplyCurrentPrices(Market, D)
 
 	sort.Slice(result.Items, func(i, j int) bool { return result.Items[i].CurrentPercent > result.Items[j].CurrentPercent })
 	return &result
@@ -299,14 +300,14 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 	today := time.Now()
 	for _, D := range Market.GetAllDates(From, &today) {
 
-		Refill := 0.0
-		if D.Weekday() == time.Thursday {
-			Refill = WeekRefillAmount
+		if D.Weekday() != time.Thursday {
+			continue
 		}
+		Refill := WeekRefillAmount
 		AllTime_Equity += Refill
 		Divs := 0.0
 		for _, item := range prtf.Items {
-			c := Market.CellsByTickerByDate(item.Ticker.ID, D, false)
+			c := Market.CellsByTickerByDate(item.Ticker.ID, D, cube.LookNone)
 			if c != nil {
 				continue
 			}
@@ -341,7 +342,7 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 			if found == nil {
 
 				if Strategy.AllowLossWhenSell || c.balPrice < c.CurrentPrice {
-					qc := Market.CellsByTickerByDate(c.Ticker.ID, D, true)
+					qc := Market.CellsByTickerByDate(c.Ticker.ID, D, cube.LookBack)
 					if qc == nil {
 						log.Printf("Simulation fail. Close position. No quote for %s for date %s\n", c.Ticker.ID, D)
 					} else {
@@ -353,7 +354,7 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 				if Strategy.AllowSellToFit {
 					if found.Lots() > c.Lots() {
 						if Strategy.AllowLossWhenSell || c.balPrice > found.balPrice {
-							qc := Market.CellsByTickerByDate(c.Ticker.ID, D, true)
+							qc := Market.CellsByTickerByDate(c.Ticker.ID, D, cube.LookBack)
 							if qc == nil {
 								log.Printf("Simulation fail. Sell position. No quote for %s for date %s\n", c.Ticker.ID, D)
 							} else {
@@ -378,7 +379,7 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 				}
 			}
 			if found == nil {
-				qc := Market.CellsByTickerByDate(idealItem.Ticker.ID, D, true)
+				qc := Market.CellsByTickerByDate(idealItem.Ticker.ID, D, cube.LookBack)
 				if qc == nil {
 					log.Printf("Simulation fail. Open position. No quote for %s for date %s\n", idealItem.Ticker.ID, D)
 				} else {
@@ -387,7 +388,7 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 				}
 			} else {
 				if idealItem.Lots() > found.Lots() {
-					qc := Market.CellsByTickerByDate(idealItem.Ticker.ID, D, true)
+					qc := Market.CellsByTickerByDate(idealItem.Ticker.ID, D, cube.LookBack)
 					if qc == nil {
 						log.Printf("Simulation fail. No quote for %s for date %s\n", idealItem.Ticker.ID, D)
 					} else {
@@ -428,28 +429,23 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 	}
 
 	result.BaseLevels = make([]float64, len(result.StrategyLevels))
-	if Strategy.BaseIndex != "" {
-		BaseStrategy := &ent.Strategy{
-			StartAmount:      Strategy.StartAmount,
-			WeekRefillAmount: Strategy.WeekRefillAmount,
-			StartSimulation:  Strategy.StartSimulation,
-		}
+	if Implicit == nil && Strategy.BaseIndex != "" {
 
-		BaseResult := Simulate(
-			BaseStrategy,
+		bResult := Simulate(
+			Strategy,
 			Market,
 			(*time.Time)(Strategy.StartSimulation),
-			BaseStrategy.StartAmount,
-			BaseStrategy.WeekRefillAmount,
+			Strategy.StartAmount,
+			Strategy.WeekRefillAmount,
 			Market.GetAllTickers()[Strategy.BaseIndex],
 		)
 
 		idx := 0
-		for _, d := range result.Days {
+		for _, d := range bResult.Days {
 			if d.D.Weekday() != time.Thursday {
 				continue
 			}
-			result.BaseLevels[idx] = BaseResult.Days[idx].PortfolioBalance + BaseResult.Days[idx].PortfolioRUB
+			result.BaseLevels[idx] = bResult.Days[idx].PortfolioBalance + bResult.Days[idx].PortfolioRUB
 			idx++
 		}
 
@@ -459,7 +455,6 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 
 	EmptyPortfolio := &Portfolio{RUB: Strategy.StartAmount}
 	result.ActualPortfolio = ActualPortfolio(Strategy, Market, Market.LastDate(), EmptyPortfolio, nil)
-	result.ActualPortfolio.ApplyCurrentPrices(Market, Market.LastDate())
 
 	return result
 
