@@ -288,16 +288,14 @@
                         <th class="text-end">Доля</th>
                         <th class="text-end">Сумма</th>
                         <th class="text-end">Лоты</th>
-                        <!--<th class="text-end" v-for="factor in results.ActualPortfolio.factors">${factor.RK}</th>-->
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="item in results.ActualPortfolio.Items">
-                        <td><a v-bind:href="tickerUrl(item.Ticker.Id)">${item.Ticker.Descr}</a></td>
+                        <td><a v-bind:href="tickerUrl(item.Ticker.id)">${item.Ticker.Descr}</a></td>
                         <td class="text-end">${ $prnPercent1(item.CurrentPercent) }</td>
                         <td class="text-end">${ $prnCurrency(item.Balance) }</td>
                         <td class="text-end">${ item.Lots }</td>
-                        <!--<td class="text-end" v-for="df in item.debugFactors">${df.value}</td>-->
                     </tr>
                 </tbody>
             </table>
@@ -606,7 +604,7 @@
             },
 
             printPercent(val) { return new Intl.NumberFormat('ru-RU', { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(val / 100); },
-            tickerUrl(tickerId) { return '/ticker/' + tickerId + "?strategy=" + window.strategyId; },
+            tickerUrl(tickerId) { return `/ticker?id=${tickerId}&strategy=${window.strategyId}`; },
             industryUrl(industryId) { return '/industry/' + industryId; },
 
             daysForYear(year) {
