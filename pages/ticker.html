@@ -60,8 +60,7 @@
                 </thead>
                 <tbody v-for="item in reps">
                     <td v-for="q in item">
-                        <a v-if="q!=null"
-                            v-bind:href="'/reports?y=' + q.ReportYear+'&q=' + q.ReportQuarter + '&tickerid=' + tickerid">
+                        <a v-if="q!=null" v-bind:href="'/report?y=' + q.ReportYear+'&q=' + q.ReportQuarter + '&tickerid=' + tickerid">
                             ${q.ReportYear}.Q${q.ReportQuarter}
                         </a>
                     </td>

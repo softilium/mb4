@@ -1,0 +1,123 @@
+{% extends "layout.html" %}
+
+{% block title %}Отчет эмитента {% endblock %}
+
+{% block content %}
+
+{% macro pnl(descr, repv, addc) %}
+<tr class="{{addc}}">
+    <td>{{ descr }}</td>
+    <td class="text-end">{{repv.V | rub0}}</td>
+    <td class="text-end">{{repv.Ltm | rub0}}</td>
+    <td class="text-end">{{repv.AG | rub0}}</td>
+</tr>
+{% endmacro %}
+
+{% macro pnl_perc(descr, repv, addc) %}
+<tr class="{{addc}}">
+    <td>{{ descr }}</td>
+    <td class="text-end">{{repv.V | rub1}}%</td>
+    <td class="text-end">{{repv.Ltm | rub1}}%</td>
+    <td class="text-end">{{repv.AG | rub1}}%</td>
+</tr>
+{% endmacro %}
+
+{% macro cf(descr, repv, addc) %}
+<tr class="{{addc}}">
+    <td>{{ descr }}</td>
+    <td class="text-end">{{repv.V | rub0}}</td>
+    <td class="text-end">{{repv.AG | rub0}}</td>
+</tr>
+{% endmacro %}
+
+{% macro cf_perc(descr, repv, addc) %}
+<tr class="{{addc}}">
+    <td>{{ descr }}</td>
+    <td class="text-end">{{repv.V | rub1}}%</td>
+    <td class="text-end">{{repv.AG | rub1}}%</td>
+</tr>
+{% endmacro %}
+
+{% macro cf_1(descr, repv, addc) %}
+<tr class="{{addc}}">
+    <td>{{ descr }}</td>
+    <td class="text-end">{{repv.V | rub1}}</td>
+    <td class="text-end">{{repv.AG | rub1}}</td>
+</tr>
+{% endmacro %}
+
+<h2>Отчет эмитента {{ pd.R2.Edges.Emitent.Descr }} за {{ pd.R2.ReportYear }}-Q{{ pd.R2.ReportQuarter }} </h2>
+<h5>Дата отчета: {{pd.R2.ReportDate | date}}</h5>
+
+<div class="row">
+
+    <div class="col-4">
+        <h5>P&L</h5>
+        <small>
+            <table class="table table-sm">
+                <thead>
+                    <th>Параметр</th>
+                    <th class="text-end">YTD</th>
+                    <th class="text-end">LTM</th>
+                    <th class="text-end">г/г</th>
+                </thead>
+                {{ pnl("Выручка", pd.R2.Revenue, "") }}
+                {{ pnl("Амортизация", pd.R2.Amortization, "") }}
+                {{ pnl("Операционная прибыль", pd.R2.OperatingIncome, "") }}
+                {{ pnl("Финансовые доходы", pd.R2.InterestIncome, "") }}
+                {{ pnl("Финансовые расходы", pd.R2.InterestExpenses, "") }}
+                {{ pnl("Налог на прибыль", pd.R2.IncomeTax, "") }}
+                {{ pnl("Прибыль", pd.R2.NetIncome, "") }}
+                {{ pnl("OIBDA", pd.R2.OIBDA, "table-warning") }}
+                {{ pnl("EBITDA", pd.R2.EBITDA, "table-warning") }}
+                {{ pnl_perc("Рентабельность OIBDA", pd.R2.OIBDAMargin, "table-warning") }}
+                {{ pnl_perc("Рентабельность EBITDA", pd.R2.EBITDAMargin, "table-warning") }}
+                {{ pnl_perc("Операционная рентабельность", pd.R2.OperationalMargin, "table-warning") }}
+                {{ pnl_perc("Чистая рентабельность", pd.R2.NetMargin, "table-warning") }}
+            </table>
+        </small>
+    </div>
+
+    <div class="col-4">
+        <h5>Cashflow</h5>
+        <table class="table table-sm">
+            <thead>
+                <th>Параметр</th>
+                <th class="text-end">SLD</th>
+                <th class="text-end">г/г</th>
+            </thead>
+            {{ cf("Денежные средства и эквиваленты", pd.R2.Cash, "") }}
+            {{ cf("Текущие обязательства", pd.R2.CurrentLiabilities, "") }}
+            {{ cf("Долговременные обязательства", pd.R2.NonCurrentLiabilities, "") }}
+            {{ cf("Неконтроллирующие доли", pd.R2.NonControlling, "") }}
+            {{ cf("Капитал", pd.R2.Equity, "") }}
+            {{ cf("Всего активов и обязательств", pd.R2.Total, "") }}
+            {{ cf("Чистый долг", pd.R2.NetDebt, "table-warning") }}
+            {{ cf("Капитализация", pd.R3.Cap, "table-warning") }}
+            {{ cf("EV", pd.R3.EV, "table-warning") }}
+            {{ cf("Book value", pd.R3.BookValue, "table-warning") }}
+        </table>
+
+    </div>
+
+    <div class="col-4">
+        <h5>Мультипликаторы</h5>
+        <table class="table table-sm">
+            <thead>
+                <th>Мультипликатор</th>
+                <th class="text-end">SLD</th>
+                <th class="text-end">г/г</th>
+            </thead>
+            {{ cf_1("EV/EBITDA", pd.R3.EV_on_EBITDA, "") }}
+            {{ cf_1("Debt/EBITDA", pd.R2.Debt_on_EBITDA, "") }}
+            {{ cf_1("P/E", pd.R3.P_on_E, "") }}
+            {{ cf_1("P/BV", pd.R3.P_on_BV, "") }}
+            {{ cf_1("P/S", pd.R3.P_on_S, "") }}
+            {{ cf_1("DSI", pd.R3.DSI, "") }}
+            {{ cf_perc("ROE", pd.R2.ROE, "") }}
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

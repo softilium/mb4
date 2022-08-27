@@ -51,6 +51,7 @@ func initServer(listenAddr string) *http.Server {
 	router.HandleFunc("/industry", pages.Industry)
 	router.HandleFunc("/strategies", pages.Strategies)
 	router.HandleFunc("/strategy", pages.Strategy)
+	router.HandleFunc("/report", pages.Report)
 
 	router.HandleFunc("/api/users/login", api.UsersLogin)
 	router.HandleFunc("/api/users/register", api.UsersRegister)
@@ -88,9 +89,19 @@ func filterRub0(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.E
 	return pongo2.AsSafeValue(r), nil
 }
 
+func filterRub1(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	r := localFormatter.Sprintf("%.1f\n", in.Float())
+	return pongo2.AsSafeValue(r), nil
+}
+
 func main() {
 
 	err := pongo2.RegisterFilter("rub0", filterRub0)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+
+	err = pongo2.RegisterFilter("rub1", filterRub1)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
