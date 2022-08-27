@@ -2,9 +2,7 @@ package cube
 
 import (
 	"context"
-	"fmt"
 
-	//	"fmt"
 	"log"
 	"math"
 	"sort"
@@ -419,16 +417,8 @@ func (c *Cube) loadIndustries() error {
 
 	for _, day := range c.allDays {
 
-		if day.Year() >= 2020 {
-			fmt.Println("dbg")
-		}
-
 		dsiArr := make(map[string][]float64)
 		repsArr := make(map[string]*Cell)
-
-		dbgEBITDA := make(map[string]float64)
-		dbgCAP := make(map[string]float64)
-		dbgEV := make(map[string]float64)
 
 		for _, cell := range c.cellsByDate[day] {
 			if cell.Industry == nil || cell.R2 == nil {
@@ -447,12 +437,6 @@ func (c *Cube) loadIndustries() error {
 				ir.R2.Init()
 			}
 			repsArr[cell.Industry.ID] = ir
-
-			if cell.Industry.ID == "consumers" {
-				dbgEBITDA[cell.TickerId()] = cell.R2.EBITDA.V
-				dbgCAP[cell.TickerId()] = cell.Cap.V
-				dbgEV[cell.TickerId()] = cell.EV.V
-			}
 
 			ir.Cap.V += cell.Cap.V
 			ir.DivSum3Y.V += cell.DivSum3Y.V
@@ -497,9 +481,6 @@ func (c *Cube) loadIndustries() error {
 
 		}
 		for _, ir := range repsArr {
-			if ir.Industry.ID == "consumers" {
-				fmt.Println("dbg")
-			}
 			ir.R2.Calc(nil, nil)
 			ir.CalcAfterLoad(c)
 			dsiSlice, ok := dsiArr[ir.Industry.ID]

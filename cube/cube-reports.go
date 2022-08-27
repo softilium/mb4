@@ -32,8 +32,7 @@ type Report2 struct { // enriched report with calculated fields
 	OperationalMargin RepV
 	NetMargin         RepV
 	Debt_on_EBITDA    RepV
-	//EV_on_EBITDA      RepV
-	ROE RepV
+	ROE               RepV
 
 	// Cf src
 	Cash                  RepV
