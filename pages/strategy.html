@@ -288,6 +288,7 @@
                         <th class="text-end">Доля</th>
                         <th class="text-end">Сумма</th>
                         <th class="text-end">Лоты</th>
+                        <th v-for="f in obj.edges.Factors" class="text-end">Фактор №${ f.LineNum }</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -296,6 +297,7 @@
                         <td class="text-end">${ $prnPercent1(item.CurrentPercent) }</td>
                         <td class="text-end">${ $prnCurrency(item.Balance) }</td>
                         <td class="text-end">${ item.Lots }</td>
+                        <td v-for="f in obj.edges.Factors" class="text-end">${ item.DebugFactors[f.LineNum] }</td>
                     </tr>
                 </tbody>
             </table>

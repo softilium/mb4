@@ -26,6 +26,7 @@ type PortfolioItem struct {
 	balPrice       float64 //read-only
 	CurrentPrice   float64
 	CurrentPercent float64
+	DebugFactors   map[int]float64
 }
 
 func (p *PortfolioItem) Balance() float64 {
@@ -38,11 +39,13 @@ func (d *PortfolioItem) MarshalJSON() ([]byte, error) {
 		Lots           int
 		Balance        float64
 		CurrentPercent float64
+		DebugFactors   map[int]float64
 	}{
 		Ticker:         d.Ticker,
 		Lots:           d.Lots(),
 		Balance:        d.Balance(),
 		CurrentPercent: d.CurrentPercent,
+		DebugFactors:   d.DebugFactors,
 	})
 }
 

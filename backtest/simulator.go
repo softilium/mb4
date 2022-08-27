@@ -12,7 +12,7 @@ import (
 	"github.com/softilium/mb4/ent/schema"
 )
 
-func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Source *Portfolio, ImplicitTicker *ent.Ticker) *Portfolio {
+func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Source *Portfolio, ImplicitTicker *ent.Ticker, debug bool) *Portfolio {
 
 	if ImplicitTicker != nil {
 		ir := Portfolio{RUB: Source.CurrentBalance() + Source.RUB}
@@ -49,6 +49,8 @@ func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Sou
 	if flexRUB > 0 {
 
 		all := Market.GetCellsByDate(D)
+
+		debugs := make(map[string]map[int]float64) // tickerId - factor.LineNum - factor weight
 
 		buffer := make(map[*cube.Cell]map[int]float64, 0)
 
@@ -88,6 +90,15 @@ func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Sou
 					buffer[c] = mapt
 				}
 				mapt[factor.LineNum] = r2
+
+				if debug {
+					tm, ok := debugs[c.TickerId()]
+					if !ok {
+						tm = make(map[int]float64)
+						debugs[c.TickerId()] = tm
+					}
+					tm[factor.LineNum] = r2
+				}
 
 			}
 
@@ -204,6 +215,17 @@ func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Sou
 			deals := result.BuyLots(sp.c, lots)
 			if len(deals) == 0 {
 				log.Println("ActualPortfolio. No deals for " + sp.c.TickerId())
+			}
+		}
+
+		if debug {
+			for _, pi := range result.Items {
+				pi.DebugFactors = make(map[int]float64)
+				for _, fi := range Strategy.Edges.Factors {
+					if tm, ok := debugs[pi.Ticker.ID]; ok {
+						pi.DebugFactors[fi.LineNum] = tm[fi.LineNum]
+					}
+				}
 			}
 		}
 
@@ -329,7 +351,7 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 
 		prtf.ApplyCurrentPrices(Market, D)
 
-		var Ideal = ActualPortfolio(Strategy, Market, D, prtf, Implicit)
+		var Ideal = ActualPortfolio(Strategy, Market, D, prtf, Implicit, false)
 		Ideal.ApplyCurrentPrices(Market, D)
 
 		// close missing positions
@@ -457,7 +479,7 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 	result.Calc(Market, prtf)
 
 	EmptyPortfolio := &Portfolio{RUB: Strategy.StartAmount}
-	result.ActualPortfolio = ActualPortfolio(Strategy, Market, Market.LastDate(), EmptyPortfolio, nil)
+	result.ActualPortfolio = ActualPortfolio(Strategy, Market, Market.LastDate(), EmptyPortfolio, nil, true)
 
 	return result
 
