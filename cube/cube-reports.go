@@ -65,6 +65,14 @@ func (r *Report2) Init() {
 	r.Debt_on_EBITDA.FromR2 = func(r *Report2) RepV { return r.Debt_on_EBITDA }
 	r.ROE.FromR2 = func(r *Report2) RepV { return r.ROE }
 
+	r.Cash.FromR2 = func(r *Report2) RepV { return r.Cash }
+	r.NonCurrentLiabilities.FromR2 = func(r *Report2) RepV { return r.NonCurrentLiabilities }
+	r.CurrentLiabilities.FromR2 = func(r *Report2) RepV { return r.CurrentLiabilities }
+	r.NonControlling.FromR2 = func(r *Report2) RepV { return r.NonControlling }
+	r.Equity.FromR2 = func(r *Report2) RepV { return r.Equity }
+	r.Total.FromR2 = func(r *Report2) RepV { return r.Total }
+	r.NetDebt.FromR2 = func(r *Report2) RepV { return r.NetDebt }
+
 	r.Debt_on_EBITDA.InverseGrowth = true
 
 }
@@ -109,11 +117,11 @@ func (r *Report2) LoadFromRawReport(s *ent.Report, prevY, prevQ *Report2) {
 	r.Total.V = s.CfTotalSld
 	r.Total.CalcCashflowAnnualGrowth(r.prevYear)
 
-	r.Calc(prevY, prevQ)
+	r.Calc()
 
 }
 
-func (r *Report2) Calc(prevY, prevQ *Report2) {
+func (r *Report2) Calc() {
 
 	// CF calculated
 	r.NetDebt.V = r.NonCurrentLiabilities.V + r.CurrentLiabilities.V - r.Cash.V

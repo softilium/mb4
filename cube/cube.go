@@ -370,6 +370,7 @@ func (c *Cube) loadReports() error {
 		r2reports := make([]*Report2, 0, 10)
 		prevMaps := make(map[int]map[int]*Report2) // Year - Quarter - Report
 		for _, r := range treps {
+
 			r2 := Report2{}
 
 			var prevY *Report2 = nil
@@ -380,7 +381,17 @@ func (c *Cube) loadReports() error {
 			if _, ok := prevMaps[r.ReportYear-1]; ok {
 				prevQ = prevMaps[r.ReportYear-1][r.ReportQuarter]
 			}
+			if prevY != nil {
+				log.Println("dbg")
+			}
 			r2.LoadFromRawReport(r, prevY, prevQ)
+
+			ymap, ok := prevMaps[r.ReportYear]
+			if !ok {
+				ymap = make(map[int]*Report2)
+				prevMaps[r.ReportYear] = ymap
+			}
+			ymap[r.ReportQuarter] = &r2
 
 			// bind report dates to quote dates for cube purposes.
 			// Because we fild quotes by report dates later (see tickers page)
@@ -481,7 +492,7 @@ func (c *Cube) loadIndustries() error {
 
 		}
 		for _, ir := range repsArr {
-			ir.R2.Calc(nil, nil)
+			ir.R2.Calc()
 			ir.CalcAfterLoad(c)
 			dsiSlice, ok := dsiArr[ir.Industry.ID]
 			if ok {
