@@ -7,48 +7,6 @@ import (
 	"github.com/softilium/mb4/ent"
 )
 
-type RepV struct {
-	V      float64 //Ytd/Sld
-	YtdAdj float64
-	Ltm    float64
-	AG     float64
-	AGLtm  float64
-	FromR2 func(*Report2) RepV `json:"-"`
-}
-
-func (p *RepV) SetFromPnl(newV, newLtm float64, src *Report2) {
-
-	p.V = newV
-	p.Ltm = newLtm
-
-	p.YtdAdj = p.V / float64(src.ReportQuarter) * 4
-	if p.Ltm == 0 { // skip when we assign it before
-		if src.prevQuarter == nil || src.prevYear == nil {
-			p.Ltm = p.YtdAdj
-		} else {
-			p.Ltm = p.FromR2(src.prevYear).V - p.FromR2(src.prevQuarter).V + p.V
-		}
-	}
-	if src.prevYear == nil {
-		p.AG = 0
-		p.AGLtm = 0
-	} else {
-		p.AG = RoundX(p.V/p.FromR2(src.prevYear).V*100, 1) - 100
-		p.AGLtm = RoundX(p.Ltm/p.FromR2(src.prevYear).Ltm*100, 1) - 100
-	}
-
-}
-
-func (p *RepV) CalcCashflowAnnualGrowth(prevY *Report2) {
-
-	if prevY == nil {
-		p.AG = 0
-	} else {
-		p.AG = RoundX(p.V/p.FromR2(prevY).V*100, 1) - 100
-	}
-
-}
-
 type Report2 struct { // enriched report with calculated fields
 	ReportYear    int
 	ReportQuarter int
@@ -74,8 +32,8 @@ type Report2 struct { // enriched report with calculated fields
 	OperationalMargin RepV
 	NetMargin         RepV
 	Debt_on_EBITDA    RepV
-	EV_on_EBITDA      RepV
-	ROE               RepV
+	//EV_on_EBITDA      RepV
+	ROE RepV
 
 	// Cf src
 	Cash                  RepV
@@ -87,10 +45,11 @@ type Report2 struct { // enriched report with calculated fields
 
 	// Cf calculated
 	NetDebt RepV
-	EV      RepV
+	//EV      RepV
 }
 
 func (r *Report2) Init() {
+
 	r.Revenue.FromR2 = func(r *Report2) RepV { return r.Revenue }
 	r.Amortization.FromR2 = func(r *Report2) RepV { return r.Amortization }
 	r.OperatingIncome.FromR2 = func(r *Report2) RepV { return r.OperatingIncome }
@@ -105,8 +64,10 @@ func (r *Report2) Init() {
 	r.OperationalMargin.FromR2 = func(r *Report2) RepV { return r.OperationalMargin }
 	r.NetMargin.FromR2 = func(r *Report2) RepV { return r.NetMargin }
 	r.Debt_on_EBITDA.FromR2 = func(r *Report2) RepV { return r.Debt_on_EBITDA }
-	r.EV_on_EBITDA.FromR2 = func(r *Report2) RepV { return r.EV_on_EBITDA }
 	r.ROE.FromR2 = func(r *Report2) RepV { return r.ROE }
+
+	r.Debt_on_EBITDA.InverseGrowth = true
+
 }
 
 func (r *Report2) LoadFromRawReport(s *ent.Report, prevY, prevQ *Report2) {
@@ -159,9 +120,6 @@ func (r *Report2) Calc(prevY, prevQ *Report2) {
 	r.NetDebt.V = r.NonCurrentLiabilities.V + r.CurrentLiabilities.V - r.Cash.V
 	r.NetDebt.CalcCashflowAnnualGrowth(r.prevYear)
 
-	r.EV.V = r.Cash.V + r.NonControlling.V + r.NonCurrentLiabilities.V + r.CurrentLiabilities.V
-	r.EV.CalcCashflowAnnualGrowth(r.prevYear)
-
 	// Pnl calculated
 
 	r.OIBDA.SetFromPnl(r.Revenue.V-r.Amortization.V, r.Revenue.Ltm-r.Amortization.Ltm, r)
@@ -183,7 +141,6 @@ func (r *Report2) Calc(prevY, prevQ *Report2) {
 	}
 	if math.Abs(r.EBITDA.V) >= 0.01 {
 		r.Debt_on_EBITDA.SetFromPnl(r.NetDebt.V/r.EBITDA.V, r.NetDebt.V/r.EBITDA.Ltm, r)
-		r.EV_on_EBITDA.SetFromPnl(r.EV.V/r.EBITDA.V, r.EV.V/r.EBITDA.Ltm, r)
 	}
 
 }

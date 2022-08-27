@@ -47,7 +47,7 @@ func Industry(w http.ResponseWriter, r *http.Request) {
 		if q.R2 == nil {
 			rows = append(rows, &emitentRow{Ticker: t, Cap: q.Cap.Ltm})
 		} else {
-			rows = append(rows, &emitentRow{Ticker: t, Cap: q.Cap.V, EV: q.R2.EV.V, EBITDA: q.R2.EBITDA.V, EBITDAGrow: q.R2.EBITDA.AG})
+			rows = append(rows, &emitentRow{Ticker: t, Cap: q.Cap.V, EV: q.EV.V, EBITDA: q.R2.EBITDA.V, EBITDAGrow: q.R2.EBITDA.AG})
 		}
 
 	}

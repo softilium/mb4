@@ -198,9 +198,12 @@ func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Sou
 		for _, sp := range pieces2 {
 			lotprice := float64(sp.c.LotSize()) * sp.c.Quote.C
 			lots := int(math.Trunc(sp.sum / lotprice))
+			if lots == 0 {
+				continue
+			}
 			deals := result.BuyLots(sp.c, lots)
 			if len(deals) == 0 {
-				log.Println("no deals for " + sp.c.TickerId())
+				log.Println("ActualPortfolio. No deals for " + sp.c.TickerId())
 			}
 		}
 

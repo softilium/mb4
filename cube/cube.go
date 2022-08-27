@@ -2,6 +2,9 @@ package cube
 
 import (
 	"context"
+	"fmt"
+
+	//	"fmt"
 	"log"
 	"math"
 	"sort"
@@ -10,7 +13,6 @@ import (
 
 	"github.com/rs/xid"
 	"github.com/softilium/mb4/db"
-	"github.com/softilium/mb4/domains"
 	"github.com/softilium/mb4/ent"
 	"github.com/softilium/mb4/ent/emission"
 	"github.com/softilium/mb4/ent/schema"
@@ -28,203 +30,6 @@ func Avg(arr []float64) float64 {
 		sum += v
 	}
 	return sum / float64(len(arr))
-}
-
-type Cell struct {
-	D                       time.Time
-	Quote                   *ent.Quote //nil means industry card for day
-	emission                *ent.Emission
-	emission_lotsize_cached int
-	R2                      *Report2      //same report for all cells between published IFRS reports
-	Industry                *ent.Industry // flat industry from quote
-	IsMissed                bool          //indicates than cell was copied for missing quotes from prevous days
-	DivPayout               float64       //div payout for day
-
-	//R3
-	BookValue  RepV
-	P_on_E     RepV
-	P_on_BV    RepV
-	Cap        RepV
-	P_on_S     RepV
-	DivSum5Y   RepV
-	DivSum3Y   RepV
-	DivYield5Y RepV
-	DivYield3Y RepV
-	DSI        RepV
-}
-
-func (r *Cell) LotSize() int {
-	if r.emission != nil {
-		ls := r.emission.LotSize
-		if ls == 0 {
-
-			// emissions can contains 0 in lotsSize. We scan for different non-zero lots sizes.
-			// If we found 1 non-zero value, we will use it in
-
-			if r.emission_lotsize_cached != 0 {
-				return r.emission_lotsize_cached
-			}
-			minls := 1000000000
-			maxls := 0
-			for _, rec := range r.Quote.Edges.Ticker.Edges.Emissions {
-				if rec.LotSize < minls && rec.LotSize > 0 {
-					minls = rec.LotSize
-				}
-				if rec.LotSize > maxls {
-					maxls = rec.LotSize
-				}
-			}
-			if minls == maxls {
-				r.emission_lotsize_cached = minls
-				return minls
-			} else {
-				log.Fatalf("LotSize is not uniform for ticker %s", r.Quote.Edges.Ticker.ID)
-				return 0
-			}
-		}
-		return ls
-	}
-	return 1
-
-}
-
-func (r *Cell) TickerId() string {
-	return r.Quote.Edges.Ticker.ID
-}
-
-func (r *Cell) CalcAfterLoad(cb *Cube) {
-
-	r.BookValue.V = 0
-	prefCap := 0.0
-	if prefTicker, ok := cb.prefTickers[r.Quote.Edges.Ticker.Edges.Emitent.ID]; ok {
-		if prefCells, ok := cb.cellsByTickerByDate[prefTicker.ID]; ok {
-			if prefcell, ok := prefCells[r.D]; ok {
-				prefCap = prefcell.Cap.V
-			}
-		}
-	}
-	r.BookValue.V = r.R2.Total.V - r.R2.CurrentLiabilities.V - r.R2.NonCurrentLiabilities.V - r.R2.NonControlling.V - prefCap
-
-	if r.BookValue.V != 0 {
-		r.P_on_BV.V = r.Cap.V / r.BookValue.V
-	}
-
-	if r.R2.NetIncome.V != 0 {
-		r.P_on_E.V = r.Cap.V / r.R2.NetIncome.V
-		r.P_on_E.Ltm = r.Cap.V / r.R2.NetIncome.Ltm
-	}
-
-	r.P_on_S.V = r.Cap.V / r.R2.Revenue.V
-	r.P_on_S.Ltm = r.Cap.V / r.R2.Revenue.Ltm
-
-}
-
-func (c *Cell) RepValue(market *Cube, rv domains.ReportValue, rvt domains.ReportValueType) float64 {
-
-	var r2 *Report2
-	var r3 *Cell
-
-	switch rvt {
-	case domains.RVT_Src, domains.RVT_YtdAdj, domains.RVT_Ltm, domains.RVT_AG, domains.RVT_AG_Ltm:
-		r2 = c.R2
-		r3 = c
-	case domains.RVT_Ind_Src, domains.RVT_Ind_YtdAdj, domains.RVT_Ind_Ltm, domains.RVT_Ind_AG, domains.RVT_Ind_AG_Ltm:
-		r3 = market.cellsByIndustryByDate[c.Industry.ID][c.D]
-		r2 = r3.R2
-	}
-
-	var rc RepV
-
-	switch rv {
-	case domains.RK_Revenue:
-		rc = r2.Revenue
-	case domains.RK_Amortization:
-		rc = r2.Amortization
-	case domains.RK_OperatingIncome:
-		rc = r2.OperatingIncome
-	case domains.RK_InterestIncome:
-		rc = r2.InterestIncome
-	case domains.RK_InterestExpenses:
-		rc = r2.InterestExpenses
-	case domains.RK_IncomeTax:
-		rc = r2.IncomeTax
-	case domains.RK_NetIncome:
-		rc = r2.NetIncome
-	case domains.RK_OIBDA:
-		rc = r2.OIBDA
-	case domains.RK_EBITDA:
-		rc = r2.EBITDA
-	case domains.RK_OIBDAMargin:
-		rc = r2.OIBDAMargin
-	case domains.RK_EBITDAMargin:
-		rc = r2.EBITDAMargin
-	case domains.RK_OperationalMargin:
-		rc = r2.OperationalMargin
-	case domains.RK_NetMargin:
-		rc = r2.NetMargin
-	case domains.RK_Debt_on_EBITDA:
-		rc = r2.Debt_on_EBITDA
-	case domains.RK_EV_on_EBITDA:
-		rc = r2.EV_on_EBITDA
-	case domains.RK_ROE:
-		rc = r2.ROE
-	case domains.RK_Cash:
-		rc = r2.Cash
-	case domains.RK_NonCurrentLiabilities:
-		rc = r2.NonCurrentLiabilities
-	case domains.RK_CurrentLiabilities:
-		rc = r2.CurrentLiabilities
-	case domains.RK_NonControlling:
-		rc = r2.NonControlling
-	case domains.RK_Equity:
-		rc = r2.Equity
-	case domains.RK_Total:
-		rc = r2.Total
-	case domains.RK_NetDebt:
-		rc = r2.NetDebt
-	case domains.RK_EV:
-		rc = r2.EV
-	case domains.RK_BookValue:
-		rc = r3.BookValue
-	case domains.RK_P_on_E:
-		rc = r3.P_on_E
-	case domains.RK_P_on_BV:
-		rc = r3.P_on_BV
-	case domains.RK_Cap:
-		rc = r3.Cap
-	case domains.RK_P_on_S:
-		rc = r3.P_on_S
-	case domains.RK_DivSum5Y:
-		rc = r3.DivSum5Y
-	case domains.RK_DivSum3Y:
-		rc = r3.DivSum3Y
-	case domains.RK_DivYield5Y:
-		rc = r3.DivYield5Y
-	case domains.RK_DivYield3Y:
-		rc = r3.DivYield3Y
-	case domains.RK_DSI:
-		rc = r3.DSI
-
-	default:
-		log.Fatalf("Unable to get report value for %v", rv)
-	}
-
-	switch rvt {
-	case domains.RVT_Src, domains.RVT_Ind_Src:
-		return rc.V
-	case domains.RVT_YtdAdj, domains.RVT_Ind_YtdAdj:
-		return rc.YtdAdj
-	case domains.RVT_Ltm, domains.RVT_Ind_Ltm:
-		return rc.Ltm
-	case domains.RVT_AG, domains.RVT_Ind_AG:
-		return rc.AG
-	case domains.RVT_AG_Ltm, domains.RVT_Ind_AG_Ltm:
-		return rc.AGLtm
-	default:
-		log.Fatalf("Unable to get report value for %v (%v)", rv, rvt)
-		return 0.0
-	}
-
 }
 
 type Cube struct {
@@ -510,7 +315,7 @@ func (c *Cube) loadDivsAndCaps() error {
 	for _, day := range c.allDays {
 		for _, cell := range c.cellsByDate[day] {
 			if cell.Quote != nil && cell.emission != nil {
-				cell.Cap.V = cell.Quote.C * float64(cell.emission.Size) / 1000000 // in mln. according to report values
+				cell.Cap.V = (cell.Quote.C * float64(cell.emission.Size)) / 1000000 // in mln. according to report values
 			}
 			if _, ok := dsimap[cell.TickerId()]; ok {
 				if dsi, ok := dsimap[cell.TickerId()][day.Year()-1]; ok {
@@ -614,8 +419,16 @@ func (c *Cube) loadIndustries() error {
 
 	for _, day := range c.allDays {
 
+		if day.Year() >= 2020 {
+			fmt.Println("dbg")
+		}
+
 		dsiArr := make(map[string][]float64)
 		repsArr := make(map[string]*Cell)
+
+		dbgEBITDA := make(map[string]float64)
+		dbgCAP := make(map[string]float64)
+		dbgEV := make(map[string]float64)
 
 		for _, cell := range c.cellsByDate[day] {
 			if cell.Industry == nil || cell.R2 == nil {
@@ -630,15 +443,20 @@ func (c *Cube) loadIndustries() error {
 			if !ok {
 				ir = &Cell{D: day, Industry: cell.Industry}
 				indMap[day] = ir
+				ir.R2 = &Report2{ReportQuarter: 4, ReportYear: cell.R2.ReportYear}
+				ir.R2.Init()
 			}
 			repsArr[cell.Industry.ID] = ir
+
+			if cell.Industry.ID == "consumers" {
+				dbgEBITDA[cell.TickerId()] = cell.R2.EBITDA.V
+				dbgCAP[cell.TickerId()] = cell.Cap.V
+				dbgEV[cell.TickerId()] = cell.EV.V
+			}
 
 			ir.Cap.V += cell.Cap.V
 			ir.DivSum3Y.V += cell.DivSum3Y.V
 			ir.DivSum5Y.V += cell.DivSum5Y.V
-
-			ir.R2 = &Report2{ReportQuarter: 4, ReportYear: cell.R2.ReportYear}
-			ir.R2.Init()
 
 			ir.R2.Revenue.V += cell.R2.Revenue.V
 			ir.R2.Revenue.Ltm += cell.R2.Revenue.Ltm
@@ -661,17 +479,15 @@ func (c *Cube) loadIndustries() error {
 			ir.R2.NetIncome.V += cell.R2.NetIncome.V
 			ir.R2.NetIncome.Ltm += cell.R2.NetIncome.Ltm
 
+			ir.R2.EBITDA.V += cell.R2.EBITDA.V
+			ir.R2.EBITDA.Ltm += cell.R2.EBITDA.Ltm
+
 			ir.R2.Cash.V += cell.R2.Cash.V
 			ir.R2.NonCurrentLiabilities.V += cell.R2.NonCurrentLiabilities.V
 			ir.R2.CurrentLiabilities.V += cell.R2.CurrentLiabilities.V
 			ir.R2.NonControlling.V += cell.R2.NonControlling.V
 			ir.R2.Equity.V += cell.R2.Equity.V
 			ir.R2.Total.V += cell.R2.Total.V
-
-			ir.R2.Calc(nil, nil)
-
-			//TODO calc previous reports
-			//TODO calc avg.values from mults for industry+day. Now it is value-weighted average, we need to just flat average
 
 			_, ok = dsiArr[cell.Industry.ID]
 			if !ok {
@@ -681,9 +497,14 @@ func (c *Cube) loadIndustries() error {
 
 		}
 		for _, ir := range repsArr {
+			if ir.Industry.ID == "consumers" {
+				fmt.Println("dbg")
+			}
+			ir.R2.Calc(nil, nil)
+			ir.CalcAfterLoad(c)
 			dsiSlice, ok := dsiArr[ir.Industry.ID]
 			if ok {
-				ir.DSI.V = Avg(dsiSlice)
+				ir.DSI.V = Avg(dsiSlice) // averate DSI for industry
 			}
 		}
 
