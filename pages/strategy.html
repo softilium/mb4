@@ -166,7 +166,7 @@
                         <td class="text-end">${ $prnPercent1(item.CurrentPercent) }</td>
                         <td class="text-end">${ $prnCurrency(item.Balance) }</td>
                         <td class="text-end">${ item.Lots }</td>
-                        <td v-for="f in obj.edges.Factors" class="text-end">${ item.DebugFactors[f.LineNum] }</td>
+                        <td v-for="f in obj.edges.Factors" class="text-end">${ $prnPercent1(item.DebugFactors[f.LineNum]) }</td>
                     </tr>
                 </tbody>
             </table>
@@ -314,11 +314,11 @@
                             <td>
                                 <div v-for='deal in item.Deals'>
                                     <span v-bind:class="{'text-danger': deal.InvestResult<0, 'text-success': deal.InvestResult>=0 }"
-                                        v-if='deal.Kind==0'>
+                                        v-if='deal.Kind==100'>
                                         продажа ${deal.TickerId} ${deal.Lots} лот., ${ $prnCurrency(deal.InvestResult) }
                                         р.
                                     </span>
-                                    <span v-if='deal.Kind!=0'>
+                                    <span v-if='deal.Kind==200'>
                                         покупка ${deal.TickerId} ${deal.Lots} лот.
                                     </span>
                                 </div>

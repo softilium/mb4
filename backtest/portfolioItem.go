@@ -105,13 +105,11 @@ func (p *PortfolioItem) Sell(Cell *cube.Cell, Delta int) []*Deal {
 
 	toProcess := Delta
 	result := make([]*Deal, 0)
-	restsSorted := make([]*PortfolioItemRest, len(p.Rests))
-	copy(restsSorted, p.Rests)
-	sort.Slice(restsSorted, func(i, j int) bool { return restsSorted[i].D.Before(restsSorted[j].D) })
+	sort.Slice(p.Rests, func(i, j int) bool { return p.Rests[i].D.Before(p.Rests[j].D) })
 
 	for toProcess > 0 && len(p.Rests) > 0 {
 
-		rest := restsSorted[0]
+		rest := p.Rests[0]
 
 		piece := toProcess
 		if piece > rest.Position {
