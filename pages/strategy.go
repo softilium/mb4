@@ -3,7 +3,6 @@ package pages
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"net/http"
 	"time"
 
@@ -131,10 +130,7 @@ func Strategy(w http.ResponseWriter, r *http.Request) {
 			tx, err := db.DB.BeginTx(context.Background(), nil)
 			HandleErr(err, w)
 			defer func() {
-				err := tx.Rollback()
-				if err != nil {
-					log.Printf("Error when rollback in post method on strategy page: %s\n", err.Error())
-				}
+				_ = tx.Rollback() // we call rollback in any case. In most cases rollback will throw error "transaction has already been commited"
 			}()
 
 			err = tx.Strategy.UpdateOne(&obj).

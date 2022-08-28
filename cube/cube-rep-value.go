@@ -32,8 +32,8 @@ func (p *RepV) SetFromPnl(newV, newLtm float64, src *Report2) {
 		p.AG = 0
 		p.AGLtm = 0
 	} else {
-		p.AG = IIF(p.FromR2(src.prevYear).V == 0, 0, RoundX((p.V-p.FromR2(src.prevYear).V)/p.FromR2(src.prevYear).V*100, 1)-100)
-		p.AGLtm = IIF(p.FromR2(src.prevYear).Ltm == 0, 0, RoundX((p.Ltm-p.FromR2(src.prevYear).Ltm)/p.FromR2(src.prevYear).Ltm*100, 1)-100)
+		p.AG = IIF(p.FromR2(src.prevYear).V == 0, 0, RoundX((p.V-p.FromR2(src.prevYear).V)/p.FromR2(src.prevYear).V*100, 1))
+		p.AGLtm = IIF(p.FromR2(src.prevYear).Ltm == 0, 0, RoundX((p.Ltm-p.FromR2(src.prevYear).Ltm)/p.FromR2(src.prevYear).Ltm*100, 1))
 	}
 
 }

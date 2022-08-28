@@ -381,9 +381,6 @@ func (c *Cube) loadReports() error {
 			if _, ok := prevMaps[r.ReportYear-1]; ok {
 				prevQ = prevMaps[r.ReportYear-1][r.ReportQuarter]
 			}
-			if prevY != nil {
-				log.Println("dbg")
-			}
 			r2.LoadFromRawReport(r, prevY, prevQ)
 
 			ymap, ok := prevMaps[r.ReportYear]
