@@ -37,7 +37,7 @@
                         <button class="btn" data-bs-toggle="modal" data-bs-target="#factorModal" v-on:click='selectedFactor=item'>
                             <i class="bi bi-pencil-square"></i>
                         </button>
-                        <button class="btn"><i class="bi bi-trash3"></i></button>
+                        <button class="btn" v-on:click='removeFactor(item)'><i class="bi bi-trash3"></i></button>
                     </td>
                 </tr>
             </tbody>
@@ -160,7 +160,11 @@
 
             addFactor() {
                 this.strategy.edges.Factors.push({ IsUsed: true, RK: null, RVT: null, MinAcceptable: null, MaxAcceptable: null, Inverse: false, K: 1, Gist: 5 });
-            }
+            },
+            removeFactor(item) {
+                this.strategy.edges.Factors.splice(this.strategy.edges.Factors.indexOf(item), 1);
+            },
+
 
         }
     }

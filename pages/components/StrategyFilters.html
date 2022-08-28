@@ -191,6 +191,7 @@
             },
 
             filterDescr(filter) {
+                
                 if (this.renderinfo.Industries.length == 0) return '';
                 if (filter.LeftValueKind == 100) {
                     return "Тикер " + this.OperationsMap.get(filter.Operation) + " " + filter.RightValueStr;
@@ -204,6 +205,8 @@
                         this.OperationsMap.get(filter.Operation) + " " +
                         filter.RightValueFloat;
                 }
+                return "Нажмите здесь для редактирования фильтра";
+
             }
 
         }
