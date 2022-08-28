@@ -288,7 +288,7 @@
                         <th class="text-end">Доля</th>
                         <th class="text-end">Сумма</th>
                         <th class="text-end">Лоты</th>
-                        <th v-for="f in obj.edges.Factors" class="text-end">Фактор №${ f.LineNum }</th>
+                        <th v-for="f in obj.edges.Factors" class="text-end">Фактор №${ f.LineNum }<br/>${ factorDescr(f) }</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -608,6 +608,15 @@
             printPercent(val) { return new Intl.NumberFormat('ru-RU', { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(val / 100); },
             tickerUrl(tickerId) { return `/ticker?id=${tickerId}&strategy=${window.strategyId}`; },
             industryUrl(industryId) { return '/industry/' + industryId; },
+
+            factorDescr(rec) {
+                for (var i = 0; i < this.renderInfo.ReportValues.length; i++) {
+                    if (this.renderInfo.ReportValues[i].Id == rec.RK) {
+                        return this.renderInfo.ReportValues[i].Descr;
+                    }
+                }
+                return "";
+            },
 
             daysForYear(year) {
                 return this.results.Days.filter(item => item.D.startsWith(year.toString()) && (item.Refill != 0 || (item.Deals != null && item.Deals.length > 0)));
