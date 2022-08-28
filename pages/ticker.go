@@ -254,12 +254,12 @@ func handleGetReps(w http.ResponseWriter, r *http.Request, tickerId string) {
 	}
 
 	reps := cube.Market.GetReports2(tickerId)
-	reps2 := make(map[int]*[4]RepDef)
+	reps2 := make(map[int]*[4]*RepDef)
 	for _, rep := range reps {
 		if _, ok := reps2[rep.ReportYear]; !ok {
-			reps2[rep.ReportYear] = &[4]RepDef{}
+			reps2[rep.ReportYear] = &[4]*RepDef{}
 		}
-		reps2[rep.ReportYear][rep.ReportQuarter-1] = RepDef{ReportYear: rep.ReportYear, ReportQuarter: rep.ReportQuarter}
+		reps2[rep.ReportYear][rep.ReportQuarter-1] = &RepDef{ReportYear: rep.ReportYear, ReportQuarter: rep.ReportQuarter}
 	}
 
 	w.Header().Set("Content-Type", "application/json")
