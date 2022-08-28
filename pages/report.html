@@ -122,18 +122,27 @@
     </div>
 
     <div class="col-1">
-        <h5>Все отчеты эмитента</h5>
-        <ul>
-            {% for rep in pd.AllReps %}
-            <li>
-                {% if pd.R2.ReportYear==rep.ReportYear && pd.R2.ReportQuarter==rep.ReportQuarter %}
-                <strong>{{rep.ReportYear}}.Q{{rep.ReportQuarter}}</strong>
-                {% else %}
-                <a href="/report?tickerid={{pd.TickerId}}&y={{rep.ReportYear}}&q={{rep.ReportQuarter}}">{{rep.ReportYear}}.Q{{rep.ReportQuarter}}</a>
-                {% endif %}
-            </li>
-            {% endfor %}
-        </ul>
+        <table class="table table-sm table-borderless">
+            <thead>
+                <tr>
+                    <th>Все отчеты</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rep in pd.AllReps %}
+                <tr>
+                    <td>
+                        {% if pd.R2.ReportYear==rep.ReportYear && pd.R2.ReportQuarter==rep.ReportQuarter %}
+                        <strong>{{rep.ReportYear}}.Q{{rep.ReportQuarter}}</strong>
+                        {% else %}
+                        <a
+                            href="/report?tickerid={{pd.TickerId}}&y={{rep.ReportYear}}&q={{rep.ReportQuarter}}">{{rep.ReportYear}}.Q{{rep.ReportQuarter}}</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
     </div>
 
