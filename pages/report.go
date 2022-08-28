@@ -2,10 +2,12 @@ package pages
 
 import (
 	"net/http"
+	"sort"
 	"strconv"
 
 	"github.com/flosch/pongo2/v6"
 	"github.com/softilium/mb4/cube"
+	"github.com/softilium/mb4/ent"
 )
 
 func Report(w http.ResponseWriter, r *http.Request) {
@@ -31,12 +33,27 @@ func Report(w http.ResponseWriter, r *http.Request) {
 
 			r3 := cube.Market.CellsByTickerByDate(tickerid, r2.ReportDate, cube.LookAhead)
 
+			indRep := cube.Market.GetIndustryCell(r3.Quote.Edges.Ticker.Edges.Emitent.Edges.Industry.ID, r2.ReportDate)
+
+			allreps := cube.Market.GetReports2(tickerid)
+			sort.Slice(allreps, func(i, j int) bool {
+				if allreps[i].ReportYear == allreps[j].ReportYear {
+					return allreps[i].ReportQuarter > allreps[j].ReportQuarter
+				} else {
+					return allreps[i].ReportYear > allreps[j].ReportYear
+				}
+			})
+
 			si := LoadSessionStruct(r)
 			pageData := struct {
 				SessionStruct
-				R2 *cube.Report2
-				R3 *cube.Cell
-			}{SessionStruct: si, R2: r2, R3: r3}
+				R2       *cube.Report2
+				R3       *cube.Cell
+				Emitent  *ent.Emitent
+				IR       *cube.Cell
+				AllReps  []*cube.Report2
+				TickerId string
+			}{SessionStruct: si, R2: r2, R3: r3, Emitent: r3.Quote.Edges.Ticker.Edges.Emitent, IR: indRep, AllReps: allreps, TickerId: tickerid}
 			pageData.Vue = false
 			pageData.Echarts = false
 
