@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/softilium/mb4/db"
@@ -67,7 +68,12 @@ func Tickers(w http.ResponseWriter, r *http.Request) {
 
 		tx, err := db.DB.Tx(context.Background())
 		pages.HandleErr(err, w)
-		defer tx.Rollback()
+		defer func() {
+			err := tx.Rollback()
+			if err != nil {
+				log.Printf("Error when rollback in post method on tickers page: %s\n", err.Error())
+			}
+		}()
 
 		_, err = db.DB.Ticker.Create().
 			SetID(buf.ID).

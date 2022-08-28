@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/rs/xid"
@@ -71,7 +72,12 @@ func Emitents(w http.ResponseWriter, r *http.Request) {
 
 		tx, err := db.DB.Tx(context.Background())
 		pages.HandleErr(err, w)
-		defer tx.Rollback()
+		defer func() {
+			err := tx.Rollback()
+			if err != nil {
+				log.Printf("Error when rollback in post method on emitents page: %s\n", err.Error())
+			}
+		}()
 
 		newdata, err := tx.Emitent.Create().
 			SetID(buf.ID).

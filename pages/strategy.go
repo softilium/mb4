@@ -3,6 +3,7 @@ package pages
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 
@@ -129,7 +130,12 @@ func Strategy(w http.ResponseWriter, r *http.Request) {
 
 			tx, err := db.DB.BeginTx(context.Background(), nil)
 			HandleErr(err, w)
-			defer tx.Rollback()
+			defer func() {
+				err := tx.Rollback()
+				if err != nil {
+					log.Printf("Error when rollback in post method on strategy page: %s\n", err.Error())
+				}
+			}()
 
 			err = tx.Strategy.UpdateOne(&obj).
 				SetDescr(obj.Descr).
