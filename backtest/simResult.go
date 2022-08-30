@@ -1,7 +1,6 @@
 package backtest
 
 import (
-	"fmt"
 	"sort"
 	"time"
 
@@ -28,9 +27,8 @@ type SimulationTickerTradeResultItem struct {
 }
 
 type SimulationTickerDividendResultItem struct {
-	Ticker    *ent.Ticker
-	D         time.Time
-	Dividends float64
+	Ticker  *ent.Ticker
+	ByYears map[int]float64
 }
 
 type SimulationIndustryTradeResultItem struct {
@@ -41,9 +39,8 @@ type SimulationIndustryTradeResultItem struct {
 }
 
 type SimulationIndustryDividendResultItem struct {
-	Industry  *ent.Industry
-	Year      int
-	Dividends float64
+	Industry *ent.Industry
+	ByYears  map[int]float64
 }
 
 type SimulationResult struct {
@@ -214,23 +211,46 @@ func (t *SimulationResult) Calc(Market *cube.Cube, FinalPortfolio *Portfolio) {
 	// dividends by industries (Year + Industry)
 	divMap := make(map[string]*SimulationIndustryDividendResultItem)
 	for _, R := range t.TickerDividendResults {
-		if R.Dividends <= 0 {
-			continue
-		}
-		key := fmt.Sprintf("%v--%v", R.Ticker.Edges.Emitent.Edges.Industry.ID, R.D.Year())
+		key := R.Ticker.Edges.Emitent.Edges.Industry.ID
 		rec, ok := divMap[key]
 		if !ok {
-			rec = &SimulationIndustryDividendResultItem{Industry: R.Ticker.Edges.Emitent.Edges.Industry, Year: R.D.Year()}
+			rec = &SimulationIndustryDividendResultItem{Industry: R.Ticker.Edges.Emitent.Edges.Industry, ByYears: make(map[int]float64)}
 			divMap[key] = rec
 		}
-		rec.Dividends += R.Dividends
+		for y, v := range R.ByYears {
+			if _, ok := rec.ByYears[y]; !ok {
+				rec.ByYears[y] = 0
+			}
+			rec.ByYears[y] += v
+		}
 	}
+
+	sort.Slice(t.TickerDividendResults, func(i, j int) bool {
+		si := 0.0
+		for _, v := range t.TickerDividendResults[i].ByYears {
+			si += v
+		}
+		sj := 0.0
+		for _, v := range t.TickerDividendResults[j].ByYears {
+			sj += v
+		}
+		return si > sj
+	})
+
 	t.IndustryDividendResults = make([]*SimulationIndustryDividendResultItem, 0, len(divMap))
 	for _, v := range divMap {
 		t.IndustryDividendResults = append(t.IndustryDividendResults, v)
 	}
 	sort.Slice(t.IndustryDividendResults, func(i, j int) bool {
-		return t.IndustryDividendResults[i].Dividends > t.IndustryDividendResults[j].Dividends
+		si := 0.0
+		for _, v := range t.IndustryDividendResults[i].ByYears {
+			si += v
+		}
+		sj := 0.0
+		for _, v := range t.IndustryDividendResults[j].ByYears {
+			sj += v
+		}
+		return si > sj
 	})
 
 	q = len(t.Dates) - 1

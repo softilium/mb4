@@ -157,7 +157,7 @@
                         <th class="text-end">Доля</th>
                         <th class="text-end">Сумма</th>
                         <th class="text-end">Лоты</th>
-                        <th v-for="f in obj.edges.Factors" class="text-end">Фактор №${ f.LineNum }<br/>${ factorDescr(f) }</th>
+                        <th v-for="f in obj.edges.Factors" class="text-end">Фактор №${ f.LineNum }<br />${ factorDescr(f) }</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -185,13 +185,13 @@
     <div class='row' v-if='results.IndustryTradeResults!=null'>
         <div class="row">
             <div class="col-12 col-xl-5">
-                <h2>Рост стоимости по отраслям:<br />${ $prnCurrency(results.ProfitTotal) }</h2>
+                <h2>Рост стоимости по отраслям: ${ $prnCurrency(results.ProfitTotal) }</h2>
                 <table class="table table-sm">
                     <thead>
                         <tr>
                             <th>Отрасль</th>
-                            <th class="text-right">Результат</th>
-                            <th class="text-right">Сделок</th>
+                            <th class="text-end">Результат</th>
+                            <th class="text-end">Сделок</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -205,13 +205,13 @@
 
             </div>
             <div class="col-12 col-xl-7">
-                <h2>Дивиденды по отраслям:<br />${ $prnCurrency(results.DivsTotal) } </h2>
+                <h2>Дивиденды по отраслям: ${ $prnCurrency(results.DivsTotal) } </h2>
                 <table class="table table-sm">
                     <thead>
                         <tr>
                             <th>Отрасль</th>
-                            <th class="text-right" v-for='y in results.YearsInResult'>${y}</th>
-                            <th class="text-right">Всего</th>
+                            <th class="text-end" v-for='y in results.YearsInResult'>${y}</th>
+                            <th class="text-end">Всего</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -223,6 +223,15 @@
                             <td class="text-end">${ $prnCurrency(sumDivForIndustry(item.Industry.id)) } </td>
                         </tr>
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td>Всего</td>
+                            <td class="text-end" v-for='y in results.YearsInResult'>
+                                ${ $prnCurrency(sumDivByYearForIndustry(y, null)) }
+                            </td>
+                            <td class="text-end">${ $prnCurrency(results.DivsTotal) } </td>
+                        </tr>
+                    </tfoot>
                 </table>
 
             </div>
@@ -237,8 +246,8 @@
                 <thead>
                     <tr>
                         <th>Тикер</th>
-                        <th class="text-right">Результат</th>
-                        <th class="text-right">Сделок</th>
+                        <th class="text-end">Результат</th>
+                        <th class="text-end">Сделок</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -258,7 +267,7 @@
                     <tr>
                         <th>Тикер</th>
                         <th class="text-end" v-for='y in results.YearsInResult'>${y}</th>
-                        <th class="text-right">Всего</th>
+                        <th class="text-end">Всего</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -267,7 +276,7 @@
                         <td class="text-end" v-for='y in results.YearsInResult'>
                             ${ $prnCurrency(sumDivByYearForTicker(y, item.Ticker.id)) }
                         </td>
-                        <td class="text-end">${ $prnCurrency(item.Dividends) }</td>
+                        <td class="text-end">${ $prnCurrency(sumAllYears(item)) }</td>
                     </tr>
                 </tbody>
                 <tfoot>
@@ -496,7 +505,10 @@
                 let s = 0;
                 this.results.IndustryDividendResults.forEach(
                     function (el) {
-                        if (el.Year == aYear && el.Industry.id == aIndustryId) s = s + el.Dividends;
+                        if (el.Industry.id == aIndustryId || aIndustryId == null) {
+                            let v = el.ByYears[aYear];
+                            if (v != null) s += v;
+                        }
                     }
                 );
                 return s;
@@ -506,7 +518,9 @@
                 let s = 0;
                 this.results.IndustryDividendResults.forEach(
                     function (el) {
-                        if (el.Industry.id == aIndustryId) s = s + el.Dividends;
+                        if (el.Industry.id == aIndustryId) {
+                            for (var y in el.ByYears) s += el.ByYears[y];
+                        }
                     }
                 );
                 return s;
@@ -516,7 +530,10 @@
                 let s = 0;
                 this.results.TickerDividendResults.forEach(
                     function (el) {
-                        if (el.D.startsWith(aYear.toString()) && el.Ticker.id == aTickerId) s = s + el.Dividends;
+                        if (el.Ticker.id == aTickerId) {
+                            let v = el.ByYears[aYear];
+                            if (v != null) s += v;
+                        }
                     }
                 );
                 return s;
@@ -527,11 +544,20 @@
                 let s = 0;
                 this.results.TickerDividendResults.forEach(
                     function (el) {
-                        if (el.D.startsWith(aYear.toString())) s = s + el.Dividends;
+                        let v = el.ByYears[aYear]
+                        if (v != null) s += v;
                     }
                 );
                 return s;
 
+            },
+
+            sumAllYears(item) {
+                let s = 0;
+                for (y in item.ByYears) {
+                    s += item.ByYears[y];
+                }
+                return s;
             },
 
             async getStrategy() {

@@ -347,11 +347,22 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 				}
 				if c.DivPayout > 0 {
 					divsSum += c.DivPayout * float64(item.Position)
-					result.TickerDividendResults = append(result.TickerDividendResults, &SimulationTickerDividendResultItem{
-						Ticker:    c.Quote.Edges.Ticker,
-						D:         D0,
-						Dividends: c.DivPayout * float64(item.Position),
-					})
+
+					var dtr *SimulationTickerDividendResultItem = nil
+					for _, dr := range result.TickerDividendResults {
+						if dr.Ticker.ID == c.TickerId() {
+							dtr = dr
+							break
+						}
+					}
+					if dtr == nil {
+						dtr = &SimulationTickerDividendResultItem{Ticker: c.Quote.Edges.Ticker, ByYears: make(map[int]float64)}
+						result.TickerDividendResults = append(result.TickerDividendResults, dtr)
+					}
+					if _, ok := dtr.ByYears[D0.Year()]; !ok {
+						dtr.ByYears[D0.Year()] = 0
+					}
+					dtr.ByYears[D0.Year()] += c.DivPayout * float64(item.Position)
 				}
 
 				D0 = D0.Add(time.Hour * 24).Truncate(0)
