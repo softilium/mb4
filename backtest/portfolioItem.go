@@ -67,32 +67,31 @@ func (p *PortfolioItem) Refresh() {
 	for _, r := range p.Rests {
 		p.Position += r.Position
 		p.balance += float64(r.Position) * r.Price
-		p.balPrice = p.balance / float64(p.Position)
 	}
-
+	p.balPrice = p.balance / float64(p.Position)
 }
 
-func (p *PortfolioItem) Buy(Cell *cube.Cell, Delta int) []*Deal {
+func (p *PortfolioItem) Buy(c *cube.Cell, delta int) []*Deal {
 
-	if Cell.LotSize() == 0 {
-		log.Fatalf("Lot size is 0 for %s (%v)", p.Ticker.ID, Cell.LotSize())
+	if c.LotSize() == 0 {
+		log.Fatalf("Lot size is 0 for %s (%v)", p.Ticker.ID, c.LotSize())
 		return nil
 	}
 
-	newDial := Deal{
-		D:            Cell.D,
+	newd := Deal{
+		D:            c.D,
 		Kind:         Buy,
-		Price:        Cell.Quote.C,
+		Price:        c.Quote.C,
 		TickerId:     p.Ticker.ID,
-		Volume:       Delta,
-		Lots:         Delta / Cell.LotSize(),
+		Volume:       delta,
+		Lots:         delta / c.LotSize(),
 		InvestResult: 0,
 	}
 
-	p.Rests = append(p.Rests, &PortfolioItemRest{D: Cell.D, Position: Delta, Price: Cell.Quote.C, Cell: Cell})
+	p.Rests = append(p.Rests, &PortfolioItemRest{D: c.D, Position: delta, Price: c.Quote.C, Cell: c})
 	p.Refresh()
 
-	result := []*Deal{&newDial}
+	result := []*Deal{&newd}
 	return result
 
 }

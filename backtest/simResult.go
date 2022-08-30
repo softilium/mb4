@@ -12,7 +12,6 @@ import (
 type SimulationDay struct {
 	D                 time.Time
 	Refill            float64
-	Dividends         float64
 	PortfolioRUB      float64
 	PortfolioBalance  float64
 	Accu_InvestResult float64
@@ -35,9 +34,10 @@ type SimulationTickerDividendResultItem struct {
 }
 
 type SimulationIndustryTradeResultItem struct {
-	IndustryId string
-	Profit     float64
-	DealsCount int
+	IndustryId   string
+	IndustryDesc string
+	Profit       float64
+	DealsCount   int
 }
 
 type SimulationIndustryDividendResultItem struct {
@@ -66,6 +66,8 @@ type SimulationResult struct {
 	BaseLevels      []float64
 	YearsInResult   []int
 	DivIndustries   []string
+	ProfitTotal     float64
+	DivsTotal       float64
 }
 
 func (t *SimulationResult) Calc(Market *cube.Cube, FinalPortfolio *Portfolio) {
@@ -77,8 +79,16 @@ func (t *SimulationResult) Calc(Market *cube.Cube, FinalPortfolio *Portfolio) {
 		}
 	}
 
+	ibt := make(map[string]*ent.Industry) // industry by tickerId
+	indd := make(map[string]string)       // industry desc by id
+	for _, c := range Market.GetCellsByDate(Market.LastDate()) {
+		if c.Industry != nil {
+			ibt[c.TickerId()] = c.Industry
+			indd[c.Industry.ID] = c.Industry.Descr
+		}
+	}
+
 	t.TickerTradeResults = make([]*SimulationTickerTradeResultItem, 0)
-	t.TickerDividendResults = make([]*SimulationTickerDividendResultItem, 0)
 
 	yearsMap := make(map[int]bool)
 
@@ -88,7 +98,6 @@ func (t *SimulationResult) Calc(Market *cube.Cube, FinalPortfolio *Portfolio) {
 		yearsMap[D.D.Year()] = true
 
 		for _, Deal := range D.Deals {
-
 			ttrIdx := -1
 			for idx, tc := range t.TickerTradeResults {
 				if tc.TickerId == Deal.TickerId {
@@ -97,7 +106,14 @@ func (t *SimulationResult) Calc(Market *cube.Cube, FinalPortfolio *Portfolio) {
 				}
 			}
 			if ttrIdx == -1 {
-				t.TickerTradeResults = append(t.TickerTradeResults, &SimulationTickerTradeResultItem{TickerId: Deal.TickerId})
+				t.TickerTradeResults = append(t.TickerTradeResults, &SimulationTickerTradeResultItem{
+					TickerId:   Deal.TickerId,
+					DealsCount: 1,
+					Profit:     Deal.InvestResult,
+				})
+			} else {
+				t.TickerTradeResults[ttrIdx].DealsCount++
+				t.TickerTradeResults[ttrIdx].Profit += Deal.InvestResult
 			}
 		}
 		ti_days := D.D.Sub(min).Hours() / 24
@@ -105,17 +121,45 @@ func (t *SimulationResult) Calc(Market *cube.Cube, FinalPortfolio *Portfolio) {
 		if D.Accu_Equity != 0 && ti_days > 0 {
 			D.Accu_Yield = D.Accu_InvestResult / D.Accu_Equity / ti_days * 365 * 100
 		}
+
 	}
 
 	t.YearsInResult = make([]int, len(yearsMap))
-	idx := 0
+	q := 0
 	for y := range yearsMap {
-		t.YearsInResult[idx] = y
-		idx++
+		t.YearsInResult[q] = y
+		q++
 	}
 	sort.Slice(t.YearsInResult, func(i, j int) bool { return t.YearsInResult[i] < t.YearsInResult[j] })
 
 	// profit for opened positions (today)
+	for _, i := range FinalPortfolio.Items {
+
+		ttrIdx := 0
+		for idx, tc := range t.TickerTradeResults {
+			if tc.TickerId == i.Ticker.ID {
+				ttrIdx = idx
+				break
+			}
+		}
+
+		c := Market.CellsByTickerByDate(i.Ticker.ID, Market.LastDate(), cube.LookBack)
+
+		prof := float64(i.Position) * (c.Quote.C - i.BalPrice())
+
+		if ttrIdx == -1 {
+			t.TickerTradeResults = append(t.TickerTradeResults, &SimulationTickerTradeResultItem{
+				TickerId:   i.Ticker.ID,
+				DealsCount: 1,
+				Profit:     prof,
+			})
+		} else {
+			t.TickerTradeResults[ttrIdx].DealsCount++
+			t.TickerTradeResults[ttrIdx].Profit += prof
+		}
+
+	}
+
 	for _, R := range t.TickerTradeResults {
 		for _, item := range FinalPortfolio.Items {
 			if item.Ticker.ID == R.TickerId {
@@ -130,25 +174,38 @@ func (t *SimulationResult) Calc(Market *cube.Cube, FinalPortfolio *Portfolio) {
 	sort.Slice(t.TickerTradeResults, func(i, j int) bool { return t.TickerTradeResults[i].Profit > t.TickerTradeResults[j].Profit })
 
 	// profit by industries
-	indProfit := make(map[string]struct {
+	indProfit := make(map[string]*struct {
 		profit     float64
 		dealsCount int
 	})
-	for _, R := range t.IndustryTradeResults {
-		indRec, ok := indProfit[R.IndustryId]
+	for _, r := range t.TickerTradeResults {
+
+		indu, ok := ibt[r.TickerId]
 		if !ok {
-			indRec = struct {
+			continue
+		}
+
+		indRec, ok := indProfit[indu.ID]
+		if !ok {
+			indRec = &struct {
 				profit     float64
 				dealsCount int
 			}{profit: 0, dealsCount: 0}
-			indProfit[R.IndustryId] = indRec
+			indProfit[indu.ID] = indRec
 		}
-		indRec.profit += R.Profit
-		indRec.dealsCount += R.DealsCount
+		indRec.profit += r.Profit
+		indRec.dealsCount += r.DealsCount
 	}
 	t.IndustryTradeResults = make([]*SimulationIndustryTradeResultItem, len(indProfit))
+	tidx := 0
 	for k, ind := range indProfit {
-		t.IndustryTradeResults = append(t.IndustryTradeResults, &SimulationIndustryTradeResultItem{IndustryId: k, Profit: ind.profit, DealsCount: ind.dealsCount})
+		t.IndustryTradeResults[tidx] = &SimulationIndustryTradeResultItem{
+			IndustryId:   k,
+			IndustryDesc: indd[k],
+			Profit:       ind.profit,
+			DealsCount:   ind.dealsCount,
+		}
+		tidx++
 	}
 	sort.Slice(t.IndustryTradeResults, func(i, j int) bool {
 		return t.IndustryTradeResults[i].Profit > t.IndustryTradeResults[j].Profit
@@ -175,5 +232,9 @@ func (t *SimulationResult) Calc(Market *cube.Cube, FinalPortfolio *Portfolio) {
 	sort.Slice(t.IndustryDividendResults, func(i, j int) bool {
 		return t.IndustryDividendResults[i].Dividends > t.IndustryDividendResults[j].Dividends
 	})
+
+	q = len(t.Dates) - 1
+	t.ProfitTotal = t.InvestResults[q]
+	t.DivsTotal = t.Divs[q]
 
 }

@@ -317,12 +317,14 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 	}
 
 	result := &SimulationResult{}
+	result.TickerDividendResults = make([]*SimulationTickerDividendResultItem, 0)
 	prtf := &Portfolio{RUB: StartAmount}
 
 	AllTime_Equity := StartAmount
 	AllTime_Dividends := 0.0
 
 	today := time.Now()
+
 	for _, D := range Market.GetAllDates(From, &today) {
 
 		if D.Weekday() != time.Thursday {
@@ -330,24 +332,36 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 		}
 		Refill := WeekRefillAmount
 		AllTime_Equity += Refill
-		Divs := 0.0
+
+		divsSum := 0.0
 		for _, item := range prtf.Items {
-			c := Market.CellsByTickerByDate(item.Ticker.ID, D, cube.LookNone)
-			if c != nil {
-				continue
+
+			D0 := D
+			D6 := D.Add(time.Hour * 24 * 7).Truncate(0)
+
+			for D0.Before(D6) {
+
+				c := Market.CellsByTickerByDate(item.Ticker.ID, D0, cube.LookBack)
+				if c == nil {
+					log.Fatalf("Simulation.divs. Unable to bind divpayout from date=%v for %s\n", D0, item.Ticker.ID)
+				}
+				if c.DivPayout > 0 {
+					divsSum += c.DivPayout * float64(item.Position)
+					result.TickerDividendResults = append(result.TickerDividendResults, &SimulationTickerDividendResultItem{
+						Ticker:    c.Quote.Edges.Ticker,
+						D:         D0,
+						Dividends: c.DivPayout * float64(item.Position),
+					})
+				}
+
+				D0 = D0.Add(time.Hour * 24).Truncate(0)
 			}
-			Divs += c.DivPayout
-			result.TickerDividendResults = append(result.TickerDividendResults, &SimulationTickerDividendResultItem{
-				Ticker:    c.Quote.Edges.Ticker,
-				D:         D,
-				Dividends: c.DivPayout * float64(item.Position),
-			})
 		}
-		AllTime_Dividends += Divs
+		AllTime_Dividends += divsSum
 
-		prtf.RUB += Refill + Divs
+		prtf.RUB += Refill + divsSum
 
-		SD := &SimulationDay{D: D, Dividends: Divs, Refill: Refill}
+		SD := &SimulationDay{D: D, Refill: Refill}
 
 		prtf.ApplyCurrentPrices(Market, D)
 
