@@ -67,7 +67,7 @@ type SimulationResult struct {
 	DivsTotal       float64
 }
 
-func (t *SimulationResult) Calc(Market *cube.Cube, FinalPortfolio *Portfolio) {
+func (t *SimulationResult) Calc(Market *cube.Cube, FinalPortfolio *Portfolio, foldDeals bool) {
 
 	min := t.Days[0].D
 	for _, d := range t.Days {
@@ -256,5 +256,39 @@ func (t *SimulationResult) Calc(Market *cube.Cube, FinalPortfolio *Portfolio) {
 	q = len(t.Dates) - 1
 	t.ProfitTotal = t.InvestResults[q]
 	t.DivsTotal = t.Divs[q]
+
+	if foldDeals {
+		for _, d := range t.Days {
+			b := make(map[string]*Deal)
+			s := make(map[string]*Deal)
+			var dc map[string]*Deal
+			for _, dl := range d.Deals {
+				if dl.Kind == Buy {
+					dc = b
+				} else {
+					dc = s
+				}
+				rec, ok := dc[dl.TickerId]
+				if !ok {
+					rec = &Deal{D: dl.D, TickerId: dl.TickerId, Volume: dl.Volume, Lots: dl.Lots, Kind: dl.Kind, Price: dl.Price, InvestResult: dl.InvestResult}
+					dc[dl.TickerId] = rec
+				} else {
+					rec.Volume += dl.Volume
+					rec.Lots += dl.Lots
+					rec.InvestResult += dl.InvestResult
+				}
+			}
+			d.Deals = make([]*Deal, len(b)+len(s))
+			idx := 0
+			for _, r := range b {
+				d.Deals[idx] = r
+				idx++
+			}
+			for _, r := range s {
+				d.Deals[idx] = r
+				idx++
+			}
+		}
+	}
 
 }

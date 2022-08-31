@@ -501,7 +501,7 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 
 	}
 
-	result.Calc(Market, prtf)
+	result.Calc(Market, prtf, true)
 
 	EmptyPortfolio := &Portfolio{RUB: Strategy.StartAmount}
 	result.ActualPortfolio = ActualPortfolio(Strategy, Market, Market.LastDate(), EmptyPortfolio, nil, true)
