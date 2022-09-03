@@ -48,8 +48,8 @@
 </tr>
 {% endmacro %}
 
-<h2>Отчет эмитента {{ pd.Emitent.Descr }} за {{ pd.R2.ReportYear }}.Q{{ pd.R2.ReportQuarter }} </h2>
-<h5>Дата отчета: {{pd.R2.ReportDate | date}}</h5>
+<h2>Отчет эмитента {{ pd.Emitent.Descr }}  за {{ pd.R2.ReportYear }}.Q{{ pd.R2.ReportQuarter }} </h2>
+<h5>Дата отчета: {{pd.R2.ReportDate | date:"2006-01-02" }}</h5>
 
 <div class="row">
 

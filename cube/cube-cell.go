@@ -58,7 +58,7 @@ func (r *Cell) LotSize() int {
 				r.emission_lotsize_cached = minls
 				return minls
 			} else {
-				log.Fatalf("LotSize is not uniform for ticker %s", r.Quote.Edges.Ticker.ID)
+				log.Fatalf("LotSize==0 && is not uniform for ticker %s", r.Quote.Edges.Ticker.ID)
 				return 0
 			}
 		}
@@ -72,7 +72,7 @@ func (r *Cell) TickerId() string {
 	return r.Quote.Edges.Ticker.ID
 }
 
-func (r *Cell) CalcAfterLoad(cb *Cube) {
+func (r *Cell) CalcAfterLoad(cb *Cube, py *Cell) {
 
 	r.BookValue.V = 0
 	prefCap := 0.0
@@ -111,6 +111,26 @@ func (r *Cell) CalcAfterLoad(cb *Cube) {
 	r.EV_on_EBITDA.InverseGrowth = true
 	r.P_on_E.InverseGrowth = true
 	r.P_on_BV.InverseGrowth = true
+
+	if py != nil {
+		r.Cap.AG = Growth(r.Cap.V, py.Cap.V, 1)
+
+		r.EV.AG = Growth(r.EV.V, py.EV.V, 1)
+		r.EV.AGLtm = Growth(r.EV.Ltm, py.EV.Ltm, 1)
+
+		r.EV_on_EBITDA.AG = Growth(r.EV_on_EBITDA.V, py.EV_on_EBITDA.V, 1)
+		r.EV_on_EBITDA.AGLtm = Growth(r.EV_on_EBITDA.Ltm, py.EV_on_EBITDA.Ltm, 1)
+
+		r.BookValue.AG = Growth(r.BookValue.V, py.BookValue.V, 1)
+		r.P_on_BV.AG = Growth(r.P_on_BV.V, py.P_on_BV.V, 1)
+		r.P_on_E.AG = Growth(r.P_on_E.V, py.P_on_E.V, 1)
+		r.P_on_S.AG = Growth(r.P_on_S.V, py.P_on_S.V, 1)
+		r.DSI.AG = Growth(r.DSI.V, py.DSI.V, 1)
+		r.DivSum5Y.AG = Growth(r.DivSum5Y.V, py.DivSum5Y.V, 1)
+		r.DivSum3Y.AG = Growth(r.DivSum3Y.V, py.DivSum3Y.V, 1)
+		r.DivYield5Y.AG = Growth(r.DivYield5Y.V, py.DivYield5Y.V, 1)
+		r.DivYield3Y.AG = Growth(r.DivYield3Y.V, py.DivYield3Y.V, 1)
+	}
 
 }
 

@@ -44,7 +44,6 @@ type Report2 struct { // enriched report with calculated fields
 
 	// Cf calculated
 	NetDebt RepV
-	//EV      RepV
 }
 
 func (r *Report2) Init() {

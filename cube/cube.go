@@ -402,12 +402,28 @@ func (c *Cube) loadReports() error {
 			r2reports = append(r2reports, &r2)
 		}
 
+		//sort cells by dates
 		c.repsByEmitent[ticker.Edges.Emitent.ID] = r2reports
-		for D, cell := range c.cellsByTickerByDate[ticker.ID] { // make report view for each day/quote
+		cells := c.cellsByTickerByDate[ticker.ID]
+		dates := make([]time.Time, len(cells))
+		i := 0
+		for k := range cells {
+			dates[i] = k
+			i++
+		}
+		sort.Slice(dates, func(i, j int) bool { return dates[i].Before(dates[j]) })
+
+		for _, D := range dates {
+			cell := cells[D]
 			for i := len(r2reports) - 1; i >= 0; i-- {
 				if D.Unix() >= r2reports[i].ReportDate.Unix() {
+
+					y := time.Date(D.Year()-1, D.Month(), D.Day(), D.Hour(), D.Minute(), D.Second(), D.Nanosecond(), D.Location())
+					pyCell := c._cellsByTickerByDate(y, ticker.ID, LookBack)
+
 					cell.R2 = r2reports[i]
-					cell.CalcAfterLoad(c)
+
+					cell.CalcAfterLoad(c, pyCell)
 					break
 				}
 			}
@@ -490,7 +506,7 @@ func (c *Cube) loadIndustries() error {
 		}
 		for _, ir := range repsArr {
 			ir.R2.Calc()
-			ir.CalcAfterLoad(c)
+			ir.CalcAfterLoad(c, nil)
 			dsiSlice, ok := dsiArr[ir.Industry.ID]
 			if ok {
 				ir.DSI.V = Avg(dsiSlice) // averate DSI for industry

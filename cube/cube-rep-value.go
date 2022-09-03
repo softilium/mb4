@@ -7,6 +7,10 @@ func IIF[T any](cond bool, vtrue, vfalse T) T {
 	return vfalse
 }
 
+func Growth(b, p float64, d int) float64 {
+	return IIF(p == 0, 0, RoundX((b-p)/p*100, d))
+}
+
 type RepV struct {
 	InverseGrowth bool
 	V             float64 //Ytd/Sld
@@ -48,6 +52,7 @@ func (p *RepV) CalcCashflowAnnualGrowth(prevY *Report2) {
 
 }
 
+// TODO InverseGrowth can be parameter for this func, not property for EACH cell
 func (p *RepV) CalcIndUpside_V(iv *RepV) float64 {
 	if p.InverseGrowth {
 		return IIF(iv.V == 0, 0, RoundX((iv.V-p.V)/iv.V*100, 1))

@@ -105,18 +105,35 @@ func handleGetMult(w http.ResponseWriter, r *http.Request, tickerId string) {
 	for idx, rep := range reps {
 
 		cell := cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate, cube.LookBack)
-		indCell := cube.Market.GetIndustryCell(cell.Industry.ID, cell.D)
+		if cell == nil {
+			continue
+		}
+
+		var indCell *cube.Cell
+		if cell.Industry != nil {
+			indCell = cube.Market.GetIndustryCell(cell.Industry.ID, cell.D)
+		}
 
 		if rep.ReportQuarter == 4 {
 			multres.Dates[idx] = fmt.Sprintf("%v", rep.ReportDate.Year())
 			multres.NetMargin[idx] = rep.NetMargin.V
-			multres.NetMarginInd[idx] = indCell.R2.NetMargin.V
 			multres.EBITDAMargin[idx] = rep.EBITDAMargin.V
-			multres.EBITDAMarginInd[idx] = indCell.R2.EBITDAMargin.V
+
+			if indCell != nil {
+				multres.NetMarginInd[idx] = indCell.R2.NetMargin.V
+				multres.EBITDAMarginInd[idx] = indCell.R2.EBITDAMargin.V
+			} else {
+				multres.NetMarginInd[idx] = 0
+				multres.EBITDAMarginInd[idx] = 0
+			}
 		} else {
 			multres.Dates[idx] = "LTM"
 			multres.EBITDAMargin[idx] = rep.EBITDAMargin.Ltm
-			multres.EBITDAMarginInd[idx] = indCell.R2.EBITDAMargin.Ltm
+			if indCell != nil {
+				multres.EBITDAMarginInd[idx] = indCell.R2.EBITDAMargin.Ltm
+			} else {
+				multres.EBITDAMarginInd[idx] = 0
+			}
 		}
 	}
 
@@ -153,8 +170,15 @@ func handleGetCF(w http.ResponseWriter, r *http.Request, tickerId string) {
 		cfres.Cash[idx] = rep.Cash.V
 		cfres.Debt[idx] = rep.NetDebt.V
 		cfres.Equity[idx] = rep.Equity.V
-		cfres.MCap[idx] = cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate, cube.LookBack).Cap.V
-		cfres.BookValue[idx] = cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate, cube.LookBack).BookValue.V
+
+		c := cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate, cube.LookBack)
+		cfres.MCap[idx] = 0
+		cfres.BookValue[idx] = 0
+		if c != nil {
+			cfres.MCap[idx] = c.Cap.V
+			cfres.BookValue[idx] = c.BookValue.V
+		}
+
 	}
 
 	w.Header().Set("Content-Type", "application/json")
