@@ -21,9 +21,10 @@ type SimulationDay struct {
 }
 
 type SimulationTickerTradeResultItem struct {
-	TickerId   string
-	Profit     float64
-	DealsCount int
+	TickerId    string
+	TickerDescr string
+	Profit      float64
+	DealsCount  int
 }
 
 type SimulationTickerDividendResultItem struct {
@@ -104,9 +105,10 @@ func (t *SimulationResult) Calc(Market *cube.Cube, FinalPortfolio *Portfolio, fo
 			}
 			if ttrIdx == -1 {
 				t.TickerTradeResults = append(t.TickerTradeResults, &SimulationTickerTradeResultItem{
-					TickerId:   Deal.TickerId,
-					DealsCount: 1,
-					Profit:     Deal.InvestResult,
+					TickerId:    Deal.TickerId,
+					TickerDescr: Market.GetAllTickers()[Deal.TickerId].Descr,
+					DealsCount:  1,
+					Profit:      Deal.InvestResult,
 				})
 			} else {
 				t.TickerTradeResults[ttrIdx].DealsCount++
@@ -146,9 +148,10 @@ func (t *SimulationResult) Calc(Market *cube.Cube, FinalPortfolio *Portfolio, fo
 
 		if ttrIdx == -1 {
 			t.TickerTradeResults = append(t.TickerTradeResults, &SimulationTickerTradeResultItem{
-				TickerId:   i.Ticker.ID,
-				DealsCount: 1,
-				Profit:     prof,
+				TickerId:    i.Ticker.ID,
+				TickerDescr: Market.GetAllTickers()[i.Ticker.ID].Descr,
+				DealsCount:  1,
+				Profit:      prof,
 			})
 		} else {
 			t.TickerTradeResults[ttrIdx].DealsCount++

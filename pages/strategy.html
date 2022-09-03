@@ -252,7 +252,7 @@
                 </thead>
                 <tbody>
                     <tr v-for='item in results.TickerTradeResults'>
-                        <td><a v-bind:href="tickerUrl(item.TickerId)">${item.TickerId}</a></td>
+                        <td><a v-bind:href="tickerUrl(item.TickerId)">${item.TickerDescr}</a></td>
                         <td class='text-end'>${ $prnCurrency(item.Profit) }</td>
                         <td class='text-end'>${item.DealsCount}</td>
                     </tr>
@@ -322,8 +322,8 @@
                             <td class="text-end">${ $prnCurrency(item.Refill) }</td>
                             <td>
                                 <div v-for='deal in item.Deals'>
-                                    <span v-bind:class="{'text-danger': deal.InvestResult<0, 'text-success': deal.InvestResult>=0 }"
-                                        v-if='deal.Kind==100'>
+                                    <span v-if='deal.Kind==100'
+                                        v-bind:class="{'text-danger': deal.InvestResult<0, 'text-success': deal.InvestResult>=0 }">
                                         продажа ${deal.TickerId} ${deal.Lots} лот., ${ $prnCurrency(deal.InvestResult) }
                                         р.
                                     </span>
