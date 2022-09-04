@@ -18,7 +18,7 @@ func (c *Cube) TopDivYields5Y(HowMany int) []*Cell {
 	slice := c.cellsByDate[c.allDays[len(c.allDays)-1]]
 	newslice := make([]*Cell, len(slice))
 	copy(newslice, slice)
-	sort.Slice(newslice, func(i, j int) bool { return newslice[i].DivYield5Y.V > newslice[j].DivYield5Y.V })
+	sort.Slice(newslice, func(i, j int) bool { return newslice[i].DivYield5Y.S > newslice[j].DivYield5Y.S })
 	return newslice[:HowMany]
 }
 
@@ -33,7 +33,7 @@ func (c *Cube) TopDSI(HowMany int) []*Cell {
 	slice := c.cellsByDate[c.allDays[len(c.allDays)-1]]
 	newslice := make([]*Cell, len(slice))
 	copy(newslice, slice)
-	sort.Slice(newslice, func(i, j int) bool { return newslice[i].DSI.V > newslice[j].DSI.V })
+	sort.Slice(newslice, func(i, j int) bool { return newslice[i].DSI.S > newslice[j].DSI.S })
 	return newslice[:HowMany]
 }
 

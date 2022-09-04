@@ -116,12 +116,12 @@ func handleGetMult(w http.ResponseWriter, r *http.Request, tickerId string) {
 
 		if rep.ReportQuarter == 4 {
 			multres.Dates[idx] = fmt.Sprintf("%v", rep.ReportDate.Year())
-			multres.NetMargin[idx] = rep.NetMargin.V
-			multres.EBITDAMargin[idx] = rep.EBITDAMargin.V
+			multres.NetMargin[idx] = rep.NetMargin.YtdAdj
+			multres.EBITDAMargin[idx] = rep.EBITDAMargin.YtdAdj
 
 			if indCell != nil {
-				multres.NetMarginInd[idx] = indCell.R2.NetMargin.V
-				multres.EBITDAMarginInd[idx] = indCell.R2.EBITDAMargin.V
+				multres.NetMarginInd[idx] = indCell.R2.NetMargin.YtdAdj
+				multres.EBITDAMarginInd[idx] = indCell.R2.EBITDAMargin.YtdAdj
 			} else {
 				multres.NetMarginInd[idx] = 0
 				multres.EBITDAMarginInd[idx] = 0
@@ -167,16 +167,16 @@ func handleGetCF(w http.ResponseWriter, r *http.Request, tickerId string) {
 		} else {
 			cfres.Dates[idx] = "LTM"
 		}
-		cfres.Cash[idx] = rep.Cash.V
-		cfres.Debt[idx] = rep.NetDebt.V
-		cfres.Equity[idx] = rep.Equity.V
+		cfres.Cash[idx] = rep.Cash.S
+		cfres.Debt[idx] = rep.NetDebt.S
+		cfres.Equity[idx] = rep.Equity.S
 
 		c := cube.Market.CellsByTickerByDate(tickerId, rep.ReportDate, cube.LookBack)
 		cfres.MCap[idx] = 0
 		cfres.BookValue[idx] = 0
 		if c != nil {
-			cfres.MCap[idx] = c.Cap.V
-			cfres.BookValue[idx] = c.BookValue.V
+			cfres.MCap[idx] = c.Cap.S
+			cfres.BookValue[idx] = c.BookValue.S
 		}
 
 	}
@@ -212,13 +212,13 @@ func handleGetPnl(w http.ResponseWriter, r *http.Request, tickerId string) {
 
 		if rep.ReportQuarter == 4 {
 			pnlres.Dates[idx] = fmt.Sprintf("%v", rep.ReportDate.Year())
-			pnlres.Revenues[idx] = rep.Revenue.V
-			pnlres.InterestIncomes[idx] = rep.InterestIncome.V
-			pnlres.Ebitdas[idx] = rep.EBITDA.V
-			pnlres.Amortizations[idx] = rep.Amortization.V
-			pnlres.InterestExpenses[idx] = rep.InterestExpenses.V
-			pnlres.Taxes[idx] = rep.IncomeTax.V
-			pnlres.Incomes[idx] = rep.NetIncome.V
+			pnlres.Revenues[idx] = rep.Revenue.YtdAdj
+			pnlres.InterestIncomes[idx] = rep.InterestIncome.YtdAdj
+			pnlres.Ebitdas[idx] = rep.EBITDA.YtdAdj
+			pnlres.Amortizations[idx] = rep.Amortization.YtdAdj
+			pnlres.InterestExpenses[idx] = rep.InterestExpenses.YtdAdj
+			pnlres.Taxes[idx] = rep.IncomeTax.YtdAdj
+			pnlres.Incomes[idx] = rep.NetIncome.YtdAdj
 		} else {
 			pnlres.Dates[idx] = "LTM"
 			pnlres.Revenues[idx] = rep.Revenue.Ltm

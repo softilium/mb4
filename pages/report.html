@@ -7,25 +7,17 @@
 {% macro pnl(descr, repv, addc) %}
 <tr class="{{addc}}">
     <td>{{ descr }}</td>
-    <td class="text-end">{{repv.V | rub0}}</td>
+    <td class="text-end">{{repv.Src | rub0}}</td>
     <td class="text-end">{{repv.Ltm | rub0}}</td>
-    <td class="text-end">{{repv.AG | rub1}}%</td>
-</tr>
-{% endmacro %}
-
-{% macro pnl_perc(descr, repv, addc) %}
-<tr class="{{addc}}">
-    <td>{{ descr }}</td>
-    <td class="text-end">{{repv.V | rub1}}%</td>
-    <td class="text-end">{{repv.Ltm | rub1}}%</td>
-    <td class="text-end">{{repv.AG | rub1}}%</td>
+    <td class="text-end">{{repv.AGYtdAdj | rub1}}%</td>
+    <td class="text-end">{{repv.AGLtm | rub1}}%</td>
 </tr>
 {% endmacro %}
 
 {% macro cf(descr, repv, addc) %}
 <tr class="{{addc}}">
     <td>{{ descr }}</td>
-    <td class="text-end">{{repv.V | rub0}}</td>
+    <td class="text-end">{{repv.S | rub0}}</td>
     <td class="text-end">{{repv.AG | rub1}}%</td>
 </tr>
 {% endmacro %}
@@ -33,18 +25,40 @@
 {% macro cf_perc(descr, repv, irepv, addc) %}
 <tr class="{{addc}}">
     <td>{{ descr }}</td>
-    <td class="text-end">{{repv.V | rub1}}%</td>
+    <td class="text-end">{{repv.S | rub1}}%</td>
     <td class="text-end">{{repv.AG | rub1}}%</td>
-    <td class="text-end">{{irepv.V | rub1}}%</td>
+    <td class="text-end">{{irepv.S | rub1}}%</td>
+    <td class="text-end">{{repv.IndustryUpside | rub1}}</td>
 </tr>
 {% endmacro %}
 
 {% macro cf_1(descr, repv, irepv, addc) %}
 <tr class="{{addc}}">
     <td>{{ descr }}</td>
-    <td class="text-end">{{repv.V | rub1}}</td>
+    <td class="text-end">{{repv.S | rub1}}</td>
     <td class="text-end">{{repv.AG | rub1}}%</td>
-    <td class="text-end">{{irepv.V | rub1}}</td>
+    <td class="text-end">{{irepv.S | rub1}}</td>
+    <td class="text-end">{{repv.IndustryUpside | rub1}}</td>
+</tr>
+{% endmacro %}
+
+{% macro cf_perc_V(descr, repv, irepv, addc) %}
+<tr class="{{addc}}">
+    <td>{{ descr }}</td>
+    <td class="text-end">{{repv.YtdAdj | rub1}}%</td>
+    <td class="text-end">{{repv.AGYtdAdj | rub1}}%</td>
+    <td class="text-end">{{irepv.YtdAdj | rub1}}%</td>
+    <td class="text-end">{{repv.IndustryUpside_YtdAdj | rub1}}</td>
+</tr>
+{% endmacro %}
+
+{% macro cf_1_V(descr, repv, irepv, addc) %}
+<tr class="{{addc}}">
+    <td>{{ descr }}</td>
+    <td class="text-end">{{repv.YtdAdj | rub1}}</td>
+    <td class="text-end">{{repv.AGYtdAdj | rub1}}%</td>
+    <td class="text-end">{{irepv.YtdAdj | rub1}}</td>
+    <td class="text-end">{{repv.IndustryUpside_YtdAdj | rub1}}</td>
 </tr>
 {% endmacro %}
 
@@ -59,9 +73,10 @@
             <table class="table table-sm">
                 <thead>
                     <th>Параметр</th>
-                    <th class="text-end">YTD</th>
-                    <th class="text-end">LTM</th>
+                    <th class="text-end">Ytd</th>
+                    <th class="text-end">Ltm</th>
                     <th class="text-end">г/г</th>
+                    <th class="text-end">г/г, Ltm</th>
                 </thead>
                 {{ pnl("Выручка", pd.R2.Revenue, "") }}
                 {{ pnl("Амортизация", pd.R2.Amortization, "") }}
@@ -106,18 +121,19 @@
                 <th class="text-end">Значение</th>
                 <th class="text-end">г/г</th>
                 <th class="text-end">Отрасль</th>
+                <th class="text-end">Апсайд</th>
             </thead>
-            {{ cf_1("EV/EBITDA", pd.R3.EV_on_EBITDA, pd.IR.EV_on_EBITDA, "") }}
-            {{ cf_1("Debt/EBITDA", pd.R2.Debt_on_EBITDA, pd.IR.Debt_on_EBITDA, "") }}
-            {{ cf_1("P/E", pd.R3.P_on_E, pd.IR.P_on_E, "") }}
+            {{ cf_1_V("EV/EBITDA", pd.R3.EV_on_EBITDA, pd.IR.EV_on_EBITDA, "") }}
+            {{ cf_1_V("Debt/EBITDA", pd.R2.Debt_on_EBITDA, pd.IR.R2.Debt_on_EBITDA, "") }}
+            {{ cf_1_V("P/E", pd.R3.P_on_E, pd.IR.P_on_E, "") }}
             {{ cf_1("P/BV", pd.R3.P_on_BV, pd.IR.P_on_BV, "") }}
-            {{ cf_1("P/S", pd.R3.P_on_S, pd.IR.P_on_S, "") }}
+            {{ cf_1_V("P/S", pd.R3.P_on_S, pd.IR.P_on_S, "") }}
             {{ cf_1("DSI", pd.R3.DSI, pd.IR.DSI, "") }}
-            {{ cf_perc("ROE", pd.R2.ROE, pd.IR.ROE, "") }}
-            {{ cf_perc("Рентабельность OIBDA", pd.R2.OIBDAMargin, pd.IR.OIBDAMargin, "") }}
-            {{ cf_perc("Рентабельность EBITDA", pd.R2.EBITDAMargin, pd.IR.EBITDAMargin, "") }}
-            {{ cf_perc("Операционная рентабельность", pd.R2.OperationalMargin, pd.IR.OperationalMargin, "") }}
-            {{ cf_perc("Чистая рентабельность", pd.R2.NetMargin, pd.IR.NetMargin, "") }}
+            {{ cf_perc_V("ROE", pd.R2.ROE, pd.IR.R2.ROE, "") }}
+            {{ cf_perc_V("Рентабельность OIBDA", pd.R2.OIBDAMargin, pd.IR.R2.OIBDAMargin, "") }}
+            {{ cf_perc_V("Рентабельность EBITDA", pd.R2.EBITDAMargin, pd.IR.R2.EBITDAMargin, "") }}
+            {{ cf_perc_V("Операционная рентабельность", pd.R2.OperationalMargin, pd.IR.R2.OperationalMargin, "") }}
+            {{ cf_perc_V("Чистая рентабельность", pd.R2.NetMargin, pd.IR.R2.NetMargin, "") }}
         </table>
     </div>
 

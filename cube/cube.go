@@ -143,6 +143,8 @@ func (c *Cube) LoadCube() (err error) {
 		return err
 	}
 
+	c.calcIndustryUpsides()
+
 	//TODO считать положение котировки на 52-недельном цикле
 
 	return nil
@@ -303,21 +305,21 @@ func (c *Cube) loadDivsAndCaps() error {
 
 			cl := c.cellsByTickerByDate[ticker][day]
 
-			cl.DivSum5Y.V = lastDivSum5
-			cl.DivSum3Y.V = lastDivSum3
-			cl.DivYield5Y.V = RoundX(lastDivSum5/cl.Quote.C*100, 1)
-			cl.DivYield3Y.V = RoundX(lastDivSum3/cl.Quote.C*100, 1)
+			cl.DivSum5Y.S = lastDivSum5
+			cl.DivSum3Y.S = lastDivSum3
+			cl.DivYield5Y.S = RoundX(lastDivSum5/cl.Quote.C*100, 1)
+			cl.DivYield3Y.S = RoundX(lastDivSum3/cl.Quote.C*100, 1)
 		} //day
 	} //ticker
 
 	for _, day := range c.allDays {
 		for _, cell := range c.cellsByDate[day] {
 			if cell.Quote != nil && cell.emission != nil {
-				cell.Cap.V = (cell.Quote.C * float64(cell.emission.Size)) / 1000000 // in mln. according to report values
+				cell.Cap.S = (cell.Quote.C * float64(cell.emission.Size)) / 1000000 // in mln. according to report values
 			}
 			if _, ok := dsimap[cell.TickerId()]; ok {
 				if dsi, ok := dsimap[cell.TickerId()][day.Year()-1]; ok {
-					cell.DSI.V = RoundX(dsi.dsi, 1)
+					cell.DSI.S = RoundX(dsi.dsi, 1)
 				}
 			}
 		}
@@ -423,7 +425,7 @@ func (c *Cube) loadReports() error {
 
 					cell.R2 = r2reports[i]
 
-					cell.CalcAfterLoad(c, pyCell)
+					cell.CalcR3(c, pyCell)
 					break
 				}
 			}
@@ -457,59 +459,66 @@ func (c *Cube) loadIndustries() error {
 			if !ok {
 				ir = &Cell{D: day, Industry: cell.Industry}
 				indMap[day] = ir
-				ir.R2 = &Report2{ReportQuarter: 4, ReportYear: cell.R2.ReportYear}
+				ir.R2 = &Report2{ReportQuarter: cell.R2.ReportQuarter, ReportYear: cell.R2.ReportYear}
 				ir.R2.Init()
 			}
 			repsArr[cell.Industry.ID] = ir
 
-			ir.Cap.V += cell.Cap.V
-			ir.DivSum3Y.V += cell.DivSum3Y.V
-			ir.DivSum5Y.V += cell.DivSum5Y.V
+			ir.Cap.S += cell.Cap.S
+			ir.DivSum3Y.S += cell.DivSum3Y.S
+			ir.DivSum5Y.S += cell.DivSum5Y.S
 
-			ir.R2.Revenue.V += cell.R2.Revenue.V
+			ir.R2.Revenue.YtdAdj += cell.R2.Revenue.YtdAdj
 			ir.R2.Revenue.Ltm += cell.R2.Revenue.Ltm
 
-			ir.R2.Amortization.V += cell.R2.Amortization.V
+			ir.R2.Amortization.YtdAdj += cell.R2.Amortization.YtdAdj
 			ir.R2.Amortization.Ltm += cell.R2.Amortization.Ltm
 
-			ir.R2.OperatingIncome.V += cell.R2.OperatingIncome.V
+			ir.R2.OperatingIncome.YtdAdj += cell.R2.OperatingIncome.YtdAdj
 			ir.R2.OperatingIncome.Ltm += cell.R2.OperatingIncome.Ltm
 
-			ir.R2.InterestIncome.V += cell.R2.InterestIncome.V
+			ir.R2.InterestIncome.YtdAdj += cell.R2.InterestIncome.YtdAdj
 			ir.R2.InterestIncome.Ltm += cell.R2.InterestIncome.Ltm
 
-			ir.R2.InterestExpenses.V += cell.R2.InterestExpenses.V
+			ir.R2.InterestExpenses.YtdAdj += cell.R2.InterestExpenses.YtdAdj
 			ir.R2.InterestExpenses.Ltm += cell.R2.InterestExpenses.Ltm
 
-			ir.R2.IncomeTax.V += cell.R2.IncomeTax.V
+			ir.R2.IncomeTax.YtdAdj += cell.R2.IncomeTax.YtdAdj
 			ir.R2.IncomeTax.Ltm += cell.R2.IncomeTax.Ltm
 
-			ir.R2.NetIncome.V += cell.R2.NetIncome.V
+			ir.R2.NetIncome.YtdAdj += cell.R2.NetIncome.YtdAdj
 			ir.R2.NetIncome.Ltm += cell.R2.NetIncome.Ltm
 
-			ir.R2.EBITDA.V += cell.R2.EBITDA.V
+			ir.R2.EBITDA.YtdAdj += cell.R2.EBITDA.YtdAdj
 			ir.R2.EBITDA.Ltm += cell.R2.EBITDA.Ltm
 
-			ir.R2.Cash.V += cell.R2.Cash.V
-			ir.R2.NonCurrentLiabilities.V += cell.R2.NonCurrentLiabilities.V
-			ir.R2.CurrentLiabilities.V += cell.R2.CurrentLiabilities.V
-			ir.R2.NonControlling.V += cell.R2.NonControlling.V
-			ir.R2.Equity.V += cell.R2.Equity.V
-			ir.R2.Total.V += cell.R2.Total.V
+			ir.R2.OIBDA.YtdAdj += cell.R2.OIBDA.YtdAdj
+			ir.R2.OIBDA.Ltm += cell.R2.OIBDA.Ltm
+
+			ir.R2.Cash.S += cell.R2.Cash.S
+			ir.R2.NonCurrentLiabilities.S += cell.R2.NonCurrentLiabilities.S
+			ir.R2.CurrentLiabilities.S += cell.R2.CurrentLiabilities.S
+			ir.R2.NonControlling.S += cell.R2.NonControlling.S
+			ir.R2.Equity.S += cell.R2.Equity.S
+			ir.R2.Total.S += cell.R2.Total.S
+
+			ir.R2.NetDebt.S += cell.R2.NetDebt.S
 
 			_, ok = dsiArr[cell.Industry.ID]
 			if !ok {
 				dsiArr[cell.Industry.ID] = make([]float64, 0)
 			}
-			dsiArr[cell.Industry.ID] = append(dsiArr[cell.Industry.ID], cell.DSI.V)
+			cell.IndustryCell = ir
+			dsiArr[cell.Industry.ID] = append(dsiArr[cell.Industry.ID], cell.DSI.S)
 
 		}
 		for _, ir := range repsArr {
-			ir.R2.Calc()
-			ir.CalcAfterLoad(c, nil)
+			ir.R2.CalcMults()
+			ir.CalcR3(c, nil)
+
 			dsiSlice, ok := dsiArr[ir.Industry.ID]
 			if ok {
-				ir.DSI.V = Avg(dsiSlice) // averate DSI for industry
+				ir.DSI.S = Avg(dsiSlice) // averate DSI for industry
 			}
 		}
 
@@ -530,6 +539,59 @@ func (c *Cube) getSortedCellsForTicker(ticker string) []*Cell {
 	}
 	sort.Slice(quotes, func(i, j int) bool { return quotes[i].D.Before(quotes[j].D) })
 	return quotes
+}
+
+func (c *Cube) calcIndustryUpsides() {
+
+	for _, d := range c.allDays {
+		for _, cell := range c.cellsByDate[d] {
+			if cell.IndustryCell == nil {
+				continue
+			}
+
+			cell.EV_on_EBITDA.IndustryUpside_YtdAdj = -Growth(cell.EV_on_EBITDA.YtdAdj, cell.IndustryCell.EV_on_EBITDA.YtdAdj, 1)
+			cell.EV_on_EBITDA.IndustryUpside_Ltm = -Growth(cell.EV_on_EBITDA.Ltm, cell.IndustryCell.EV_on_EBITDA.Ltm, 1)
+
+			cell.R2.Debt_on_EBITDA.IndustryUpside_YtdAdj = -Growth(cell.R2.Debt_on_EBITDA.YtdAdj, cell.IndustryCell.R2.Debt_on_EBITDA.YtdAdj, 1)
+			cell.R2.Debt_on_EBITDA.IndustryUpside_Ltm = -Growth(cell.R2.Debt_on_EBITDA.Ltm, cell.IndustryCell.R2.Debt_on_EBITDA.Ltm, 1)
+
+			cell.P_on_E.IndustryUpside_YtdAdj = -Growth(cell.P_on_E.YtdAdj, cell.IndustryCell.P_on_E.YtdAdj, 1)
+			cell.P_on_E.IndustryUpside_Ltm = -Growth(cell.P_on_E.Ltm, cell.IndustryCell.P_on_E.Ltm, 1)
+
+			cell.P_on_BV.IndustryUpside = -Growth(cell.P_on_BV.S, cell.IndustryCell.P_on_BV.S, 1)
+
+			cell.P_on_S.IndustryUpside_YtdAdj = -Growth(cell.P_on_S.YtdAdj, cell.IndustryCell.P_on_S.YtdAdj, 1)
+			cell.P_on_S.IndustryUpside_Ltm = -Growth(cell.P_on_S.Ltm, cell.IndustryCell.P_on_S.Ltm, 1)
+
+			cell.R2.ROE.IndustryUpside_YtdAdj = -Growth(cell.R2.ROE.YtdAdj, cell.IndustryCell.R2.ROE.YtdAdj, 1)
+			cell.R2.ROE.IndustryUpside_Ltm = -Growth(cell.R2.ROE.Ltm, cell.IndustryCell.R2.ROE.Ltm, 1)
+
+			{ // margins
+
+				cell.R2.OIBDAMargin.IndustryUpside_YtdAdj = -Growth(cell.R2.OIBDAMargin.YtdAdj, cell.IndustryCell.R2.OIBDAMargin.YtdAdj, 1)
+				cell.R2.OIBDAMargin.IndustryUpside_Ltm = -Growth(cell.R2.OIBDAMargin.Ltm, cell.IndustryCell.R2.OIBDAMargin.Ltm, 1)
+
+				cell.R2.EBITDAMargin.IndustryUpside_YtdAdj = -Growth(cell.R2.EBITDAMargin.YtdAdj, cell.IndustryCell.R2.EBITDAMargin.YtdAdj, 1)
+				cell.R2.EBITDAMargin.IndustryUpside_Ltm = -Growth(cell.R2.EBITDAMargin.Ltm, cell.IndustryCell.R2.EBITDAMargin.Ltm, 1)
+
+				cell.R2.OperationalMargin.IndustryUpside_YtdAdj = -Growth(cell.R2.OperationalMargin.YtdAdj, cell.IndustryCell.R2.OperationalMargin.YtdAdj, 1)
+				cell.R2.OperationalMargin.IndustryUpside_Ltm = -Growth(cell.R2.OperationalMargin.Ltm, cell.IndustryCell.R2.OperationalMargin.Ltm, 1)
+
+				cell.R2.NetMargin.IndustryUpside_YtdAdj = -Growth(cell.R2.NetMargin.YtdAdj, cell.IndustryCell.R2.NetMargin.YtdAdj, 1)
+				cell.R2.NetMargin.IndustryUpside_Ltm = -Growth(cell.R2.NetMargin.Ltm, cell.IndustryCell.R2.NetMargin.Ltm, 1)
+
+			}
+
+			{ // dividends
+				cell.DivYield3Y.IndustryUpside = Growth(cell.DivYield3Y.S, cell.IndustryCell.DivYield3Y.S, 1)
+				cell.DivYield5Y.IndustryUpside = Growth(cell.DivYield5Y.S, cell.IndustryCell.DivYield5Y.S, 1)
+
+				cell.DSI.IndustryUpside = Growth(cell.DSI.S, cell.IndustryCell.DSI.S, 1)
+			}
+
+		}
+	}
+
 }
 
 var Market *Cube = &Cube{l: &sync.Mutex{}}

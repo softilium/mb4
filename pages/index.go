@@ -69,8 +69,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		pd.TopY[k] = &TopItem{
 			Ticker: "/ticker?id=" + v.TickerId(),
 			Descr:  v.Quote.Edges.Ticker.Descr,
-			V:      fmt.Sprintf("%.1f", v.DivYield5Y.V),
-			V1:     fmt.Sprintf("%.1f", v.DSI.V),
+			V:      fmt.Sprintf("%.1f", v.DivYield5Y.S),
+			V1:     fmt.Sprintf("%.1f", v.DSI.S),
 		}
 	}
 	pd.TopDSI = make([]*TopItem, len(topDSI))
@@ -78,8 +78,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		pd.TopDSI[k] = &TopItem{
 			Ticker: "/ticker?id=" + v.TickerId(),
 			Descr:  v.Quote.Edges.Ticker.Descr,
-			V:      fmt.Sprintf("%.1f", v.DivYield5Y.V),
-			V1:     fmt.Sprintf("%.1f", v.DSI.V),
+			V:      fmt.Sprintf("%.1f", v.DivYield5Y.S),
+			V1:     fmt.Sprintf("%.1f", v.DSI.S),
 		}
 	}
 	pd.TopFallen = make([]*TopItem, len(topFallen))

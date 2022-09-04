@@ -15,22 +15,23 @@ type Cell struct {
 	emission_lotsize_cached int
 	R2                      *Report2      //same report for all cells between published IFRS reports
 	Industry                *ent.Industry // flat industry from quote
+	IndustryCell            *Cell         //linked industry-cell
 	IsMissed                bool          //indicates than cell was copied for missing quotes from prevous days
 	DivPayout               float64       //div payout for day
 
 	//R3
-	EV           RepV
+	EV           RepS
 	EV_on_EBITDA RepV
-	BookValue    RepV
+	BookValue    RepS
 	P_on_E       RepV
-	P_on_BV      RepV
-	Cap          RepV
+	P_on_BV      RepS
+	Cap          RepS
 	P_on_S       RepV
-	DivSum5Y     RepV
-	DivSum3Y     RepV
-	DivYield5Y   RepV
-	DivYield3Y   RepV
-	DSI          RepV
+	DivSum5Y     RepS
+	DivSum3Y     RepS
+	DivYield5Y   RepS
+	DivYield3Y   RepS
+	DSI          RepS
 }
 
 func (r *Cell) LotSize() int {
@@ -72,64 +73,63 @@ func (r *Cell) TickerId() string {
 	return r.Quote.Edges.Ticker.ID
 }
 
-func (r *Cell) CalcAfterLoad(cb *Cube, py *Cell) {
+func (r *Cell) CalcR3(cb *Cube, py *Cell) {
 
-	r.BookValue.V = 0
+	r.BookValue.S = 0
 	prefCap := 0.0
 	if r.Quote != nil {
 		if prefTicker, ok := cb.prefTickers[r.Quote.Edges.Ticker.Edges.Emitent.ID]; ok {
 			if prefCells, ok := cb.cellsByTickerByDate[prefTicker.ID]; ok {
 				if prefcell, ok := prefCells[r.D]; ok {
-					prefCap = prefcell.Cap.V
+					prefCap = prefcell.Cap.S
 				}
 			}
 		}
 	}
 
-	r.EV.V = r.Cap.V + r.R2.Cash.V + r.R2.NonControlling.V + r.R2.NonCurrentLiabilities.V + r.R2.CurrentLiabilities.V
-	r.EV.Ltm = r.EV.V
-	r.EV.YtdAdj = r.EV.V
+	r.EV.S = r.Cap.S + r.R2.Cash.S + r.R2.NonControlling.S + r.R2.NonCurrentLiabilities.S + r.R2.CurrentLiabilities.S
 
-	r.EV_on_EBITDA.V = r.EV.V / r.R2.EBITDA.V
-	r.EV_on_EBITDA.YtdAdj = r.EV.YtdAdj / r.R2.EBITDA.YtdAdj
-	r.EV_on_EBITDA.Ltm = r.EV.Ltm / r.R2.EBITDA.Ltm
+	r.EV_on_EBITDA.YtdAdj = r.EV.S / r.R2.EBITDA.YtdAdj
+	r.EV_on_EBITDA.Ltm = r.EV.S / r.R2.EBITDA.Ltm
 
-	r.BookValue.V = r.R2.Total.V - r.R2.CurrentLiabilities.V - r.R2.NonCurrentLiabilities.V - r.R2.NonControlling.V - prefCap
+	r.BookValue.S = r.R2.Total.S - r.R2.CurrentLiabilities.S - r.R2.NonCurrentLiabilities.S - r.R2.NonControlling.S - prefCap
 
-	if r.BookValue.V != 0 {
-		r.P_on_BV.V = r.Cap.V / r.BookValue.V
+	if r.BookValue.S != 0 {
+		r.P_on_BV.S = r.Cap.S / r.BookValue.S
 	}
 
-	if r.R2.NetIncome.V != 0 {
-		r.P_on_E.V = r.Cap.V / r.R2.NetIncome.V
-		r.P_on_E.Ltm = r.Cap.V / r.R2.NetIncome.Ltm
+	if r.R2.NetIncome.YtdAdj != 0 {
+		r.P_on_E.YtdAdj = r.Cap.S / r.R2.NetIncome.YtdAdj
+		r.P_on_E.Ltm = r.Cap.S / r.R2.NetIncome.Ltm
 	}
 
-	r.P_on_S.V = r.Cap.V / r.R2.Revenue.V
-	r.P_on_S.Ltm = r.Cap.V / r.R2.Revenue.Ltm
-
-	r.EV_on_EBITDA.InverseGrowth = true
-	r.P_on_E.InverseGrowth = true
-	r.P_on_BV.InverseGrowth = true
+	r.P_on_S.YtdAdj = r.Cap.S / r.R2.Revenue.YtdAdj
+	r.P_on_S.Ltm = r.Cap.S / r.R2.Revenue.Ltm
 
 	if py != nil {
-		r.Cap.AG = Growth(r.Cap.V, py.Cap.V, 1)
+		r.Cap.AG = Growth(r.Cap.S, py.Cap.S, 1)
 
-		r.EV.AG = Growth(r.EV.V, py.EV.V, 1)
-		r.EV.AGLtm = Growth(r.EV.Ltm, py.EV.Ltm, 1)
+		r.EV.AG = Growth(r.EV.S, py.EV.S, 1)
 
-		r.EV_on_EBITDA.AG = Growth(r.EV_on_EBITDA.V, py.EV_on_EBITDA.V, 1)
+		r.EV_on_EBITDA.AGYtdAdj = Growth(r.EV_on_EBITDA.YtdAdj, py.EV_on_EBITDA.YtdAdj, 1)
 		r.EV_on_EBITDA.AGLtm = Growth(r.EV_on_EBITDA.Ltm, py.EV_on_EBITDA.Ltm, 1)
 
-		r.BookValue.AG = Growth(r.BookValue.V, py.BookValue.V, 1)
-		r.P_on_BV.AG = Growth(r.P_on_BV.V, py.P_on_BV.V, 1)
-		r.P_on_E.AG = Growth(r.P_on_E.V, py.P_on_E.V, 1)
-		r.P_on_S.AG = Growth(r.P_on_S.V, py.P_on_S.V, 1)
-		r.DSI.AG = Growth(r.DSI.V, py.DSI.V, 1)
-		r.DivSum5Y.AG = Growth(r.DivSum5Y.V, py.DivSum5Y.V, 1)
-		r.DivSum3Y.AG = Growth(r.DivSum3Y.V, py.DivSum3Y.V, 1)
-		r.DivYield5Y.AG = Growth(r.DivYield5Y.V, py.DivYield5Y.V, 1)
-		r.DivYield3Y.AG = Growth(r.DivYield3Y.V, py.DivYield3Y.V, 1)
+		r.BookValue.AG = Growth(r.BookValue.S, py.BookValue.S, 1)
+
+		r.P_on_BV.AG = Growth(r.P_on_BV.S, py.P_on_BV.S, 1)
+
+		r.P_on_E.AGYtdAdj = Growth(r.P_on_E.YtdAdj, py.P_on_E.YtdAdj, 1)
+		r.P_on_E.AGLtm = Growth(r.P_on_E.Ltm, py.P_on_E.Ltm, 1)
+
+		r.P_on_S.AGYtdAdj = Growth(r.P_on_S.YtdAdj, py.P_on_S.YtdAdj, 1)
+		r.P_on_S.Ltm = Growth(r.P_on_S.Ltm, py.P_on_S.Ltm, 1)
+
+		r.DSI.AG = Growth(r.DSI.S, py.DSI.S, 1)
+
+		r.DivSum5Y.AG = Growth(r.DivSum5Y.S, py.DivSum5Y.S, 1)
+		r.DivSum3Y.AG = Growth(r.DivSum3Y.S, py.DivSum3Y.S, 1)
+		r.DivYield5Y.AG = Growth(r.DivYield5Y.S, py.DivYield5Y.S, 1)
+		r.DivYield3Y.AG = Growth(r.DivYield3Y.S, py.DivYield3Y.S, 1)
 	}
 
 }
@@ -167,6 +167,22 @@ func (c *Cell) GetRepV(k domains.ReportValue) *RepV {
 		return &c.R2.Debt_on_EBITDA
 	case domains.RK_ROE:
 		return &c.R2.ROE
+	case domains.RK_EV_on_EBITDA:
+		return &c.EV_on_EBITDA
+	case domains.RK_P_on_E:
+		return &c.P_on_E
+	case domains.RK_P_on_S:
+		return &c.P_on_S
+
+	}
+
+	return nil
+
+}
+
+func (c *Cell) GetRepS(k domains.ReportValue) *RepS {
+
+	switch k {
 	case domains.RK_Cash:
 		return &c.R2.Cash
 	case domains.RK_NonCurrentLiabilities:
@@ -183,18 +199,12 @@ func (c *Cell) GetRepV(k domains.ReportValue) *RepV {
 		return &c.R2.NetDebt
 	case domains.RK_EV:
 		return &c.EV
-	case domains.RK_EV_on_EBITDA:
-		return &c.EV_on_EBITDA
 	case domains.RK_BookValue:
 		return &c.BookValue
-	case domains.RK_P_on_E:
-		return &c.P_on_E
 	case domains.RK_P_on_BV:
 		return &c.P_on_BV
 	case domains.RK_Cap:
 		return &c.Cap
-	case domains.RK_P_on_S:
-		return &c.P_on_S
 	case domains.RK_DivSum5Y:
 		return &c.DivSum5Y
 	case domains.RK_DivSum3Y:
@@ -205,42 +215,58 @@ func (c *Cell) GetRepV(k domains.ReportValue) *RepV {
 		return &c.DivYield3Y
 	case domains.RK_DSI:
 		return &c.DSI
-
 	default:
-		log.Fatalf("Unable to get report value for %v", k)
+		return nil
 	}
-
-	return nil
 
 }
 
 func (c *Cell) RepValue(market *Cube, rv domains.ReportValue, rvt domains.ReportValueType) float64 {
 
-	var ind, rc *RepV
-	rc = c.GetRepV(rv)
-	switch rvt {
-	case domains.RVT_Ind_Src, domains.RVT_Ind_YtdAdj, domains.RVT_Ind_Ltm, domains.RVT_Ind_AG, domains.RVT_Ind_AG_Ltm,
-		domains.RVT_IndUpside_Src, domains.RVT_IndUpside_YtdAdj, domains.RVT_IndUpside_Ltm, domains.RVT_IndUpside_AG, domains.RVT_IndUpside_AG_Ltm:
-		ind = market.cellsByIndustryByDate[c.Industry.ID][c.D].GetRepV(rv)
-	}
+	valV := c.GetRepV(rv)
+	valS := c.GetRepS(rv)
 
 	switch rvt {
-	case domains.RVT_Src, domains.RVT_Ind_Src:
-		return rc.V
-	case domains.RVT_YtdAdj, domains.RVT_Ind_YtdAdj:
-		return rc.YtdAdj
-	case domains.RVT_Ltm, domains.RVT_Ind_Ltm:
-		return rc.Ltm
-	case domains.RVT_AG, domains.RVT_Ind_AG:
-		return rc.AG
-	case domains.RVT_AG_Ltm, domains.RVT_Ind_AG_Ltm:
-		return rc.AGLtm
-	case domains.RVT_IndUpside_Src:
-		return rc.CalcIndUpside_V(ind)
+	case domains.RVT_S:
+		if valS == nil {
+			return 0
+		}
+		return valS.S
+	case domains.RVT_YtdAdj:
+		if valV == nil {
+			return 0
+		}
+		return valV.YtdAdj
+	case domains.RVT_Ltm:
+		if valV == nil {
+			return 0
+		}
+		return valV.Ltm
+	case domains.RVT_AG:
+		if valS == nil {
+			return 0
+		}
+		return valS.AG
+	case domains.RVT_AG_Ltm:
+		if valV == nil {
+			return 0
+		}
+		return valV.AGLtm
+	case domains.RVT_IndUpside:
+		if valS == nil {
+			return 0
+		}
+		return valS.IndustryUpside
 	case domains.RVT_IndUpside_YtdAdj:
-		return rc.CalcIndUpside_YtdAdj(ind)
+		if valV == nil {
+			return 0
+		}
+		return valV.IndustryUpside_YtdAdj
 	case domains.RVT_IndUpside_Ltm:
-		return rc.CalcIndUpside_Ltm(ind)
+		if valV == nil {
+			return 0
+		}
+		return valV.IndustryUpside_Ltm
 	default:
 		log.Fatalf("Unable to get report value for %v (%v)", rv, rvt)
 		return 0.0

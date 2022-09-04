@@ -202,6 +202,9 @@ func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Sou
 		for _, p := range pieces2 {
 			ws += p.w
 		}
+		if ws == 0.0 {
+			ws = 0.000000001
+		}
 		for idx, p := range pieces2 {
 			pieces2[idx].sum = p.w / ws * flexRUB
 		}
@@ -252,7 +255,7 @@ func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Sou
 
 }
 
-func Filter(Src *cube.Cell, Strategy *ent.Strategy, Market *cube.Cube, D time.Time) bool {
+func Filter(s0 *cube.Cell, Strategy *ent.Strategy, Market *cube.Cube, D time.Time) bool {
 
 	for _, f := range Strategy.Edges.Filters {
 
@@ -263,25 +266,25 @@ func Filter(Src *cube.Cell, Strategy *ent.Strategy, Market *cube.Cube, D time.Ti
 		switch f.LeftValueKind {
 		case domains.FVK_Ticker:
 			{
-				if f.Operation == domains.FilterOp_Eq && Src.TickerId() != f.RightValueStr {
+				if f.Operation == domains.FilterOp_Eq && s0.TickerId() != f.RightValueStr {
 					return false
 				}
-				if f.Operation == domains.FilterOp_Ne && Src.TickerId() == f.RightValueStr {
+				if f.Operation == domains.FilterOp_Ne && s0.TickerId() == f.RightValueStr {
 					return false
 				}
 			}
 		case domains.FVK_Industry:
 			{
-				if f.Operation == domains.FilterOp_Eq && Src.Industry.ID != f.RightValueStr {
+				if f.Operation == domains.FilterOp_Eq && s0.Industry.ID != f.RightValueStr {
 					return false
 				}
-				if f.Operation == domains.FilterOp_Ne && Src.Industry.ID == f.RightValueStr {
+				if f.Operation == domains.FilterOp_Ne && s0.Industry.ID == f.RightValueStr {
 					return false
 				}
 			}
 		case domains.FVK_ReportValue:
 			{
-				lval := Src.RepValue(cube.Market, f.LeftReportValue, f.LeftReportValueType)
+				lval := s0.RepValue(cube.Market, f.LeftReportValue, f.LeftReportValueType)
 				rval := f.RightValueFloat
 				if f.Operation == domains.FilterOp_Eq && lval != rval {
 					return false

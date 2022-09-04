@@ -45,9 +45,9 @@ func Industry(w http.ResponseWriter, r *http.Request) {
 
 		q := cube.Market.CellsByTickerByDate(t.ID, ld, cube.LookBack)
 		if q.R2 == nil {
-			rows = append(rows, &emitentRow{Ticker: t, Cap: q.Cap.Ltm})
+			rows = append(rows, &emitentRow{Ticker: t, Cap: q.Cap.S})
 		} else {
-			rows = append(rows, &emitentRow{Ticker: t, Cap: q.Cap.V, EV: q.EV.V, EBITDA: q.R2.EBITDA.V, EBITDAGrow: q.R2.EBITDA.AG})
+			rows = append(rows, &emitentRow{Ticker: t, Cap: q.Cap.S, EV: q.EV.S, EBITDA: q.R2.EBITDA.YtdAdj, EBITDAGrow: q.R2.EBITDA.AGYtdAdj})
 		}
 
 	}
