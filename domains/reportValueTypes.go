@@ -22,17 +22,17 @@ func init() {
 
 	ReportValueTypes.init([]DomainItem[ReportValueType]{
 
-		{Id: RVT_S, Descr: "SLD (CF)"},
-		{Id: RVT_YtdAdj, Descr: "YTD adj."},
+		{Id: RVT_S, Descr: "Из отчета cashflow"},
+		{Id: RVT_YtdAdj, Descr: "Из отчета PnL, выравненное по году"},
 		{Id: RVT_Ltm, Descr: "LTM"},
 
 		{Id: RVT_AG, Descr: "Рост г/г"},
-		{Id: RVT_AG_YtdSld, Descr: "Рост YTD adj. г/г"},
-		{Id: RVT_AG_Ltm, Descr: "Рост LTM г/г"},
+		{Id: RVT_AG_YtdSld, Descr: "Рост г/г, выравненное по году"},
+		{Id: RVT_AG_Ltm, Descr: "Рост г/г, LTM"},
 
 		{Id: RVT_IndUpside, Descr: "Отраслевой апсайд"},
-		{Id: RVT_IndUpside_YtdAdj, Descr: "Отраслевой апсайд YTD ajd."},
-		{Id: RVT_IndUpside_Ltm, Descr: "Отраслевой апсайд LTM"},
+		{Id: RVT_IndUpside_YtdAdj, Descr: "Отраслевой апсайд, выравненно по году"},
+		{Id: RVT_IndUpside_Ltm, Descr: "Отраслевой апсайд, LTM"},
 	})
 
 }
