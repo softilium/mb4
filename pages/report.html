@@ -62,8 +62,33 @@
 </tr>
 {% endmacro %}
 
-<h2>Отчет эмитента {{ pd.Emitent.Descr }}  за {{ pd.R2.ReportYear }}.Q{{ pd.R2.ReportQuarter }} </h2>
-<h5>Дата отчета: {{pd.R2.ReportDate | date:"2006-01-02" }}</h5>
+<div class="row">
+    <div class="col-7">
+        <h2>Отчет эмитента {{ pd.Emitent.Descr }} за {{ pd.R2.ReportYear }}.Q{{ pd.R2.ReportQuarter }} </h2>
+        <h5>Дата отчета: {{pd.R2.ReportDate | date:"2006-01-02" }}</h5>
+    </div>
+    <div class="col-5">
+        <table class="table table-sm table-borderless">
+            <thead>
+                <tr>
+                    <th>Тикеры эмитента</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in pd.Emitent.Edges.Tickers %}
+                <tr>
+                    <td>
+                        <a href="/ticker?id={{t.ID}}">{{ t.Descr }}</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<br></br>
 
 <div class="row">
 
@@ -141,13 +166,13 @@
         <table class="table table-sm table-borderless">
             <thead>
                 <tr>
-                    <th>Все отчеты</th>
+                    <th class="text-end">Все отчеты</th>
                 </tr>
             </thead>
             <tbody>
                 {% for rep in pd.AllReps %}
                 <tr>
-                    <td>
+                    <td class="text-end">
                         {% if pd.R2.ReportYear==rep.ReportYear && pd.R2.ReportQuarter==rep.ReportQuarter %}
                         <strong>{{rep.ReportYear}}.Q{{rep.ReportQuarter}}</strong>
                         {% else %}

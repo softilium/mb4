@@ -563,22 +563,22 @@ func (c *Cube) calcIndustryUpsides() {
 			cell.P_on_S.IndustryUpside_YtdAdj = -Growth(cell.P_on_S.YtdAdj, cell.IndustryCell.P_on_S.YtdAdj, 1)
 			cell.P_on_S.IndustryUpside_Ltm = -Growth(cell.P_on_S.Ltm, cell.IndustryCell.P_on_S.Ltm, 1)
 
-			cell.R2.ROE.IndustryUpside_YtdAdj = -Growth(cell.R2.ROE.YtdAdj, cell.IndustryCell.R2.ROE.YtdAdj, 1)
-			cell.R2.ROE.IndustryUpside_Ltm = -Growth(cell.R2.ROE.Ltm, cell.IndustryCell.R2.ROE.Ltm, 1)
+			cell.R2.ROE.IndustryUpside_YtdAdj = Growth(cell.R2.ROE.YtdAdj, cell.IndustryCell.R2.ROE.YtdAdj, 1)
+			cell.R2.ROE.IndustryUpside_Ltm = Growth(cell.R2.ROE.Ltm, cell.IndustryCell.R2.ROE.Ltm, 1)
 
 			{ // margins
 
-				cell.R2.OIBDAMargin.IndustryUpside_YtdAdj = -Growth(cell.R2.OIBDAMargin.YtdAdj, cell.IndustryCell.R2.OIBDAMargin.YtdAdj, 1)
-				cell.R2.OIBDAMargin.IndustryUpside_Ltm = -Growth(cell.R2.OIBDAMargin.Ltm, cell.IndustryCell.R2.OIBDAMargin.Ltm, 1)
+				cell.R2.OIBDAMargin.IndustryUpside_YtdAdj = Growth(cell.R2.OIBDAMargin.YtdAdj, cell.IndustryCell.R2.OIBDAMargin.YtdAdj, 1)
+				cell.R2.OIBDAMargin.IndustryUpside_Ltm = Growth(cell.R2.OIBDAMargin.Ltm, cell.IndustryCell.R2.OIBDAMargin.Ltm, 1)
 
-				cell.R2.EBITDAMargin.IndustryUpside_YtdAdj = -Growth(cell.R2.EBITDAMargin.YtdAdj, cell.IndustryCell.R2.EBITDAMargin.YtdAdj, 1)
-				cell.R2.EBITDAMargin.IndustryUpside_Ltm = -Growth(cell.R2.EBITDAMargin.Ltm, cell.IndustryCell.R2.EBITDAMargin.Ltm, 1)
+				cell.R2.EBITDAMargin.IndustryUpside_YtdAdj = Growth(cell.R2.EBITDAMargin.YtdAdj, cell.IndustryCell.R2.EBITDAMargin.YtdAdj, 1)
+				cell.R2.EBITDAMargin.IndustryUpside_Ltm = Growth(cell.R2.EBITDAMargin.Ltm, cell.IndustryCell.R2.EBITDAMargin.Ltm, 1)
 
-				cell.R2.OperationalMargin.IndustryUpside_YtdAdj = -Growth(cell.R2.OperationalMargin.YtdAdj, cell.IndustryCell.R2.OperationalMargin.YtdAdj, 1)
-				cell.R2.OperationalMargin.IndustryUpside_Ltm = -Growth(cell.R2.OperationalMargin.Ltm, cell.IndustryCell.R2.OperationalMargin.Ltm, 1)
+				cell.R2.OperationalMargin.IndustryUpside_YtdAdj = Growth(cell.R2.OperationalMargin.YtdAdj, cell.IndustryCell.R2.OperationalMargin.YtdAdj, 1)
+				cell.R2.OperationalMargin.IndustryUpside_Ltm = Growth(cell.R2.OperationalMargin.Ltm, cell.IndustryCell.R2.OperationalMargin.Ltm, 1)
 
-				cell.R2.NetMargin.IndustryUpside_YtdAdj = -Growth(cell.R2.NetMargin.YtdAdj, cell.IndustryCell.R2.NetMargin.YtdAdj, 1)
-				cell.R2.NetMargin.IndustryUpside_Ltm = -Growth(cell.R2.NetMargin.Ltm, cell.IndustryCell.R2.NetMargin.Ltm, 1)
+				cell.R2.NetMargin.IndustryUpside_YtdAdj = Growth(cell.R2.NetMargin.YtdAdj, cell.IndustryCell.R2.NetMargin.YtdAdj, 1)
+				cell.R2.NetMargin.IndustryUpside_Ltm = Growth(cell.R2.NetMargin.Ltm, cell.IndustryCell.R2.NetMargin.Ltm, 1)
 
 			}
 

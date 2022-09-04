@@ -89,22 +89,18 @@ func (r *Cell) CalcR3(cb *Cube, py *Cell) {
 
 	r.EV.S = r.Cap.S + r.R2.Cash.S + r.R2.NonControlling.S + r.R2.NonCurrentLiabilities.S + r.R2.CurrentLiabilities.S
 
-	r.EV_on_EBITDA.YtdAdj = r.EV.S / r.R2.EBITDA.YtdAdj
-	r.EV_on_EBITDA.Ltm = r.EV.S / r.R2.EBITDA.Ltm
+	r.EV_on_EBITDA.YtdAdj = IIF(r.R2.EBITDA.YtdAdj == 0, 0, r.EV.S/r.R2.EBITDA.YtdAdj)
+	r.EV_on_EBITDA.Ltm = IIF(r.R2.EBITDA.Ltm == 0, 0, r.EV.S/r.R2.EBITDA.Ltm)
 
 	r.BookValue.S = r.R2.Total.S - r.R2.CurrentLiabilities.S - r.R2.NonCurrentLiabilities.S - r.R2.NonControlling.S - prefCap
 
-	if r.BookValue.S != 0 {
-		r.P_on_BV.S = r.Cap.S / r.BookValue.S
-	}
+	r.P_on_BV.S = IIF(r.BookValue.S == 0, 0, r.Cap.S/r.BookValue.S)
 
-	if r.R2.NetIncome.YtdAdj != 0 {
-		r.P_on_E.YtdAdj = r.Cap.S / r.R2.NetIncome.YtdAdj
-		r.P_on_E.Ltm = r.Cap.S / r.R2.NetIncome.Ltm
-	}
+	r.P_on_E.YtdAdj = IIF(r.R2.NetIncome.YtdAdj == 0, 0, r.Cap.S/r.R2.NetIncome.YtdAdj)
+	r.P_on_E.Ltm = IIF(r.R2.NetIncome.Ltm == 0, 0, r.Cap.S/r.R2.NetIncome.Ltm)
 
-	r.P_on_S.YtdAdj = r.Cap.S / r.R2.Revenue.YtdAdj
-	r.P_on_S.Ltm = r.Cap.S / r.R2.Revenue.Ltm
+	r.P_on_S.YtdAdj = IIF(r.R2.Revenue.YtdAdj == 0, 0, r.Cap.S/r.R2.Revenue.YtdAdj)
+	r.P_on_S.Ltm = IIF(r.R2.Revenue.Ltm == 0, 0, r.Cap.S/r.R2.Revenue.Ltm)
 
 	if py != nil {
 		r.Cap.AG = Growth(r.Cap.S, py.Cap.S, 1)

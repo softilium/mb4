@@ -1,13 +1,16 @@
 package pages
 
 import (
+	"context"
 	"net/http"
 	"sort"
 	"strconv"
 
 	"github.com/flosch/pongo2/v6"
 	"github.com/softilium/mb4/cube"
+	"github.com/softilium/mb4/db"
 	"github.com/softilium/mb4/ent"
+	"github.com/softilium/mb4/ent/emitent"
 )
 
 func Report(w http.ResponseWriter, r *http.Request) {
@@ -44,6 +47,12 @@ func Report(w http.ResponseWriter, r *http.Request) {
 				}
 			})
 
+			em, err := db.DB.Emitent.Query().
+				Where(emitent.IDEQ(r3.Quote.Edges.Ticker.Edges.Emitent.ID)).
+				WithTickers().
+				Only(context.Background())
+			HandleErr(err, w)
+
 			si := LoadSessionStruct(r)
 			pageData := struct {
 				SessionStruct
@@ -53,7 +62,7 @@ func Report(w http.ResponseWriter, r *http.Request) {
 				IR       *cube.Cell
 				AllReps  []*cube.Report2
 				TickerId string
-			}{SessionStruct: si, R2: r2, R3: r3, Emitent: r3.Quote.Edges.Ticker.Edges.Emitent, IR: indRep, AllReps: allreps, TickerId: tickerid}
+			}{SessionStruct: si, R2: r2, R3: r3, Emitent: em, IR: indRep, AllReps: allreps, TickerId: tickerid}
 			pageData.Vue = false
 			pageData.Echarts = false
 
