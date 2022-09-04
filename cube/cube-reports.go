@@ -7,6 +7,7 @@ import (
 	"github.com/softilium/mb4/ent"
 )
 
+// TODO Отношение EV к BookValue - When compared to the company's market value, book value can indicate whether a stock is under- or overpriced.
 type Report2 struct { // enriched report with calculated fields
 	ReportYear    int
 	ReportQuarter int

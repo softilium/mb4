@@ -18,6 +18,8 @@ import (
 
 func Ticker(w http.ResponseWriter, r *http.Request) {
 
+	// TODO Переделать страницу на SSR, отказаться от Vue
+
 	switch r.Method {
 	case http.MethodGet:
 		{

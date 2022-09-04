@@ -123,6 +123,8 @@ func main() {
 	signal.Notify(quit, os.Interrupt)
 
 	log.Println("Loading market cube...")
+
+	//TODO make end-point to reload cube
 	clRoutine := func() {
 		err := cube.Market.LoadCube()
 		if err != nil {

@@ -19,7 +19,7 @@ import (
 	"github.com/softilium/mb4/pages"
 )
 
-//InvestAccounts handles the /api/invest-accounts.* endpoint.
+// InvestAccounts handles the /api/invest-accounts.* endpoint.
 func InvestAccounts(w http.ResponseWriter, r *http.Request) {
 
 	session := pages.LoadSessionStruct(r)
@@ -205,6 +205,8 @@ func handleAccsGetList(session pages.SessionStruct, w http.ResponseWriter) {
 }
 
 func handleAccsWeekflow(w http.ResponseWriter, r *http.Request, session pages.SessionStruct) {
+
+	//TODO move to page handler
 
 	startDate := session.GetUser().StartInvestAccountsFlow
 

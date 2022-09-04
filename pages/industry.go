@@ -14,6 +14,8 @@ import (
 	"golang.org/x/text/message"
 )
 
+//TODO выбор любой даты для показа страницы
+
 func Industry(w http.ResponseWriter, r *http.Request) {
 
 	iid := r.URL.Query().Get("id")

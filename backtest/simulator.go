@@ -61,7 +61,7 @@ func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Sou
 			if k := c.Quote.Edges.Ticker.Kind; !(k == schema.TickerKind_Stock || k == schema.TickerKind_StockPref) {
 				continue
 			}
-			if !Filter(c, Strategy, Market, D) {
+			if !Filter(c, Strategy, D) {
 				continue
 			}
 
@@ -71,7 +71,7 @@ func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Sou
 				if !factor.IsUsed {
 					continue
 				}
-				rv := c.RepValue(Market, factor.RK, factor.RVT)
+				rv := c.RepValue(factor.RK, factor.RVT)
 				if factor.Inverse {
 					if rv == 0 {
 						rv = 0.00000001
@@ -255,7 +255,7 @@ func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Sou
 
 }
 
-func Filter(s0 *cube.Cell, Strategy *ent.Strategy, Market *cube.Cube, D time.Time) bool {
+func Filter(s0 *cube.Cell, Strategy *ent.Strategy, D time.Time) bool {
 
 	for _, f := range Strategy.Edges.Filters {
 
@@ -284,7 +284,7 @@ func Filter(s0 *cube.Cell, Strategy *ent.Strategy, Market *cube.Cube, D time.Tim
 			}
 		case domains.FVK_ReportValue:
 			{
-				lval := s0.RepValue(cube.Market, f.LeftReportValue, f.LeftReportValueType)
+				lval := s0.RepValue(f.LeftReportValue, f.LeftReportValueType)
 				rval := f.RightValueFloat
 				if f.Operation == domains.FilterOp_Eq && lval != rval {
 					return false
