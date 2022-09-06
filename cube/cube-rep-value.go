@@ -11,6 +11,16 @@ func Growth(b, p float64, d int) float64 {
 	return IIF(p == 0, 0, RoundX((b-p)/p*100, d))
 }
 
+type ChangeValulation int
+
+const (
+	VeryBad  ChangeValulation = -50
+	Bad      ChangeValulation = -15
+	Neutral  ChangeValulation = 0
+	Good     ChangeValulation = 15
+	VeryGood ChangeValulation = 50
+)
+
 type RepV struct {
 	Src                   float64 //Ytd from rep src
 	YtdAdj                float64

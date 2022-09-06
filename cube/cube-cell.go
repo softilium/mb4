@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/softilium/mb4/domains"
+	d "github.com/softilium/mb4/domains"
 	"github.com/softilium/mb4/ent"
 )
 
@@ -130,44 +130,44 @@ func (r *Cell) CalcR3(cb *Cube, py *Cell) {
 
 }
 
-func (c *Cell) GetRepV(k domains.ReportValue) *RepV {
+func (c *Cell) GetRepV(k d.ReportValue) *RepV {
 
 	switch k {
-	case domains.RK_Revenue:
+	case d.RK_Revenue:
 		return &c.R2.Revenue
-	case domains.RK_Amortization:
+	case d.RK_Amortization:
 		return &c.R2.Amortization
-	case domains.RK_OperatingIncome:
+	case d.RK_OperatingIncome:
 		return &c.R2.OperatingIncome
-	case domains.RK_InterestIncome:
+	case d.RK_InterestIncome:
 		return &c.R2.InterestIncome
-	case domains.RK_InterestExpenses:
+	case d.RK_InterestExpenses:
 		return &c.R2.InterestExpenses
-	case domains.RK_IncomeTax:
+	case d.RK_IncomeTax:
 		return &c.R2.IncomeTax
-	case domains.RK_NetIncome:
+	case d.RK_NetIncome:
 		return &c.R2.NetIncome
-	case domains.RK_OIBDA:
+	case d.RK_OIBDA:
 		return &c.R2.OIBDA
-	case domains.RK_EBITDA:
+	case d.RK_EBITDA:
 		return &c.R2.EBITDA
-	case domains.RK_OIBDAMargin:
+	case d.RK_OIBDAMargin:
 		return &c.R2.OIBDAMargin
-	case domains.RK_EBITDAMargin:
+	case d.RK_EBITDAMargin:
 		return &c.R2.EBITDAMargin
-	case domains.RK_OperationalMargin:
+	case d.RK_OperationalMargin:
 		return &c.R2.OperationalMargin
-	case domains.RK_NetMargin:
+	case d.RK_NetMargin:
 		return &c.R2.NetMargin
-	case domains.RK_Debt_on_EBITDA:
+	case d.RK_Debt_on_EBITDA:
 		return &c.R2.Debt_on_EBITDA
-	case domains.RK_ROE:
+	case d.RK_ROE:
 		return &c.R2.ROE
-	case domains.RK_EV_on_EBITDA:
+	case d.RK_EV_on_EBITDA:
 		return &c.EV_on_EBITDA
-	case domains.RK_P_on_E:
+	case d.RK_P_on_E:
 		return &c.P_on_E
-	case domains.RK_P_on_S:
+	case d.RK_P_on_S:
 		return &c.P_on_S
 
 	}
@@ -176,40 +176,40 @@ func (c *Cell) GetRepV(k domains.ReportValue) *RepV {
 
 }
 
-func (c *Cell) GetRepS(k domains.ReportValue) *RepS {
+func (c *Cell) GetRepS(k d.ReportValue) *RepS {
 
 	switch k {
-	case domains.RK_Cash:
+	case d.RK_Cash:
 		return &c.R2.Cash
-	case domains.RK_NonCurrentLiabilities:
+	case d.RK_NonCurrentLiabilities:
 		return &c.R2.NonCurrentLiabilities
-	case domains.RK_CurrentLiabilities:
+	case d.RK_CurrentLiabilities:
 		return &c.R2.CurrentLiabilities
-	case domains.RK_NonControlling:
+	case d.RK_NonControlling:
 		return &c.R2.NonControlling
-	case domains.RK_Equity:
+	case d.RK_Equity:
 		return &c.R2.Equity
-	case domains.RK_Total:
+	case d.RK_Total:
 		return &c.R2.Total
-	case domains.RK_NetDebt:
+	case d.RK_NetDebt:
 		return &c.R2.NetDebt
-	case domains.RK_EV:
+	case d.RK_EV:
 		return &c.EV
-	case domains.RK_BookValue:
+	case d.RK_BookValue:
 		return &c.BookValue
-	case domains.RK_P_on_BV:
+	case d.RK_P_on_BV:
 		return &c.P_on_BV
-	case domains.RK_Cap:
+	case d.RK_Cap:
 		return &c.Cap
-	case domains.RK_DivSum5Y:
+	case d.RK_DivSum5Y:
 		return &c.DivSum5Y
-	case domains.RK_DivSum3Y:
+	case d.RK_DivSum3Y:
 		return &c.DivSum3Y
-	case domains.RK_DivYield5Y:
+	case d.RK_DivYield5Y:
 		return &c.DivYield5Y
-	case domains.RK_DivYield3Y:
+	case d.RK_DivYield3Y:
 		return &c.DivYield3Y
-	case domains.RK_DSI:
+	case d.RK_DSI:
 		return &c.DSI
 	default:
 		return nil
@@ -217,55 +217,154 @@ func (c *Cell) GetRepS(k domains.ReportValue) *RepS {
 
 }
 
-func (c *Cell) RepValue(market *Cube, rv domains.ReportValue, rvt domains.ReportValueType) float64 {
+func (c *Cell) RepValue(rv d.ReportValue, rvt d.ReportValueType) float64 {
 
 	valV := c.GetRepV(rv)
 	valS := c.GetRepS(rv)
 
 	switch rvt {
-	case domains.RVT_S:
+	case d.RVT_Src:
+		if valV == nil {
+			return 0
+		}
+		return valV.Src
+	case d.RVT_S:
 		if valS == nil {
 			return 0
 		}
 		return valS.S
-	case domains.RVT_YtdAdj:
+	case d.RVT_YtdAdj:
 		if valV == nil {
 			return 0
 		}
 		return valV.YtdAdj
-	case domains.RVT_Ltm:
+	case d.RVT_Ltm:
 		if valV == nil {
 			return 0
 		}
 		return valV.Ltm
-	case domains.RVT_AG:
+	case d.RVT_AG:
 		if valS == nil {
 			return 0
 		}
 		return valS.AG
-	case domains.RVT_AG_Ltm:
+	case d.RVT_AG_YtdAdj:
+		if valV == nil {
+			return 0
+		}
+		return valV.AGYtdAdj
+	case d.RVT_AG_Ltm:
 		if valV == nil {
 			return 0
 		}
 		return valV.AGLtm
-	case domains.RVT_IndUpside:
+	case d.RVT_IndUpside:
 		if valS == nil {
 			return 0
 		}
 		return valS.IndustryUpside
-	case domains.RVT_IndUpside_YtdAdj:
+	case d.RVT_IndUpside_YtdAdj:
 		if valV == nil {
 			return 0
 		}
 		return valV.IndustryUpside_YtdAdj
-	case domains.RVT_IndUpside_Ltm:
+	case d.RVT_IndUpside_Ltm:
 		if valV == nil {
 			return 0
 		}
 		return valV.IndustryUpside_Ltm
 	default:
-		log.Fatalf("Unable to get report value for %v (%v)", rv, rvt)
+		log.Fatalf("Unable to call Cell.RepValue for rv=%v, rvt=%v", rv, rvt)
 		return 0.0
 	}
+
+}
+
+func (c *Cell) EvalChange(rv d.ReportValue, rvt d.ReportValueType) ChangeValulation {
+
+	upGood := func(c float64) ChangeValulation {
+		if c <= float64(VeryBad) {
+			return VeryBad
+		}
+		if c < float64(Bad) {
+			return Bad
+		}
+		if c > float64(VeryGood) {
+			return VeryGood
+		}
+		if c > float64(Good) {
+			return Good
+		}
+		return Neutral
+	}
+
+	negIsBad := func(c float64) ChangeValulation {
+		if c < 0 {
+			return VeryBad
+		}
+		return Neutral
+	}
+
+	pozIsBad := func(c float64) ChangeValulation {
+		if c > 0 {
+			return VeryBad
+		}
+		return Neutral
+	}
+
+	downGood := func(c float64) ChangeValulation { return -upGood(c) }
+	neutral := func(c float64) ChangeValulation { return Neutral }
+
+	switch rvt {
+	case d.RVT_AG, d.RVT_AG_YtdAdj, d.RVT_AG_Ltm, d.RVT_IndUpside, d.RVT_IndUpside_Ltm, d.RVT_IndUpside_YtdAdj:
+		switch rv {
+		case d.RK_Revenue, d.RK_OperatingIncome, d.RK_NetIncome, d.RK_OIBDA,
+			d.RK_EBITDA, d.RK_OIBDAMargin, d.RK_EBITDAMargin, d.RK_OperationalMargin,
+			d.RK_NetMargin, d.RK_ROE, d.RK_Equity, d.RK_Total, d.RK_BookValue,
+			d.RK_Cap, d.RK_DivYield5Y, d.RK_DivYield3Y, d.RK_DSI:
+			return upGood(c.RepValue(rv, rvt))
+		case d.RK_Debt_on_EBITDA, d.RK_EV_on_EBITDA, d.RK_NetDebt, d.RK_P_on_E:
+			return downGood(c.RepValue(rv, rvt))
+		default:
+			return neutral(0)
+		}
+
+	case d.RVT_S, d.RVT_Src, d.RVT_Ltm, d.RVT_YtdAdj:
+		switch rv {
+		case d.RK_Revenue, d.RK_OperatingIncome, d.RK_InterestIncome, d.RK_NetIncome, d.RK_OIBDA,
+			d.RK_EBITDA, d.RK_OIBDAMargin, d.RK_EBITDAMargin, d.RK_OperationalMargin,
+			d.RK_NetMargin, d.RK_ROE, d.RK_Equity, d.RK_Total, d.RK_BookValue,
+			d.RK_Cap, d.RK_DivYield5Y, d.RK_DivYield3Y, d.RK_Cash, d.RK_NonCurrentLiabilities, d.RK_CurrentLiabilities,
+			d.RK_NonControlling, d.RK_EV, d.RK_DivSum5Y, d.RK_DivSum3Y:
+			return negIsBad(c.RepValue(rv, rvt))
+		case d.RK_Amortization, d.RK_InterestExpenses, d.RK_IncomeTax:
+			return pozIsBad(c.RepValue(rv, rvt))
+		default:
+			return neutral(0)
+		}
+	}
+
+	log.Panicf("Unable to determine report value for eval: %v\n", rv)
+	return neutral(0)
+
+}
+
+// TODO move to report page code (UI)
+func (c *Cell) EvalChangeAsClass(rv d.ReportValue, rvt d.ReportValueType) string {
+
+	r := c.EvalChange(rv, rvt)
+
+	switch r {
+	case VeryBad:
+		return "table-danger fw-bold"
+	case Bad:
+		return "table-danger"
+	case VeryGood:
+		return "table-success fw-bold"
+	case Good:
+		return "table-success"
+	}
+
+	return ""
 
 }

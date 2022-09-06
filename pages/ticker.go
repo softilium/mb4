@@ -16,6 +16,7 @@ import (
 	"github.com/softilium/mb4/ent/ticker"
 )
 
+// BUG периоды иногда инвертятся
 func Ticker(w http.ResponseWriter, r *http.Request) {
 
 	// TODO Переделать страницу на SSR, отказаться от Vue
