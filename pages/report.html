@@ -7,7 +7,7 @@
 {% macro pnl(descr, repv, hc) %}
 <tr>
     <td class="{{hc}}">{{ descr }}</td>
-    <td class="text-end {{repv.Src.C}}">{{repv.Src.V | rub0}}</td>
+    <td class="text-end {{repv.Src.C}}">{{repv.Ytd.V | rub0}}</td>
     <td class="text-end {{repv.AG_YtdAdj.C}}">{{repv.AG_YtdAdj.V | rub1}}%</td>
     <td class="text-end {{repv.Ltm.C}}">{{repv.Ltm.V | rub0}}</td>
     <td class="text-end {{repv.AG_Ltm.C}}">{{repv.AG_Ltm.V | rub1}}%</td>
@@ -160,7 +160,7 @@
         <h5>Мультипликаторы, доходы и расходы</h5>
         <table class="table table-sm table-bordered">
             <thead>
-                <th>Мультипликатор</th>
+                <th></th>
                 <th class="text-end">Ytd (adj)</th>
                 <th class="text-end">г/г, Ytd</th>
                 <th class="text-end">Отрасль, Ytd</th>

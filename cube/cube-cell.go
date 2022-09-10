@@ -316,19 +316,20 @@ func (c *Cell) EvalChange(rv d.ReportValue, rvt d.ReportValueType) ChangeValulat
 	neutral := func(c float64) ChangeValulation { return Neutral }
 
 	switch rvt {
-	case d.RVT_AG, d.RVT_AG_YtdAdj, d.RVT_AG_Ltm, d.RVT_IndUpside, d.RVT_IndUpside_Ltm, d.RVT_IndUpside_YtdAdj:
+	case d.RVT_IndUpside, d.RVT_IndUpside_Ltm, d.RVT_IndUpside_YtdAdj:
+		return upGood(c.RepValue(rv, rvt))
+	case d.RVT_AG, d.RVT_AG_YtdAdj, d.RVT_AG_Ltm:
 		switch rv {
 		case d.RK_Revenue, d.RK_OperatingIncome, d.RK_NetIncome, d.RK_OIBDA,
 			d.RK_EBITDA, d.RK_OIBDAMargin, d.RK_EBITDAMargin, d.RK_OperationalMargin,
 			d.RK_NetMargin, d.RK_ROE, d.RK_Equity, d.RK_Total, d.RK_BookValue,
 			d.RK_Cap, d.RK_DivYield5Y, d.RK_DivYield3Y, d.RK_DSI:
 			return upGood(c.RepValue(rv, rvt))
-		case d.RK_Debt_on_EBITDA, d.RK_EV_on_EBITDA, d.RK_NetDebt, d.RK_P_on_E:
+		case d.RK_EV_on_EBITDA, d.RK_Debt_on_EBITDA, d.RK_NetDebt, d.RK_P_on_E:
 			return downGood(c.RepValue(rv, rvt))
 		default:
 			return neutral(0)
 		}
-
 	case d.RVT_S, d.RVT_Src, d.RVT_Ltm, d.RVT_YtdAdj:
 		switch rv {
 		case d.RK_Revenue, d.RK_OperatingIncome, d.RK_InterestIncome, d.RK_NetIncome, d.RK_OIBDA,

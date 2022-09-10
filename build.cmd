@@ -13,6 +13,9 @@ unparam github.com/softilium/mb4/domains
 unparam github.com/softilium/mb4/ent
 unparam github.com/softilium/mb4/pages
 
+govulncheck ./...
+
+
 rem go build -ldflags "-s -w"
 go build
 
@@ -21,3 +24,5 @@ go build
 rem go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
 rem go install mvdan.cc/unparam@latest
+
+rem go install golang.org/x/vuln/cmd/govulncheck@latest

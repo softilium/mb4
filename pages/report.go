@@ -129,10 +129,10 @@ func (t *MV) LoadMV(r *cube.Cell, rv d.ReportValue) {
 	t.AG_YtdAdj.C = r.EvalChangeAsClass(rv, d.RVT_AG_YtdAdj)
 
 	t.IND_YtdAdj.V = qi.YtdAdj
-	t.IND_YtdAdj.C = r.IndustryCell.EvalChangeAsClass(rv, d.RVT_YtdAdj)
+	t.IND_YtdAdj.C = ""
 
 	t.Upside_YtdAdj.V = q.IndustryUpside_YtdAdj
-	t.IND_YtdAdj.C = r.IndustryCell.EvalChangeAsClass(rv, d.RVT_IndUpside_YtdAdj)
+	t.Upside_YtdAdj.C = r.EvalChangeAsClass(rv, d.RVT_IndUpside_YtdAdj)
 
 	t.Ltm.V = q.Ltm
 	t.Ltm.C = r.EvalChangeAsClass(rv, d.RVT_Ltm)
@@ -141,10 +141,10 @@ func (t *MV) LoadMV(r *cube.Cell, rv d.ReportValue) {
 	t.AG_Ltm.C = r.EvalChangeAsClass(rv, d.RVT_AG_Ltm)
 
 	t.IND_Ltm.V = qi.Ltm
-	t.IND_Ltm.C = r.IndustryCell.EvalChangeAsClass(rv, d.RVT_Ltm)
+	t.IND_Ltm.C = ""
 
 	t.Upside_Ltm.V = q.IndustryUpside_Ltm
-	t.IND_Ltm.C = r.IndustryCell.EvalChangeAsClass(rv, d.RVT_IndUpside_Ltm)
+	t.Upside_Ltm.C = r.EvalChangeAsClass(rv, d.RVT_IndUpside_Ltm)
 
 }
 
