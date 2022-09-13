@@ -445,8 +445,14 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 					if qc == nil {
 						log.Printf("Simulation fail. No quote for %s for date %s\n", idealItem.Ticker.ID, D)
 					} else {
-						deals := prtf.BuyLots(qc, idealItem.Lots()-found.Lots())
-						SD.Deals = append(SD.Deals, deals...)
+						allow := true
+						if Strategy.BuyOnlyLowPrice {
+							allow = qc.Quote.C < found.BalPrice()
+						}
+						if allow {
+							deals := prtf.BuyLots(qc, idealItem.Lots()-found.Lots())
+							SD.Deals = append(SD.Deals, deals...)
+						}
 					}
 				}
 			}
