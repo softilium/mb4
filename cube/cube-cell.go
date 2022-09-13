@@ -274,7 +274,7 @@ func (c *Cell) RepValue(rv d.ReportValue, rvt d.ReportValueType) float64 {
 		}
 		return valV.IndustryUpside_Ltm
 	default:
-		log.Fatalf("Unable to call Cell.RepValue for rv=%v, rvt=%v", rv, rvt)
+		log.Panicf("Unable to call Cell.RepValue for rv=%v, rvt=%v", rv, rvt)
 		return 0.0
 	}
 

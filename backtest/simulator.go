@@ -18,7 +18,7 @@ func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Sou
 		ir := Portfolio{RUB: Source.CurrentBalance() + Source.RUB}
 		cell := Market.CellsByTickerByDate(ImplicitTicker.ID, D, cube.LookBack)
 		if cell == nil {
-			log.Fatalf("ActualPortfolio: no cell for %s on %s\n", ImplicitTicker.Descr, D)
+			log.Panicf("ActualPortfolio: no cell for %s on %s\n", ImplicitTicker.Descr, D)
 			return nil
 		}
 		lots := int(math.Trunc(Source.CurrentBalance() + Source.RUB/(float64(cell.LotSize())+cell.Quote.C)))
@@ -346,7 +346,7 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 
 				c := Market.CellsByTickerByDate(item.Ticker.ID, D0, cube.LookBack)
 				if c == nil {
-					log.Fatalf("Simulation.divs. Unable to bind divpayout from date=%v for %s\n", D0, item.Ticker.ID)
+					log.Panicf("Simulation.divs. Unable to bind divpayout from date=%v for %s\n", D0, item.Ticker.ID)
 				}
 				if c.DivPayout > 0 {
 					divsSum += c.DivPayout * float64(item.Position)

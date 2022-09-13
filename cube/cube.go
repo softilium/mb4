@@ -339,7 +339,16 @@ func (c *Cube) addMissingCells() error {
 			if !ok && lk[ticker.ID] != nil {
 				sc := lk[ticker.ID]
 
-				newCell := &Cell{D: day, Quote: sc.Quote, emission: sc.emission, R2: sc.R2, IsMissed: true}
+				newCell := &Cell{
+					D:                       sc.D,
+					Quote:                   sc.Quote,
+					emission:                sc.emission,
+					emission_lotsize_cached: 0,
+					Industry:                sc.Industry,
+					IndustryCell:            sc.IndustryCell,
+					IsMissed:                true,
+					DivPayout:               0,
+				}
 
 				c.cellsByDate[day] = append(c.cellsByDate[day], newCell)
 				c.cellsByTickerByDate[ticker.ID][day] = sc
@@ -352,6 +361,8 @@ func (c *Cube) addMissingCells() error {
 
 func (c *Cube) loadReports() error {
 
+	//BUG does not fill R2 for missing cells. If you add index cell for new days, all other cells will be created as missed for this day
+	// with R2=nil
 	rd, err := db.DB.Report.Query().WithEmitent().All(context.Background())
 	if err != nil {
 		return err
