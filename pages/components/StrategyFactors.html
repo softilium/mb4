@@ -11,7 +11,7 @@
                     <td>Инверс.</td>
                     <td>К</td>
                     <td>Гистерезис</td>
-                    <td> <button class="btn" v-on:click='addFactor()'> <i class="bi bi-file-earmark-plus"></i></i> </button> </td>
+                    <td class="text-end"> <button class="btn" v-on:click='addFactor()'> <i class="bi bi-file-earmark-plus"></i></i> </button> </td>
                 </tr>
             </thead>
             <tbody>
@@ -33,7 +33,7 @@
                     <td> <input class="form-check-input form-control-sm" type="checkbox" v-model='item.Inverse' disabled /> </td>
                     <td>${item.K}</td>
                     <td>${item.Gist}</td>
-                    <td>
+                    <td class="text-end">
                         <button class="btn" data-bs-toggle="modal" data-bs-target="#factorModal" v-on:click='selectedFactor=item'>
                             <i class="bi bi-pencil-square"></i>
                         </button>
