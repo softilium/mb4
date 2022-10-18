@@ -227,6 +227,8 @@ func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Sou
 				for _, fi := range Strategy.Edges.Factors {
 					if tm, ok := debugs[pi.Ticker.ID]; ok {
 						pi.DebugFactors[fi.LineNum] = tm[fi.LineNum]
+					} else {
+						pi.DebugFactors[fi.LineNum] = 0
 					}
 				}
 			}
@@ -244,6 +246,19 @@ func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Sou
 			lots := int(math.Trunc((Source.CurrentBalance() + Source.RUB) / 100 * float64(r.Share) / (float64(cell.LotSize()) * cell.Quote.C)))
 			if lots > 0 {
 				result.BuyLots(cell, lots)
+			}
+		}
+
+	}
+	// add empty debug factors for correct rendering
+	if debug {
+		for _, pi := range result.Items {
+			if pi.DebugFactors != nil {
+				continue
+			}
+			pi.DebugFactors = make(map[int]float64)
+			for _, fi := range Strategy.Edges.Factors {
+				pi.DebugFactors[fi.LineNum] = -1
 			}
 		}
 	}

@@ -5,12 +5,7 @@
             <thead>
                 <tr>
                     <td>Исп.</td>
-                    <td>Параметр отчета</td>
-                    <td>Расчет</td>
-                    <td>min/max</td>
-                    <td>Инверс.</td>
-                    <td>К</td>
-                    <td>Гистерезис</td>
+                    <td>Фактор</td>
                     <td class="text-end"> <button class="btn" v-on:click='addFactor()'> <i class="bi bi-file-earmark-plus"></i></i> </button> </td>
                 </tr>
             </thead>
@@ -18,21 +13,8 @@
                 <tr v-for='item in strategy.edges.Factors'>
                     <td> <input class="form-check-input form-control-sm" type="checkbox" v-model='item.IsUsed' disabled /> </td>
                     <td>
-                        <select class="form-select form-control-sm" v-model='item.RK' disabled>
-                            <option></option>
-                            <option v-for="item2 in renderinfo.ReportValues" v-bind:value="item2.Id"> ${item2.Descr} </option>
-                        </select>
+                        ${ lineDescr(item) }
                     </td>
-                    <td>
-                        <select class="form-select form-control-sm" v-model='item.RVT' disabled>
-                            <option></option>
-                            <option v-for="item3 in renderinfo.ReportValueTypes" v-bind:value="item3.Id"> ${item3.Descr} </option>
-                        </select>
-                    </td>
-                    <td>${item.MinAcceptable}..${item.MaxAcceptable}</td>
-                    <td> <input class="form-check-input form-control-sm" type="checkbox" v-model='item.Inverse' disabled /> </td>
-                    <td>${item.K}</td>
-                    <td>${item.Gist}</td>
                     <td class="text-end">
                         <button class="btn" data-bs-toggle="modal" data-bs-target="#factorModal" v-on:click='selectedFactor=item'>
                             <i class="bi bi-pencil-square"></i>
@@ -145,7 +127,8 @@
         props: {
             strategy: {},
             renderinfo: {
-                ReportValues: []
+                ReportValues: [],
+                ReportValueTypes: []
             }
         },
 
@@ -157,15 +140,35 @@
         },
 
         methods: {
-
             addFactor() {
                 this.strategy.edges.Factors.push({ IsUsed: true, RK: null, RVT: null, MinAcceptable: null, MaxAcceptable: null, Inverse: false, K: 1, Gist: 5 });
             },
             removeFactor(item) {
                 this.strategy.edges.Factors.splice(this.strategy.edges.Factors.indexOf(item), 1);
             },
-
-
+            lineDescr(item) {
+                if (item.MinAcceptable === undefined) item.MinAcceptable = 0;
+                if (item.MaxAcceptable === undefined) item.MaxAcceptable = 0;
+                for (let i = 0; i < this.renderinfo.ReportValues.length; i++) {
+                    if (this.renderinfo.ReportValues[i].Id == item.RK) {
+                        let r = this.renderinfo.ReportValues[i].Descr + ' ';
+                        for (let j = 0; j < this.renderinfo.ReportValueTypes.length; j++) {
+                            if (this.renderinfo.ReportValueTypes[j].Id == item.RVT) {
+                                r += this.renderinfo.ReportValueTypes[j].Descr + ' ';
+                                if (item.MinAcceptable != 0 || item.MaxAcceptable != 0) {
+                                    if (item.MinAcceptable != 0) r += item.MinAcceptable.ToString();
+                                    r += "..";
+                                    if (item.MaxAcceptable != 0) r += item.MaxAcceptable.ToString();
+                                }
+                                if (item.Inverse == true) r += ' (инв) ';
+                                r += `K=${item.K}, Г=${item.Gist}`;
+                                return r;
+                            }
+                        }
+                    }
+                }
+                return 'Нажмите здесь для редактирования фвактора';
+            },
         }
     }
 
