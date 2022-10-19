@@ -13,12 +13,11 @@
                 <tr v-for='item in strategy.edges.Factors'>
                     <td> <input class="form-check-input form-control-sm" type="checkbox" v-model='item.IsUsed' disabled /> </td>
                     <td>
-                        ${ lineDescr(item) }
+                        <button class="btn" data-bs-toggle="modal" data-bs-target="#factorModal" v-on:click='selectedFactor=item'>
+                            ${ lineDescr(item) }
+                        </button>
                     </td>
                     <td class="text-end">
-                        <button class="btn" data-bs-toggle="modal" data-bs-target="#factorModal" v-on:click='selectedFactor=item'>
-                            <i class="bi bi-pencil-square"></i>
-                        </button>
                         <button class="btn" v-on:click='removeFactor(item)'><i class="bi bi-trash3"></i></button>
                     </td>
                 </tr>
@@ -167,7 +166,7 @@
                         }
                     }
                 }
-                return 'Нажмите здесь для редактирования фвактора';
+                return 'Нажмите здесь для редактирования фактора';
             },
         }
     }
