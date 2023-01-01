@@ -13,7 +13,7 @@ require (
 require github.com/gorilla/securecookie v1.1.1 // indirect
 
 require (
-	ariga.io/atlas v0.8.1 // indirect
+	ariga.io/atlas v0.8.3 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
@@ -21,10 +21,10 @@ require (
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/sessions v1.2.1
-	github.com/hashicorp/hcl/v2 v2.14.1 // indirect
+	github.com/hashicorp/hcl/v2 v2.15.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/rs/xid v1.4.0
-	github.com/zclconf/go-cty v1.12.0 // indirect
-	golang.org/x/mod v0.6.0 // indirect
-	golang.org/x/text v0.4.0
+	github.com/zclconf/go-cty v1.12.1 // indirect
+	golang.org/x/mod v0.7.0 // indirect
+	golang.org/x/text v0.5.0
 )
