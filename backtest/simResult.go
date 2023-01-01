@@ -70,6 +70,10 @@ type SimulationResult struct {
 
 func (t *SimulationResult) Calc(Market *cube.Cube, FinalPortfolio *Portfolio, foldDeals bool) {
 
+	if len(t.Days) == 0 {
+		return
+	}
+
 	min := t.Days[0].D
 	for _, d := range t.Days {
 		if d.D.Before(min) {

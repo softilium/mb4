@@ -3,9 +3,11 @@ package pages
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/flosch/pongo2/v6"
 	"github.com/softilium/mb4/db"
+	"github.com/softilium/mb4/domains"
 	"github.com/softilium/mb4/ent"
 	"github.com/softilium/mb4/ent/strategy"
 	"github.com/softilium/mb4/ent/user"
@@ -42,12 +44,17 @@ func Strategies(w http.ResponseWriter, r *http.Request) {
 		}
 	case http.MethodPost:
 		{
+
+			sd := domains.JSDateOnly(time.Now().AddDate(-1, 0, 0))
+
 			descr := r.FormValue("descr")
 			_, err := db.DB.Strategy.Create().
 				SetDescr(descr).
+				SetStartSimulation(&sd).
 				SetUser(si.user).
 				SetWeekRefillAmount(1000).
 				SetStartAmount(1000).
+				SetSameEmitent(domains.SameEmitentPolicy_PreferPrefs).
 				Save(context.Background())
 			HandleErr(err, w)
 			http.Redirect(w, r, "/strategies", http.StatusSeeOther)
