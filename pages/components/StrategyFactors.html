@@ -155,9 +155,11 @@
                             if (this.renderinfo.ReportValueTypes[j].Id == item.RVT) {
                                 r += this.renderinfo.ReportValueTypes[j].Descr + ' ';
                                 if (item.MinAcceptable != 0 || item.MaxAcceptable != 0) {
-                                    if (item.MinAcceptable != 0) r += item.MinAcceptable.ToString();
+                                    if (item.MinAcceptable != 0) 
+                                        r += item.MinAcceptable.toString();
                                     r += "..";
-                                    if (item.MaxAcceptable != 0) r += item.MaxAcceptable.ToString();
+                                    if (item.MaxAcceptable != 0)
+                                        r += item.MaxAcceptable.toString();
                                 }
                                 if (item.Inverse == true) r += ' (инв) ';
                                 r += `K=${item.K}, Г=${item.Gist}`;

@@ -31,6 +31,7 @@
             <td class="text-end">{{ item.LastYearYield|rub0 }}</td>
             <td class="text-end">{{ item.Last3YearsInvertResult|rub0 }}</td>
             <td class="text-end">{{ item.Last3YearsYield|rub0 }}</td>
+            <td><button class="btn"><i class="bi bi-trash3"></i></button></td>
         </tr>
         {% endfor %}
     </tbody>
@@ -39,11 +40,11 @@
 <form method="POST">
 
     <div class="form-group">
-        <label for="strategyName">Название стратегии</label>
+        <label for="strategyName">Добавление новой стратегии</label>
         <input type="text" class="form-control" name="descr" placeholder="Название стратегии">
     </div>
 
-    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <button type="submit" class="btn btn-primary">Добавить</button>
 
 </form>
 
