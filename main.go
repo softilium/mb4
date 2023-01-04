@@ -84,24 +84,24 @@ func initServer(listenAddr string) *http.Server {
 
 var localFormatter = message.NewPrinter(language.Russian)
 
-func filterRub0(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+func filterCur0(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
 	r := localFormatter.Sprintf("%.0f\n", in.Float())
 	return pongo2.AsSafeValue(r), nil
 }
 
-func filterRub1(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+func filterCur1(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
 	r := localFormatter.Sprintf("%.1f\n", in.Float())
 	return pongo2.AsSafeValue(r), nil
 }
 
 func main() {
 
-	err := pongo2.RegisterFilter("rub0", filterRub0)
+	err := pongo2.RegisterFilter("cur0", filterCur0)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 
-	err = pongo2.RegisterFilter("rub1", filterRub1)
+	err = pongo2.RegisterFilter("cur1", filterCur1)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}

@@ -15,13 +15,13 @@ import (
 func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Source *Portfolio, ImplicitTicker *ent.Ticker, debug bool) *Portfolio {
 
 	if ImplicitTicker != nil {
-		ir := Portfolio{RUB: Source.CurrentBalance() + Source.RUB}
+		ir := Portfolio{Cash: Source.CurrentBalance() + Source.Cash}
 		cell := Market.CellsByTickerByDate(ImplicitTicker.ID, D, cube.LookBack)
 		if cell == nil {
 			log.Panicf("ActualPortfolio: no cell for %s on %s\n", ImplicitTicker.Descr, D)
 			return nil
 		}
-		lots := int(math.Trunc(Source.CurrentBalance() + Source.RUB/(float64(cell.LotSize())+cell.Quote.C)))
+		lots := int(math.Trunc(Source.CurrentBalance() + Source.Cash/(float64(cell.LotSize())+cell.Quote.C)))
 		ir.BuyLots(cell, lots)
 		ir.ApplyCurrentPrices(Market, D)
 		return &ir
@@ -42,11 +42,11 @@ func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Sou
 	}
 
 	// take into account fixed tickers
-	flexRUB := (Source.CurrentBalance() + Source.RUB) / 100.0 * (100.0 - float64(fixedTickersShare))
-	result.RUB = Source.CurrentBalance() + Source.RUB
+	flexCash := (Source.CurrentBalance() + Source.Cash) / 100.0 * (100.0 - float64(fixedTickersShare))
+	result.Cash = Source.CurrentBalance() + Source.Cash
 
 	// first, process factor+filter combinations
-	if flexRUB > 0 {
+	if flexCash > 0 {
 
 		all := Market.GetCellsByDate(D)
 
@@ -134,7 +134,7 @@ func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Sou
 			ws += p.w
 		}
 		for idx, p := range pieces {
-			pieces[idx].sum = p.w / ws * flexRUB
+			pieces[idx].sum = p.w / ws * flexCash
 		}
 		pieces2 := make([]piece, 0, len(pieces))
 
@@ -206,7 +206,7 @@ func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Sou
 			ws = 0.000000001
 		}
 		for idx, p := range pieces2 {
-			pieces2[idx].sum = p.w / ws * flexRUB
+			pieces2[idx].sum = p.w / ws * flexCash
 		}
 
 		for _, sp := range pieces2 {
@@ -243,7 +243,7 @@ func ActualPortfolio(Strategy *ent.Strategy, Market *cube.Cube, D time.Time, Sou
 		}
 		cell := Market.CellsByTickerByDate(r.Ticker, D, cube.LookBack)
 		if cell != nil {
-			lots := int(math.Trunc((Source.CurrentBalance() + Source.RUB) / 100 * float64(r.Share) / (float64(cell.LotSize()) * cell.Quote.C)))
+			lots := int(math.Trunc((Source.CurrentBalance() + Source.Cash) / 100 * float64(r.Share) / (float64(cell.LotSize()) * cell.Quote.C)))
 			if lots > 0 {
 				result.BuyLots(cell, lots)
 			}
@@ -336,7 +336,7 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 
 	result := &SimulationResult{}
 	result.TickerDividendResults = make([]*SimulationTickerDividendResultItem, 0)
-	prtf := &Portfolio{RUB: StartAmount}
+	prtf := &Portfolio{Cash: StartAmount}
 
 	AllTime_Equity := StartAmount
 	AllTime_Dividends := 0.0
@@ -388,7 +388,7 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 		}
 		AllTime_Dividends += divsSum
 
-		prtf.RUB += Refill + divsSum
+		prtf.Cash += Refill + divsSum
 
 		SD := &SimulationDay{D: D, Refill: Refill}
 
@@ -474,10 +474,10 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 		}
 
 		prtf.ApplyCurrentPrices(Market, D)
-		SD.PortfolioRUB = prtf.RUB
+		SD.PortfolioCash = prtf.Cash
 		SD.PortfolioBalance = prtf.CurrentBalance()
 
-		SD.Accu_InvestResult = SD.PortfolioBalance + SD.PortfolioRUB - AllTime_Equity - AllTime_Dividends
+		SD.Accu_InvestResult = SD.PortfolioBalance + SD.PortfolioCash - AllTime_Equity - AllTime_Dividends
 		SD.Accu_Equity = AllTime_Equity
 		SD.Accu_Dividends = AllTime_Dividends
 
@@ -498,7 +498,7 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 		result.Equity = append(result.Equity, d.Accu_Equity)
 		result.InvestResults = append(result.InvestResults, d.Accu_InvestResult)
 		result.Divs = append(result.Divs, d.Accu_Dividends)
-		result.StrategyLevels = append(result.StrategyLevels, d.PortfolioBalance+d.PortfolioRUB)
+		result.StrategyLevels = append(result.StrategyLevels, d.PortfolioBalance+d.PortfolioCash)
 
 	}
 
@@ -519,7 +519,7 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 			if d.D.Weekday() != time.Thursday {
 				continue
 			}
-			result.BaseLevels[idx] = bResult.Days[idx].PortfolioBalance + bResult.Days[idx].PortfolioRUB
+			result.BaseLevels[idx] = bResult.Days[idx].PortfolioBalance + bResult.Days[idx].PortfolioCash
 			idx++
 		}
 
@@ -527,7 +527,7 @@ func Simulate(Strategy *ent.Strategy, Market *cube.Cube, From *time.Time, StartA
 
 	result.Calc(Market, prtf, true)
 
-	EmptyPortfolio := &Portfolio{RUB: Strategy.StartAmount}
+	EmptyPortfolio := &Portfolio{Cash: Strategy.StartAmount}
 	result.ActualPortfolio = ActualPortfolio(Strategy, Market, Market.LastDate(), EmptyPortfolio, nil, true)
 
 	return result

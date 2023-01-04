@@ -149,7 +149,7 @@
 
             <h2>Актуальный состав портфеля на сегодня</h2>
 
-            <p>Денежные средства: ${ $prnCurrency(results.ActualPortfolio.RUB) } </p>
+            <p>Денежные средства: ${ $prnCurrency(results.ActualPortfolio.Cash) } </p>
             <table class="table table-sm">
                 <thead>
                     <tr>
@@ -332,7 +332,7 @@
                                     </span>
                                 </div>
                             </td>
-                            <td class="text-end">${ $prnCurrency(item.PortfolioRUB) }</td>
+                            <td class="text-end">${ $prnCurrency(item.PortfolioCash) }</td>
                             <td class="text-end">${ $prnCurrency(item.PortfolioBalance) }</td>
                             <td class="text-end">${ $prnCurrency(item.Accu_Equity) }</td>
                             <td class="text-end">${ $prnCurrency(item.Accu_Dividends) }</td>

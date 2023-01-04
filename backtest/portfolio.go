@@ -8,7 +8,7 @@ import (
 )
 
 type Portfolio struct {
-	RUB   float64
+	Cash  float64
 	Items []*PortfolioItem
 }
 
@@ -34,7 +34,7 @@ func (p *Portfolio) CurrentBalance() float64 {
 func (p *Portfolio) BuyLots(Cell *cube.Cell, LotsToBuy int) []*Deal {
 
 	lots := LotsToBuy
-	maxLots := int(math.Trunc(p.RUB / (float64(Cell.LotSize()) * Cell.Quote.C)))
+	maxLots := int(math.Trunc(p.Cash / (float64(Cell.LotSize()) * Cell.Quote.C)))
 	if lots > maxLots {
 		lots = maxLots
 	}
@@ -58,7 +58,7 @@ func (p *Portfolio) BuyLots(Cell *cube.Cell, LotsToBuy int) []*Deal {
 	}
 	deals := p.Items[tIdx].Buy(Cell, lots*Cell.LotSize())
 	for _, deal := range deals {
-		p.RUB -= deal.Sum()
+		p.Cash -= deal.Sum()
 	}
 	return deals
 
@@ -90,7 +90,7 @@ func (p *Portfolio) SellLots(Cell *cube.Cell, lots int) []*Deal {
 	}
 
 	for _, deal := range deals {
-		p.RUB += deal.Sum()
+		p.Cash += deal.Sum()
 	}
 
 	return deals

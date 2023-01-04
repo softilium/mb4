@@ -20,10 +20,10 @@
                 {% for item in pd.Emitents %}
                 <tr>
                     <td><a href="/ticker?id={{ item.Ticker.ID }}">{{ item.Ticker.Descr }}</a></td>
-                    <td class="text-end">{{ item.Cap|rub0 }}</td>
-                    <td class="text-end">{{ item.EV|rub0 }}</td>
-                    <td class="text-end">{{ item.EBITDA|rub0 }}</td>
-                    <td class="text-end">{{ item.EBITDAGrow|rub0 }}</td>
+                    <td class="text-end">{{ item.Cap|cur0 }}</td>
+                    <td class="text-end">{{ item.EV|cur0 }}</td>
+                    <td class="text-end">{{ item.EBITDA|cur0 }}</td>
+                    <td class="text-end">{{ item.EBITDAGrow|cur0 }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

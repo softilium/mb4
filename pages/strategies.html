@@ -25,12 +25,12 @@
             <td>
                 <a href="{{ '/strategy?id=' + item.ID }}">{{ item.Descr }}</a>
             </td>
-            <td class="text-end">{{ item.StartAmount|rub0 }}</td>
-            <td class="text-end">{{ item.WeekRefillAmount|rub0 }}</td>
-            <td class="text-end">{{ item.LastYearInvertResult|rub0 }}</td>
-            <td class="text-end">{{ item.LastYearYield|rub0 }}</td>
-            <td class="text-end">{{ item.Last3YearsInvertResult|rub0 }}</td>
-            <td class="text-end">{{ item.Last3YearsYield|rub0 }}</td>
+            <td class="text-end">{{ item.StartAmount|cur0 }}</td>
+            <td class="text-end">{{ item.WeekRefillAmount|cur0 }}</td>
+            <td class="text-end">{{ item.LastYearInvertResult|cur0 }}</td>
+            <td class="text-end">{{ item.LastYearYield|cur0 }}</td>
+            <td class="text-end">{{ item.Last3YearsInvertResult|cur0 }}</td>
+            <td class="text-end">{{ item.Last3YearsYield|cur0 }}</td>
             <td><button class="btn"><i class="bi bi-trash3"></i></button></td>
         </tr>
         {% endfor %}

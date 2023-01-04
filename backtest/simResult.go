@@ -11,7 +11,7 @@ import (
 type SimulationDay struct {
 	D                 time.Time
 	Refill            float64
-	PortfolioRUB      float64
+	PortfolioCash     float64
 	PortfolioBalance  float64
 	Accu_InvestResult float64
 	Accu_Yield        float64

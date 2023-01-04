@@ -7,56 +7,56 @@
 {% macro pnl(descr, repv, hc) %}
 <tr>
     <td class="{{hc}}">{{ descr }}</td>
-    <td class="text-end {{repv.Src.C}}">{{repv.Ytd.V | rub0}}</td>
-    <td class="text-end {{repv.AG_YtdAdj.C}}">{{repv.AG_YtdAdj.V | rub1}}%</td>
-    <td class="text-end {{repv.Ltm.C}}">{{repv.Ltm.V | rub0}}</td>
-    <td class="text-end {{repv.AG_Ltm.C}}">{{repv.AG_Ltm.V | rub1}}%</td>
+    <td class="text-end {{repv.Src.C}}">{{repv.Ytd.V | cur0}}</td>
+    <td class="text-end {{repv.AG_YtdAdj.C}}">{{repv.AG_YtdAdj.V | cur1}}%</td>
+    <td class="text-end {{repv.Ltm.C}}">{{repv.Ltm.V | cur0}}</td>
+    <td class="text-end {{repv.AG_Ltm.C}}">{{repv.AG_Ltm.V | cur1}}%</td>
 </tr>
 {% endmacro %}
 
 {% macro cf(descr, repv, hc) %}
 <tr">
     <td class="{{hc}}">{{ descr }}</td>
-    <td class="text-end {{repv.S.C}}">{{repv.S.V | rub0}}</td>
-    <td class="text-end {{repv.AG.C}}">{{repv.AG.V | rub1}}%</td>
+    <td class="text-end {{repv.S.C}}">{{repv.S.V | cur0}}</td>
+    <td class="text-end {{repv.AG.C}}">{{repv.AG.V | cur1}}%</td>
 </tr>
 {% endmacro %}
 
 {% macro mult_cf(descr, repv) %}
 <tr">
     <td>{{ descr }}</td>
-    <td class="text-end {{repv.S.C}}">{{repv.S.V | rub1}}</td>
-    <td class="text-end {{repv.AG.C}}">{{repv.AG.V | rub1}}%</td>
-    <td class="text-end {{repv.IND_S.C}}">{{repv.IND_S.V | rub1}}</td>
-    <td class="text-end {{repv.Upside.C}}">{{repv.Upside.V | rub1}}</td>
+    <td class="text-end {{repv.S.C}}">{{repv.S.V | cur1}}</td>
+    <td class="text-end {{repv.AG.C}}">{{repv.AG.V | cur1}}%</td>
+    <td class="text-end {{repv.IND_S.C}}">{{repv.IND_S.V | cur1}}</td>
+    <td class="text-end {{repv.Upside.C}}">{{repv.Upside.V | cur1}}</td>
 </tr>
 {% endmacro %}
 
 {% macro mult_pnl_percent(descr, repv) %}
 <tr>
     <td>{{ descr }}</td>
-    <td class="text-end {{repv.YtdAdj.C}}">{{repv.YtdAdj.V | rub1}}%</td>
-    <td class="text-end {{repv.AG_YtdAdj.C}}">{{repv.AG_YtdAdj.V | rub1}}%</td>
-    <td class="text-end {{repv.IND_YtdAdj.C}}">{{repv.IND_YtdAdj.V | rub1}}%</td>
-    <td class="text-end {{repv.Upside_YtdAdj.C}}">{{repv.Upside_YtdAdj.V | rub1}}</td>
-    <td class="text-end {{repv.Ltm.C}}">{{repv.Ltm.V | rub1}}%</td>
-    <td class="text-end {{repv.AG_Ltm.C}}">{{repv.AG_Ltm.V | rub1}}%</td>
-    <td class="text-end {{repv.IND_Ltm.C}}">{{repv.IND_Ltm.V | rub1}}%</td>
-    <td class="text-end {{repv.Upside_Ltm.C}}">{{repv.Upside_Ltm.V | rub1}}</td>
+    <td class="text-end {{repv.YtdAdj.C}}">{{repv.YtdAdj.V | cur1}}%</td>
+    <td class="text-end {{repv.AG_YtdAdj.C}}">{{repv.AG_YtdAdj.V | cur1}}%</td>
+    <td class="text-end {{repv.IND_YtdAdj.C}}">{{repv.IND_YtdAdj.V | cur1}}%</td>
+    <td class="text-end {{repv.Upside_YtdAdj.C}}">{{repv.Upside_YtdAdj.V | cur1}}</td>
+    <td class="text-end {{repv.Ltm.C}}">{{repv.Ltm.V | cur1}}%</td>
+    <td class="text-end {{repv.AG_Ltm.C}}">{{repv.AG_Ltm.V | cur1}}%</td>
+    <td class="text-end {{repv.IND_Ltm.C}}">{{repv.IND_Ltm.V | cur1}}%</td>
+    <td class="text-end {{repv.Upside_Ltm.C}}">{{repv.Upside_Ltm.V | cur1}}</td>
 </tr>
 {% endmacro %}
 
 {% macro mult_pnl(descr, repv) %}
 <tr>
     <td>{{ descr }}</td>
-    <td class="text-end {{repv.YtdAdj.C}}">{{repv.YtdAdj.V | rub1}}</td>
-    <td class="text-end {{repv.AG_YtdAdj.C}}">{{repv.AG_YtdAdj.V | rub1}}%</td>
-    <td class="text-end {{repv.IND_YtdAdj.C}}">{{repv.IND_YtdAdj.V | rub1}}</td>
-    <td class="text-end {{repv.Upside_YtdAdj.C}}">{{repv.Upside_YtdAdj.V | rub1}}</td>
-    <td class="text-end {{repv.Ltm.C}}">{{repv.Ltm.V | rub1}}</td>
-    <td class="text-end {{repv.AG_Ltm.C}}">{{repv.AG_Ltm.V | rub1}}%</td>
-    <td class="text-end {{repv.IND_Ltm.C}}">{{repv.IND_Ltm.V | rub1}}</td>
-    <td class="text-end {{repv.Upside_Ltm.C}}">{{repv.Upside_Ltm.V | rub1}}</td>
+    <td class="text-end {{repv.YtdAdj.C}}">{{repv.YtdAdj.V | cur1}}</td>
+    <td class="text-end {{repv.AG_YtdAdj.C}}">{{repv.AG_YtdAdj.V | cur1}}%</td>
+    <td class="text-end {{repv.IND_YtdAdj.C}}">{{repv.IND_YtdAdj.V | cur1}}</td>
+    <td class="text-end {{repv.Upside_YtdAdj.C}}">{{repv.Upside_YtdAdj.V | cur1}}</td>
+    <td class="text-end {{repv.Ltm.C}}">{{repv.Ltm.V | cur1}}</td>
+    <td class="text-end {{repv.AG_Ltm.C}}">{{repv.AG_Ltm.V | cur1}}%</td>
+    <td class="text-end {{repv.IND_Ltm.C}}">{{repv.IND_Ltm.V | cur1}}</td>
+    <td class="text-end {{repv.Upside_Ltm.C}}">{{repv.Upside_Ltm.V | cur1}}</td>
 </tr>
 {% endmacro %}
 
