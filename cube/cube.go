@@ -145,8 +145,6 @@ func (c *Cube) LoadCube() (err error) {
 
 	c.calcIndustryUpsides()
 
-	//TODO считать положение котировки на 52-недельном цикле
-
 	return nil
 
 }

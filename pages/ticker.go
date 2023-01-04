@@ -16,10 +16,10 @@ import (
 	"github.com/softilium/mb4/ent/ticker"
 )
 
-// BUG периоды иногда инвертятся
+// BUG periods may show in wrong order
 func Ticker(w http.ResponseWriter, r *http.Request) {
 
-	// TODO Переделать страницу на SSR, отказаться от Vue
+	// TODO move to pongo2 from Vue
 
 	switch r.Method {
 	case http.MethodGet:
