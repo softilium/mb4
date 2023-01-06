@@ -195,6 +195,10 @@ func (c *Cube) LastDate() time.Time {
 	c.l.Lock()
 	defer c.l.Unlock()
 
+	if len(c.allDays) == 0 {
+		return time.Now()
+	}
+
 	return c.allDays[len(c.allDays)-1]
 }
 
