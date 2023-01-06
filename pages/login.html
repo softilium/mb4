@@ -8,7 +8,7 @@
 <div id="vueapp">
     <div class="row"></div>
     <div class="col-6">
-        <h1>Вход</h1>
+        <h1>Login</h1>
         <form>
             <div class="mb-3">
                 <label class="form-label">Email address</label>
@@ -19,29 +19,29 @@
                 <input id="password" class="form-control" type="password" v-model="password" />
             </div>
             <div>
-                <button class="btn btn-primary" v-on:click.prevent="login()">Вход</button>
+                <button class="btn btn-primary" v-on:click.prevent="login()">Login</button>
                 <span>&nbsp;</span>
                 <span class="alert" v-show="showAlert">{{ alertText }}</span>
             </div>
         </form>
     </div>
     <div class="col-6">
-        <h1>Регистрация</h1>
+        <h1>Sign up</h1>
         <form>
             <div class="mb-3">
                 <label class="form-label">Email address</label>
                 <input class="form-control" type="email" v-model="userNameReg" required />
             </div>
             <div class="mb-3">
-                <label class="form-label">Пароль</label>
+                <label class="form-label">Password</label>
                 <input class="form-control" type="password" v-model="passwordReg" required />
             </div>
             <div class="mb-3">
-                <label class="form-label">Повторите пароль</label>
+                <label class="form-label">Password again</label>
                 <input class="form-control" type="password" v-model="passwordReg1" required />
             </div>
             <div>
-                <button class="btn btn-primary" v-on:click.prevent="register()">Регистрация</button>
+                <button class="btn btn-primary" v-on:click.prevent="register()">Sign up</button>
                 <span>&nbsp;</span>
                 <span class="alert" v-show="showAlertReg">{{ alertTextReg }}</span>
             </div>
@@ -82,7 +82,7 @@
             async register() {
                 if (this.passwordReg != this.passwordReg1) {
                     this.showAlertReg = true;
-                    this.alertTextReg = "Пароли не совпадают";
+                    this.alertTextReg = "Passwords don't match";
                     return;
                 }
                 let res = await fetch(

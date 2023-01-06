@@ -4,8 +4,8 @@
         <table class="table table-sm">
             <thead>
                 <tr>
-                    <td>Исп.</td>
-                    <td>Фактор</td>
+                    <td></td>
+                    <td>Factor</td>
                     <td class="text-end"> <button class="btn" v-on:click='addFactor()'> <i class="bi bi-file-earmark-plus"></i></i> </button> </td>
                 </tr>
             </thead>
@@ -24,18 +24,18 @@
             </tbody>
         </table>
 
-        <!-- редактор фактора стратегии -->
+        <!-- editor -->
         <div class="modal fade" id="factorModal" tabindex="-1" aria-labelledby="factorModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="factorModalLabel"> Редактирование фактора стратегии </h5>
+                        <h5 class="modal-title" id="factorModalLabel">Edit strategy factor</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
 
                         <div class="mb-3 row">
-                            <label class="col-sm-3 col-form-label">Используется</label>
+                            <label class="col-sm-3 col-form-label">Use</label>
                             <div class="col-sm-9">
                                 <input class="form-check-input form-control-sm" type="checkbox" v-model='selectedFactor.IsUsed' />
                             </div>
@@ -43,7 +43,7 @@
 
                         <div class="mb-3 row">
                             <label class="col-sm-3 col-form-label">
-                                Параметр отчета
+                                Report parameter
                             </label>
                             <div class="col-sm-9">
                                 <select class="form-select form-control-sm" v-model='selectedFactor.RK'>
@@ -56,7 +56,7 @@
 
                         <div class="mb-3 row">
                             <label class="col-sm-3 col-form-label">
-                                Расчет параметра
+                                Parameter calc
                             </label>
                             <div class="col-sm-9">
                                 <select class="form-select form-control-sm" v-model='selectedFactor.RVT'>
@@ -68,35 +68,35 @@
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-3 col-form-label">Мин.значение</label>
+                            <label class="col-sm-3 col-form-label">Min</label>
                             <div class="col-sm-9">
                                 <input class="form-control form-control-sm" type="number" v-model='selectedFactor.MinAcceptable' />
                             </div>
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-3 col-form-label">Макс.значение</label>
+                            <label class="col-sm-3 col-form-label">Max</label>
                             <div class="col-sm-9">
                                 <input class="form-control form-control-sm" type="number" v-model='selectedFactor.MaxAcceptable' />
                             </div>
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-3 col-form-label">Инвертировать</label>
+                            <label class="col-sm-3 col-form-label">Invert</label>
                             <div class="col-sm-9">
                                 <input class="form-check-input form-control-sm" type="checkbox" v-model='selectedFactor.Inverse' />
                             </div>
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-3 col-form-label">Коэффициент</label>
+                            <label class="col-sm-3 col-form-label">Koeff</label>
                             <div class="col-sm-9">
                                 <input class="form-control form-control-sm" type="number" v-model='selectedFactor.K' />
                             </div>
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-3 col-form-label">Гистерезис</label>
+                            <label class="col-sm-3 col-form-label">Hysteresis</label>
                             <div class="col-sm-9">
                                 <input class="form-control form-control-sm" type="number" v-model='selectedFactor.Gist' />
                             </div>
@@ -105,7 +105,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Закрыть
+                            Close
                         </button>
                     </div>
                 </div>
@@ -161,14 +161,14 @@
                                     if (item.MaxAcceptable != 0)
                                         r += item.MaxAcceptable.toString();
                                 }
-                                if (item.Inverse == true) r += ' (инв) ';
+                                if (item.Inverse == true) r += ' (inv) ';
                                 r += `K=${item.K}, Г=${item.Gist}`;
                                 return r;
                             }
                         }
                     }
                 }
-                return 'Нажмите здесь для редактирования фактора';
+                return 'Click to edit factor';
             },
         }
     }

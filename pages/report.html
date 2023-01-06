@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block title %}Отчет эмитента {% endblock %}
+{% block title %}Report{% endblock %}
 
 {% block content %}
 
@@ -62,14 +62,14 @@
 
 <div class="row">
     <div class="col-4">
-        <h2>Отчет {{ pd.Emitent.Descr }} за {{ pd.R2.ReportYear }}.Q{{ pd.R2.ReportQuarter }} </h2>
-        <h6>Дата отчета: {{pd.R2.ReportDate | date:"2006-01-02" }}</h5>
+        <h2>Report from {{ pd.Emitent.Descr }} for period {{ pd.R2.ReportYear }}.Q{{ pd.R2.ReportQuarter }} </h2>
+        <h6>Report date: {{pd.R2.ReportDate | date:"2006-01-02" }}</h5>
     </div>
     <div class="col-4">
         <table class="table table-sm table-borderless">
             <thead>
                 <tr>
-                    <th>Тикеры эмитента</th>
+                    <th>Tickers</th>
                 </tr>
             </thead>
             <tbody>
@@ -86,7 +86,7 @@
     </div>
 
     <div class="col-4">
-        <h6>Другие отчеты эмитента</h6>
+        <h6>Another reports</h6>
         {% for rep in pd.AllReps %}
         <span class="text-end">
             {% if pd.R2.ReportYear==rep.ReportYear && pd.R2.ReportQuarter==rep.ReportQuarter %}
@@ -106,23 +106,23 @@
 <div class="row">
 
     <div class="col-7">
-        <h5>Доходы и расходы</h5>
+        <h5>Profit & Lost</h5>
         <small>
             <table class="table table-sm table-bordered">
                 <thead>
                     <th></th>
-                    <th class="text-end">Из отчета, Ytd</th>
-                    <th class="text-end">г/г</th>
+                    <th class="text-end">Ytd</th>
+                    <th class="text-end">y/y</th>
                     <th class="text-end">Ltm</th>
-                    <th class="text-end">г/г, Ltm</th>
+                    <th class="text-end">y/y, Ltm</th>
                 </thead>
-                {{ pnl("Выручка", pd.Revenue, "") }}
-                {{ pnl("Амортизация", pd.Amortization, "") }}
-                {{ pnl("Операционная прибыль", pd.OperatingIncome, "") }}
-                {{ pnl("Финансовые доходы", pd.InterestIncome, "") }}
-                {{ pnl("Финансовые расходы", pd.InterestExpenses, "") }}
-                {{ pnl("Налог на прибыль", pd.IncomeTax, "") }}
-                {{ pnl("Прибыль", pd.NetIncome, "") }}
+                {{ pnl("Revenue", pd.Revenue, "") }}
+                {{ pnl("Amortization", pd.Amortization, "") }}
+                {{ pnl("Operating income", pd.OperatingIncome, "") }}
+                {{ pnl("Interest income", pd.InterestIncome, "") }}
+                {{ pnl("Interest expenses", pd.InterestExpenses, "") }}
+                {{ pnl("Income tax", pd.IncomeTax, "") }}
+                {{ pnl("Net income", pd.NetIncome, "") }}
                 {{ pnl("OIBDA", pd.OIBDA, "table-warning") }}
                 {{ pnl("EBITDA", pd.EBITDA, "table-warning") }}
             </table>
@@ -137,15 +137,15 @@
                 <th class="text-end">Из отчета</th>
                 <th class="text-end">г/г</th>
             </thead>
-            {{ cf("Денежные средства и эквиваленты", pd.Cash, "") }}
-            {{ cf("Текущие обязательства", pd.CurrentLiabilities, "") }}
-            {{ cf("Долговременные обязательства", pd.NonCurrentLiabilities, "") }}
-            {{ cf("Неконтроллирующие доли", pd.NonControlling, "") }}
-            {{ cf("Капитал", pd.Equity, "") }}
-            {{ cf("Всего активов и обязательств", pd.Total, "") }}
-            {{ cf("Чистый долг", pd.NetDebt, "table-warning") }}
-            {{ cf("Капитализация", pd.Cap, "table-warning") }}
-            {{ cf("EV", pd.EV, "table-warning") }}
+            {{ cf("Cash and cash equivalents", pd.Cash, "") }}
+            {{ cf("Current liabilities", pd.CurrentLiabilities, "") }}
+            {{ cf("Non-current liabilities", pd.NonCurrentLiabilities, "") }}
+            {{ cf("Non-controlling shares", pd.NonControlling, "") }}
+            {{ cf("Equity", pd.Equity, "") }}
+            {{ cf("Total", pd.Total, "") }}
+            {{ cf("Net debt", pd.NetDebt, "table-warning") }}
+            {{ cf("Market capitalization", pd.Cap, "table-warning") }}
+            {{ cf("Enterprise value", pd.EV, "table-warning") }}
             {{ cf("Book value", pd.BookValue, "table-warning") }}
         </table>
 
@@ -157,40 +157,40 @@
 <div class="row">
 
     <div class="col-7">
-        <h5>Мультипликаторы, доходы и расходы</h5>
+        <h5>Ratios, P&L</h5>
         <table class="table table-sm table-bordered">
             <thead>
                 <th></th>
                 <th class="text-end">Ytd (adj)</th>
-                <th class="text-end">г/г, Ytd</th>
-                <th class="text-end">Отрасль, Ytd</th>
-                <th class="text-end">Апсайд, Ytd</th>
+                <th class="text-end">y/y, Ytd</th>
+                <th class="text-end">Industry, Ytd</th>
+                <th class="text-end">Upside, Ytd</th>
                 <th class="text-end">Ltm</th>
-                <th class="text-end">г/г, Ltm</th>
-                <th class="text-end">Отрасль, Ltm</th>
-                <th class="text-end">Апсайд, Ltm</th>
+                <th class="text-end">y/y, Ltm</th>
+                <th class="text-end">Industry, Ltm</th>
+                <th class="text-end">Upside, Ltm</th>
             </thead>
             {{ mult_pnl("EV/EBITDA", pd.EV_on_EBITDA) }}
             {{ mult_pnl("Debt/EBITDA", pd.Debt_on_EBITDA) }}
             {{ mult_pnl("P/E", pd.P_on_E) }}
             {{ mult_pnl("P/S", pd.P_on_S) }}
             {{ mult_pnl_percent("ROE", pd.ROE) }}
-            {{ mult_pnl_percent("Рентабельность OIBDA", pd.OIBDAMargin) }}
-            {{ mult_pnl_percent("Рентабельность EBITDA", pd.EBITDAMargin) }}
-            {{ mult_pnl_percent("Операционная рентабельность", pd.OperationalMargin) }}
-            {{ mult_pnl_percent("Чистая рентабельность", pd.NetMargin) }}
+            {{ mult_pnl_percent("OIBDA margin", pd.OIBDAMargin) }}
+            {{ mult_pnl_percent("EBITDA margin", pd.EBITDAMargin) }}
+            {{ mult_pnl_percent("Operating margin", pd.OperationalMargin) }}
+            {{ mult_pnl_percent("Net margin", pd.NetMargin) }}
         </table>
     </div>
 
     <div class="col-5">
-        <h5>Мультипликаторы, финансы</h5>
+        <h5>Ratios, CF</h5>
         <table class="table table-sm table-bordered">
             <thead>
                 <th></th>
-                <th class="text-end">Значение</th>
-                <th class="text-end">г/г</th>
-                <th class="text-end">Отрасль</th>
-                <th class="text-end">Апсайд</th>
+                <th class="text-end">Value</th>
+                <th class="text-end">y/y</th>
+                <th class="text-end">Industry</th>
+                <th class="text-end">Upside</th>
             </thead>
             {{ mult_cf("P/BV", pd.P_on_BV) }}
             {{ mult_cf("DSI", pd.DSI) }}

@@ -1,15 +1,15 @@
 {% extends "layout.html" %}
 
-{% block title %}Инвестиционные счета{% endblock %}
+{% block title %}Brokerage accounts{% endblock %}
 
 {% block content %}
 
 <div id="vueapp">
-    <h1> Инвестиционные счета</h1>
+    <h1>Brokerage accounts</h1>
     <div class="row">
         <div class="col-4">
             <div class="form-group.row">
-                <label class="col-sm-6 col-form-label" for="startSimulation">Стартовая дата расчета</label>
+                <label class="col-sm-6 col-form-label" for="startSimulation">Show data from</label>
                 <div class="col-sm-6">
                     <input class="form-control form-control-sm" type="date" v-model="startInvestAccountsFlow"
                         v-on:change="startInvestAccountsFlowChanged()" />
@@ -19,9 +19,9 @@
                 <thead>
                     <tr>
                         <th></th>
-                        <th>Наименование счета</th>
-                        <th class="text-end"> Оценка активов, руб.</th>
-                        <th class="text-end">Дата последней оценки</th>
+                        <th>Account name</th>
+                        <th class="text-end">Balance</th>
+                        <th class="text-end">Last evaluated at</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -66,9 +66,9 @@
                         this.startInvestAccountsFlow = "2017-01-01";
                     response = await fetch('/api/invest-accounts', { method: 'GET' });
                     if (response.ok) this.accList = await response.json();
-                    else alert("Проблема с получением списка брокерских счетов");
+                    else alert("Error when get list of accounts");
                 } else {
-                    alert("Проблема при получении стартовой даты расчета");
+                    alert("Error while get starting date");
                 }
             },
             async startInvestAccountsFlowChanged() {
@@ -79,7 +79,7 @@
                 if (response.ok) {
                     this.showContent();
                 }
-                else alert("Проблема при установке стартовой даты расчета");
+                else alert("Error while setting starting date");
             },
             async showContent() {
                 let idsArr = [];
@@ -94,7 +94,7 @@
                 if (response.ok) {
                     this.weekflow = await response.json();
                 }
-                else alert("Проблема с получением списка брокерских счетов");
+                else alert("Error while get accounts flow");
             }
         }
     };

@@ -7,7 +7,7 @@
 <div class="row">
     <div class="col-md-12">
         <form action="" method="get">
-            Сколько показывать тикеров:
+            Top size:
             <div class="form-check form-check-inline">
                 <input class="form-check-input" type="radio" name="hm" value="10" onchange="this.form.submit();" formaction="/?hm=10" 
                     {% if pd.HM==10 %} checked {% endif %} />
@@ -33,16 +33,16 @@
 </div>
 <div class="row">
     <div class="col-12 col-md-6 col-xl-3">
-        <h2>Дивидендная доходность</h2>
+        <h2>Dividend yieds</h2>
     </div>
     <div class="div col-12 col-md-6 col-xl-3">
-        <h2>Дивидендная стабильность</h2>
+        <h2>Dividend stability</h2>
     </div>
     <div class="div col-12 col-md-6 col-xl-3">
-        <h2>Падения месяца</h2>
+        <h2>Falls of month</h2>
     </div>
     <div class="div col-12 col-md-6 col-xl-3">
-        <h2>Рост месяца</h2>
+        <h2>Rises of month</h2>
     </div>
 </div>
 
@@ -53,7 +53,7 @@
         <table class="table table-sm">
             <thead>
                 <tr>
-                    <th>Тикер</th>
+                    <th>Ticker</th>
                     <th class="text-end">Yield-5Y</th>
                     <th class="text-end ">DSI</th>
                 </tr>
@@ -75,7 +75,7 @@
         <table class="table table-sm">
             <thead>
                 <tr>
-                    <th>Тикер</th>
+                    <th>Ticker</th>
                     <th class="text-end">Yield-5Y</th>
                     <th class="text-end ">DSI</th>
                 </tr>
@@ -97,8 +97,8 @@
         <table class="table table-sm">
             <thead>
                 <tr>
-                    <th>Тикер</th>
-                    <th class="text-end">Падение, %</th>
+                    <th>Ticker</th>
+                    <th class="text-end">Falling, %</th>
                 </tr>
             </thead>
             <tbody>
@@ -117,8 +117,8 @@
         <table class="table table-sm">
             <thead>
                 <tr>
-                    <th>Тикер</th>
-                    <th class="text-end">Рост, %</th>
+                    <th>Ticker</th>
+                    <th class="text-end">Rising, %</th>
                 </tr>
             </thead>
             <tbody>

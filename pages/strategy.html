@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block title %}Инвестиционная стратегия{% endblock %}
+{% block title %}Strategy{% endblock %}
 
 {% block content %}
 
@@ -10,24 +10,24 @@
 
         <div class="col-12 col-xl-6">
 
-            <button class="btn btn-primary btn-sm" v-on:click="putStrategy">Применить</button>
+            <button class="btn btn-primary btn-sm" v-on:click="putStrategy">Apply</button>
 
             <ul class="nav nav-tabs" id="pills-tab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="pills-main-tab" data-bs-toggle="pill" data-bs-target="#pills-main" type="button" role="tab"
-                        aria-controls="pills-main" aria-selected="true"> Основное </button>
+                        aria-controls="pills-main" aria-selected="true">Main</button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="pills-shares-tab" data-bs-toggle="pill" data-bs-target="#pills-shares" type="button" role="tab"
-                        aria-controls="pills-shares" aria-selected="false"> Фиксированные доли</button>
+                        aria-controls="pills-shares" aria-selected="false">Fixed shares</button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="pills-factors-tab" data-bs-toggle="pill" data-bs-target="#pills-factors" type="button" role="tab"
-                        aria-controls="pills-factors" aria-selected="false"> Факторы </button>
+                        aria-controls="pills-factors" aria-selected="false">Factors</button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="pills-filters-tab" data-bs-toggle="pill" data-bs-target="#pills-filters" type="button" role="tab"
-                        aria-controls="pills-filters" aria-selected="false"> Отборы </button>
+                        aria-controls="pills-filters" aria-selected="false">Filters</button>
                 </li>
             </ul>
 
@@ -37,7 +37,7 @@
                     <div id="strategyForm">
                         <small>
                             <div class="form-group form-group-sm row">
-                                <label for="descr" class="col-sm-3 col-form-label">Наименование</label>
+                                <label for="descr" class="col-sm-3 col-form-label">Name</label>
                                 <div class="col-sm-9">
                                     <input class="form-control input-sm form-control-sm" type="text" v-model="obj.Descr" />
                                 </div>
@@ -47,35 +47,35 @@
                                 <div class="col">
 
                                     <div class="form-group row">
-                                        <label for="maxtickers" class="col-sm-6 col-form-label"> Максимальное число инструментов </label>
+                                        <label for="maxtickers" class="col-sm-6 col-form-label">Max. tickers</label>
                                         <div class="col-sm-6">
                                             <input class="form-control form-control-sm" type='number' v-model='obj.MaxTickers' />
                                         </div>
                                     </div>
 
                                     <div class="form-group row">
-                                        <label for="startAmount" class="col-sm-6 col-form-label"> Стартовый баланс</label>
+                                        <label for="startAmount" class="col-sm-6 col-form-label">Start cash</label>
                                         <div class="col-sm-6">
                                             <input class="form-control form-control-sm" type='number' v-model='obj.StartAmount' />
                                         </div>
                                     </div>
 
                                     <div class="form-group row">
-                                        <label for="weekRefillAmount" class="col-sm-6 col-form-label"> Недельное пополнение </label>
+                                        <label for="weekRefillAmount" class="col-sm-6 col-form-label">Weekly top-up</label>
                                         <div class="col-sm-6">
                                             <input class="form-control form-control-sm" type='number' v-model='obj.WeekRefillAmount' />
                                         </div>
                                     </div>
 
                                     <div class="form-group row">
-                                        <label for="startSimulation" class="col-sm-6 col-form-label"> Стартовая дата симуляции </label>
+                                        <label for="startSimulation" class="col-sm-6 col-form-label">Start simulation date</label>
                                         <div class="col-sm-6">
                                             <input class="form-control form-control-sm" type='date' v-model='obj.StartSimulation' />
                                         </div>
                                     </div>
 
                                     <div class="'form-group row">
-                                        <label for="baseIndex" class="col-sm-6 col-form-label"> Базовый индекс для сравнения </label>
+                                        <label for="baseIndex" class="col-sm-6 col-form-label">Base for calc alpha</label>
                                         <div class="col-sm-6">
                                             <select class="form-select form-control-sm" v-model='obj.BaseIndex'>
                                                 <option></option>
@@ -87,7 +87,7 @@
                                     </div>
 
                                     <div class="form-group row">
-                                        <label for="SameEmitent" class="col-sm-6 col-form-label"> Разные тикеры одного эмитента </label>
+                                        <label for="SameEmitent" class="col-sm-6 col-form-label">Same emitent tickers</label>
                                         <div class="col-sm-6">
                                             <select class="form-select form-control-sm" v-model='obj.SameEmitent'>
                                                 <option v-for="item in renderInfo.SameEmitentPolicies" v-bind:value="item.Id">${item.Descr}</option>
@@ -99,7 +99,7 @@
                                 <div class="col">
                                     <div class="form-group row">
                                         <label for="allowLossWhenSell" class="col-sm-6 col-form-check-label">
-                                            Разрешать закрывать позицию в убыток
+                                            Allow loss when sell
                                         </label>
                                         <div class="col-sm-6">
                                             <input class="form-check-input form-control-sm" type="checkbox" v-model='obj.AllowLossWhenSell' />
@@ -107,7 +107,7 @@
                                     </div>
 
                                     <div class="form-group row">
-                                        <label for="buyOnlyLowPrice" class="col-sm-6 col-form-label"> Докупать только на просадках </label>
+                                        <label for="buyOnlyLowPrice" class="col-sm-6 col-form-label">Buy only lower price</label>
                                         <div class="col-sm-6">
                                             <input class="form-check-input form-control-sm" type="checkbox" v-model='obj.BuyOnlyLowPrice' />
                                         </div>
@@ -115,7 +115,7 @@
 
                                     <div class="form-group row">
                                         <label for="AllowSellToFit" class="col-sm-6 col-form-label">
-                                            Частичная продажа позиции для выравнивания долей
+                                            Allow partial sell to fit
                                         </label>
                                         <div class="col-sm-6">
                                             <input class="form-check-input form-control-sm" type="checkbox" v-model='obj.AllowSellToFit' />
@@ -147,17 +147,17 @@
 
         <div class="col-12 col-xl-6" v-if="results != null && results.ActualPortfolio != null">
 
-            <h2>Актуальный состав портфеля на сегодня</h2>
+            <h2>Today portfolio</h2>
 
-            <p>Денежные средства: ${ $prnCurrency(results.ActualPortfolio.Cash) } </p>
+            <p>Cash: ${ $prnCurrency(results.ActualPortfolio.Cash) } </p>
             <table class="table table-sm">
                 <thead>
                     <tr>
                         <th>Тикер</th>
-                        <th class="text-end">Доля</th>
-                        <th class="text-end">Сумма</th>
-                        <th class="text-end">Лоты</th>
-                        <th v-for="f in obj.edges.Factors" class="text-end">Фактор №${ f.LineNum }<br />${ factorDescr(f) }</th>
+                        <th class="text-end">%</th>
+                        <th class="text-end">Qty</th>
+                        <th class="text-end">Lots</th>
+                        <th v-for="f in obj.edges.Factors" class="text-end">Factor ${ f.LineNum }<br />${ factorDescr(f) }</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -185,13 +185,13 @@
     <div class='row' v-if='results.IndustryTradeResults!=null'>
         <div class="row">
             <div class="col-12 col-xl-5">
-                <h2>Рост стоимости по отраслям: ${ $prnCurrency(results.ProfitTotal) }</h2>
+                <h2>Profit by industries: ${ $prnCurrency(results.ProfitTotal) }</h2>
                 <table class="table table-sm">
                     <thead>
                         <tr>
-                            <th>Отрасль</th>
-                            <th class="text-end">Результат</th>
-                            <th class="text-end">Сделок</th>
+                            <th>Industry</th>
+                            <th class="text-end">Profit</th>
+                            <th class="text-end">Trades</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -205,13 +205,13 @@
 
             </div>
             <div class="col-12 col-xl-7">
-                <h2>Дивиденды по отраслям: ${ $prnCurrency(results.DivsTotal) } </h2>
+                <h2>Dividends by industries: ${ $prnCurrency(results.DivsTotal) } </h2>
                 <table class="table table-sm">
                     <thead>
                         <tr>
-                            <th>Отрасль</th>
+                            <th>Industry</th>
                             <th class="text-end" v-for='y in results.YearsInResult'>${y}</th>
-                            <th class="text-end">Всего</th>
+                            <th class="text-end">Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -225,7 +225,7 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td>Всего</td>
+                            <td>Total</td>
                             <td class="text-end" v-for='y in results.YearsInResult'>
                                 ${ $prnCurrency(sumDivByYearForIndustry(y, null)) }
                             </td>
@@ -241,13 +241,13 @@
     <div class=row v-if='!results!=null && results.TickerTradeResults != null'>
 
         <div class="col-12 col-xl-5">
-            <h2>Рост стоимости: ${ $prnCurrency(results.ProfitTotal) }</h2>
+            <h2>Profit: ${ $prnCurrency(results.ProfitTotal) }</h2>
             <table class="table table-sm">
                 <thead>
                     <tr>
-                        <th>Тикер</th>
-                        <th class="text-end">Результат</th>
-                        <th class="text-end">Сделок</th>
+                        <th>Ticker</th>
+                        <th class="text-end">Profit</th>
+                        <th class="text-end">Trades</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -261,13 +261,13 @@
         </div>
 
         <div class="col-12 col-xl-7">
-            <h2>Дивиденды: ${ $prnCurrency(results.DivsTotal) }</h2>
+            <h2>Dividends: ${ $prnCurrency(results.DivsTotal) }</h2>
             <table class="table table-sm">
                 <thead>
                     <tr>
-                        <th>Тикер</th>
+                        <th>Ticker</th>
                         <th class="text-end" v-for='y in results.YearsInResult'>${y}</th>
-                        <th class="text-end">Всего</th>
+                        <th class="text-end">Total</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -281,7 +281,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td>Всего</td>
+                        <td>Total</td>
                         <td class="text-end" v-for='y in results.YearsInResult'>
                             ${ $prnCurrency(sumDivByYearForTickerAll(y)) }</td>
                         <td class="text-end">${ $prnCurrency(results.DivsTotal) }</td>
@@ -293,7 +293,7 @@
 
     <div class="row" v-if='selectedYear != null'>
         <div class="col">
-            <h2>Результаты симуляции</h2>
+            <h2>Simulation results</h2>
 
             <div>
                 <button v-for='y in results.YearsInResult' class="btn btn-xs"
@@ -305,15 +305,15 @@
                 <table class="table table-sm">
                     <thead>
                         <tr>
-                            <th>Дата</th>
-                            <th class="text-end">Пополнение</th>
-                            <th>Сделки</th>
-                            <th class="text-end">Рубли</th>
-                            <th class="text-end">Портфель</th>
-                            <th class="text-end">Вложенное н.</th>
-                            <th class="text-end">Дивиденды н.</th>
-                            <th class="text-end">Результат н.</th>
-                            <th class="text-end">Доходность н.</th>
+                            <th>Date</th>
+                            <th class="text-end">Top-up</th>
+                            <th>Trades</th>
+                            <th class="text-end">Cash</th>
+                            <th class="text-end">Balance</th>
+                            <th class="text-end">Invested  accum.</th>
+                            <th class="text-end">Dividends accum.</th>
+                            <th class="text-end">Result accum.</th>
+                            <th class="text-end">Yield accum.</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -324,11 +324,10 @@
                                 <div v-for='deal in item.Deals'>
                                     <span v-if='deal.Kind==100'
                                         v-bind:class="{'text-danger': deal.InvestResult<0, 'text-success': deal.InvestResult>=0 }">
-                                        продажа ${deal.TickerId} ${deal.Lots} лот., ${ $prnCurrency(deal.InvestResult) }
-                                        р.
+                                        sell ${deal.TickerId} ${deal.Lots} lot(s), ${ $prnCurrency(deal.InvestResult) }
                                     </span>
                                     <span v-if='deal.Kind==200'>
-                                        покупка ${deal.TickerId} ${deal.Lots} лот.
+                                        buy ${deal.TickerId} ${deal.Lots} lot(s)
                                     </span>
                                 </div>
                             </td>
@@ -405,13 +404,13 @@
 
                 option = {
                     legend: {
-                        data: ['Капитал', 'Дивиденды', 'Результат'],
+                        data: ['Equity', 'Dividends', 'Result'],
                         left: 10
                     },
                     tooltip: {},
                     xAxis: {
                         data: dates,
-                        name: 'Недели',
+                        name: 'Weeks',
                         axisLine: { onZero: true },
                         splitLine: { show: false },
                         splitArea: { show: false }
@@ -424,19 +423,19 @@
                     },
                     series: [
                         {
-                            name: 'Капитал',
+                            name: 'Equity',
                             type: 'bar',
                             stack: 'one',
                             data: equity
                         },
                         {
-                            name: 'Дивиденды',
+                            name: 'Dividends',
                             type: 'bar',
                             stack: 'one',
                             data: alldivs
                         },
                         {
-                            name: 'Результат',
+                            name: 'Result',
                             type: 'bar',
                             stack: 'one',
                             data: results
@@ -453,7 +452,7 @@
 
                 option = {
                     legend: {
-                        data: ['Стратегия', 'Базовый инструмент'],
+                        data: ['Strategy', 'Base'],
                         left: 10
                     },
                     xAxis: {
@@ -464,14 +463,14 @@
                     grid: { left: 100 },
                     series: [
                         {
-                            name: 'Стратегия',
+                            name: 'Strategy',
                             data: strategyLevels,
                             type: 'line',
                             smooth: true,
                             symbol: 'none'
                         },
                         {
-                            name: 'Базовый инструмент',
+                            name: 'Base',
                             data: baseLevels,
                             type: 'line',
                             smooth: true,
@@ -566,7 +565,7 @@
                 if (await res.ok) {
                     this.renderInfo = await res.json();
                 } else {
-                    alert("Проблема с получением данных рендеринга");
+                    alert("Error when get rendering info");
                     return;
                 };
 
@@ -584,7 +583,7 @@
                         this.obj.edges.FixedTickers = [];
 
                 }
-                else alert("Проблема с получением данных стратегии");
+                else alert("Error when get strategy data");
 
             },
 
@@ -596,7 +595,7 @@
                 );
 
                 if (shares > 100) {
-                    alert("Сумма всех фиксированных долей не может превышать 100")
+                    alert("Total of all fixed shars cannot exceeds 100")
                     return false;
                 }
                 return true;
@@ -623,7 +622,7 @@
                 if (await res.ok)
                     this.getResults();
                 else
-                    alert("Проблема с записью данных стратегии");
+                    alert("Error when save strategy");
             },
 
             async getResults() {
@@ -633,7 +632,7 @@
                     if (this.results.YearsInResult.length > 0)
                         this.selectedYear = this.results.YearsInResult[this.results.YearsInResult.length - 1];
                 }
-                else alert('Проблемы с чтениеv результатов симуляции');
+                else alert('Error when read simulation data');
             },
 
             setSelectedYear(y) { this.selectedYear = y; }

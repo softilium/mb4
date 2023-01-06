@@ -1,22 +1,22 @@
 {% extends "layout.html" %}
 
-{% block title %}Инвестиционный счет{% endblock %}
+{% block title %}Brokerage account{% endblock %}
 
 {% block content %}
 
-<h1>Инвестиционный счет</h1>
+<h1>Brokerage account</h1>
 
 <div id="vueapp">
     <div class="row">
         <div class="form-group row">
             <div class="col-sm-2">
-                <label class="col-form-label" for="descr">Наименование</label>
+                <label class="col-form-label" for="descr">Account name</label>
             </div>
             <div class="col-sm-4">
                 <input class="form-control form-control-sm" type="text" v-model="obj.Descr" />
             </div>
             <div class="col-sm-2">
-                <button class="btn btn-primary btn-sm" v-on:click="setDescr()">Сохранить</button>
+                <button class="btn btn-primary btn-sm" v-on:click="setDescr()">Apply</button>
             </div>
         </div>
     </div>
@@ -25,12 +25,12 @@
     </div>
     <div class="row">
         <div class="col-3">
-            <h3>Оценки портфеля</h3>
+            <h3>Balances</h3>
             <table class="table table-hover table-responsive table-sm">
                 <thead>
                     <tr>
-                        <th class="text-end">Дата</th>
-                        <th class="text-end">Руб.</th>
+                        <th class="text-end">Date</th>
+                        <th class="text-end">Qty</th>
                         <th>
                             <button class="btn" data-bs-toggle="modal" data-bs-target="#valModal"
                                 v-on:click="setNewSelectedVal()">
@@ -59,19 +59,19 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="valModalLabel">Редактор оценки</h5>
+                            <h5 class="modal-title" id="valModalLabel">Edit</h5>
                             <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <div class="mb-3.row">
-                                <label class="col-sm-3 col-form-label">Дата оценки</label>
+                                <label class="col-sm-3 col-form-label">Date</label>
                                 <div class="col-sm-9">
                                     <input class="form-control form-control-sm" type="date"
                                         v-model="selectedVal.RecDate" />
                                 </div>
                             </div>
                             <div class="mb-3.row">
-                                <label class="col-sm-3 col-form-label">Оценка, руб.</label>
+                                <label class="col-sm-3 col-form-label">Balance</label>
                                 <div class="col-sm-9">
                                     <input class="form-control form-control-sm" type="number"
                                         v-model="selectedVal.Value" />
@@ -80,19 +80,19 @@
                         </div>
                         <div class="modal-footer">
                             <button class="btn btn-primary" type="button" v-on:click="saveSelectedVal()"
-                                data-bs-dismiss="modal">Сохранить и закрыть</button>
+                                data-bs-dismiss="modal">Save</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-3">
-            <h3>Ввод-вывод</h3>
+            <h3>Cash flow</h3>
             <table class="table table-hover table-responsive .table-sm">
                 <thead>
                     <tr>
-                        <th class="text-end">Дата</th>
-                        <th class="text-end">Руб.</th>
+                        <th class="text-end">Date</th>
+                        <th class="text-end">Qty</th>
                         <th>
                             <button class="btn" data-bs-toggle="modal" data-bs-target="#cfModal"
                                 v-on:click="setNewSelectedCF()">
@@ -120,12 +120,12 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="cfModalLabel">Редактор движения ДС</h5>
+                            <h5 class="modal-title" id="cfModalLabel">Edit</h5>
                             <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <div class="mb-3.row">
-                                <label class="col-sm-3 col-form-label">Дата движения</label>
+                                <label class="col-sm-3 col-form-label">Date</label>
                                 <div class="col-sm-9">
                                     <input class="form-control form-control-sm" type="date"
                                         v-model="selectedCF.RecDate" />
@@ -138,13 +138,13 @@
                                         v-model="selectedCF.Qty" />
                                 </div>
                                 <div class="form-text">
-                                    Положительные значения - пополнения, отрицательные - вывод средств.
+                                    Positives mean cash in, negatives mean cash out
                                 </div>
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button class="btn btn-primary" type="button" v-on:click="saveSelectedCF()"
-                                data-bs-dismiss="modal">Сохранить и закрыть</button>
+                                data-bs-dismiss="modal">Save</button>
                         </div>
                     </div>
                 </div>
@@ -218,7 +218,7 @@
                     res = await fetch(`?id=${this.selectedVal.id}&mode=val`, { method: 'PUT', body: JSON.stringify(this.selectedVal) });
                 }
                 if (!res.ok) {
-                    alert(`Ошибка при сохранении значения: ${res.text()}`);
+                    alert(`Error while save data: ${res.text()}`);
                     return;
                 }
 
@@ -235,7 +235,7 @@
                     );
                 }
                 if (!res.ok) {
-                    alert(`Ошибка при сохранении значения: ${res.text()}`);
+                    alert(`Error while save value: ${res.text()}`);
                     return;
                 }
 
@@ -244,36 +244,36 @@
             async getObj() {
                 const response = await fetch(`/api/invest-accounts?id=${window.accid}`, { method: 'GET' });
                 if (!response.ok) {
-                    alert("Проблема с получением брокерского счета");
+                    alert("Error while get account");
                     return;
                 }
                 this.obj = await response.json();
 
                 const r2 = await fetch(`/api/invest-accounts?mode=weekflow&ids=${window.accid}`, { method: 'GET' });
                 if (!r2.ok) {
-                    alert("Проблема с получением аналитических данных по брокерскому счету");
+                    alert("Error while get flow");
                     return;
                 }
                 this.weekflow = await r2.json();
 
             },
             async deleteValuation(id) {
-                if (!confirm("Удалить указанную строку оценки?")) return;
+                if (!confirm("Remove selected valuation?")) return;
 
                 let res = await fetch(`?id=${id}&mode=val`, { method: 'DELETE' });
                 if (!res.ok) {
-                    alert("Ошибка удаления строки оценки");
+                    alert("Error while removing valuation row");
                     return;
                 }
                 await this.getObj();
 
             },
             async deleteCF(id) {
-                if (!confirm("Удалить указанную строку движения ДС?")) return;
+                if (!confirm("Remove selected cf row?")) return;
 
                 let res = await fetch(`?id=${id}&mode=cf`, { method: 'DELETE' });
                 if (!res.ok) {
-                    alert("Ошибка удаления строки движения ДС");
+                    alert("Error removing cf row");
                     return;
                 }
                 await this.getObj();
@@ -282,7 +282,7 @@
             async setDescr() {
                 let response = await fetch(`/api/invest-accounts?id=${window.accid}&newdescr=${this.obj.Descr}`, { method: 'PUT' });
                 if (!response.ok) {
-                    alert("Проблема с установкой наименования брокерского счета");
+                    alert("Error while set name for account");
                     return;
                 }
             }

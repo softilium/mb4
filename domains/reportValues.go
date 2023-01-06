@@ -56,48 +56,48 @@ func init() {
 	ReportValues.init([]DomainItem[ReportValue]{
 
 		// Pnl Src
-		{Id: RK_Revenue, Descr: "Выручка"},
-		{Id: RK_Amortization, Descr: "Амортизация"},
-		{Id: RK_OperatingIncome, Descr: "Операционная прибыль"},
-		{Id: RK_InterestIncome, Descr: "Финансовые доходы"},
-		{Id: RK_InterestExpenses, Descr: "Финансовые расходы"},
-		{Id: RK_IncomeTax, Descr: "Налог на прибыль"},
-		{Id: RK_NetIncome, Descr: "Чистая прибыль"},
+		{Id: RK_Revenue, Descr: "Revenue"},
+		{Id: RK_Amortization, Descr: "Amortization"},
+		{Id: RK_OperatingIncome, Descr: "Operational income"},
+		{Id: RK_InterestIncome, Descr: "Financial incoming"},
+		{Id: RK_InterestExpenses, Descr: "Financial expences"},
+		{Id: RK_IncomeTax, Descr: "Income tax"},
+		{Id: RK_NetIncome, Descr: "Net income"},
 
 		// Pnl calculated
 
 		{Id: RK_OIBDA, Descr: "OIBDA"},
 		{Id: RK_EBITDA, Descr: "EBITDA"},
-		{Id: RK_OIBDAMargin, Descr: "Рентабельность OIBDA"},
-		{Id: RK_EBITDAMargin, Descr: "Рентабельность EBITDA"},
-		{Id: RK_OperationalMargin, Descr: "Рентабельность операционная"},
-		{Id: RK_NetMargin, Descr: "Рентабельность чистая"},
+		{Id: RK_OIBDAMargin, Descr: "OIBDA margin"},
+		{Id: RK_EBITDAMargin, Descr: "EBITDA margin"},
+		{Id: RK_OperationalMargin, Descr: "Operational margin"},
+		{Id: RK_NetMargin, Descr: "Net margin"},
 		{Id: RK_Debt_on_EBITDA, Descr: "Debt/EBITDA"},
 		{Id: RK_EV_on_EBITDA, Descr: "EV/EBITDA"},
 		{Id: RK_ROE, Descr: "ROE"},
 
 		// Cf src
-		{Id: RK_Cash, Descr: "Денежные средства"},
-		{Id: RK_NonCurrentLiabilities, Descr: "Долгосрочные обязательства"},
-		{Id: RK_CurrentLiabilities, Descr: "Краткосрочные обязательства"},
-		{Id: RK_NonControlling, Descr: "Неконтроллируемые доли в уставном капитале"},
-		{Id: RK_Equity, Descr: "Капитал"},
-		{Id: RK_Total, Descr: "Активы и обязательства"},
+		{Id: RK_Cash, Descr: "Cash and equivalents"},
+		{Id: RK_NonCurrentLiabilities, Descr: "Non-current liabilities"},
+		{Id: RK_CurrentLiabilities, Descr: "Current liabilities"},
+		{Id: RK_NonControlling, Descr: "Non-controlling shares"},
+		{Id: RK_Equity, Descr: "Equity"},
+		{Id: RK_Total, Descr: "Total"},
 
 		// Cf calculated
-		{Id: RK_NetDebt, Descr: "Чистый долг"},
+		{Id: RK_NetDebt, Descr: "Net debt"},
 		{Id: RK_EV, Descr: "EV"},
 
 		//R3
-		{Id: RK_BookValue, Descr: "Балансовая стоимость"},
+		{Id: RK_BookValue, Descr: "Book value"},
 		{Id: RK_P_on_E, Descr: "P/E"},
 		{Id: RK_P_on_BV, Descr: "P/BV"},
-		{Id: RK_Cap, Descr: "Капитализация"},
+		{Id: RK_Cap, Descr: "Market cap"},
 		{Id: RK_P_on_S, Descr: "P/S"},
-		{Id: RK_DivSum5Y, Descr: "Сумма дивидендов за 5 лет"},
-		{Id: RK_DivSum3Y, Descr: "Сумма дивидендов за 3 года"},
-		{Id: RK_DivYield5Y, Descr: "Дивидендная доходность за 5 лет"},
-		{Id: RK_DivYield3Y, Descr: "Дивидендная доходность за 3 года"},
+		{Id: RK_DivSum5Y, Descr: "Dividends for 5y"},
+		{Id: RK_DivSum3Y, Descr: "Dividends for 3y"},
+		{Id: RK_DivYield5Y, Descr: "Dividend yield for 5y"},
+		{Id: RK_DivYield3Y, Descr: "Vididend yield for 3y"},
 		{Id: RK_DSI, Descr: "DSI"},
 	})
 

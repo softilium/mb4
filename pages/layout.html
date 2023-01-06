@@ -57,9 +57,9 @@
                 <a class="navbar-brand" href="/">MoneyBox</a>
                 {% if pd.Authenticated %}
                 <span>&nbsp;</span>
-                <a class="navbar-text" href="/strategies">Стратегии</a>
+                <a class="navbar-text" href="/strategies">Strategies</a>
                 <span>&nbsp;</span>
-                <a class="navbar-text" href="/invest-accounts">Брокерские счета</a>
+                <a class="navbar-text" href="/invest-accounts">Brokerage accounts</a>
                 {% endif %}
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
                     aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,7 +70,7 @@
                     {% if pd.Authenticated %}
                     <a href="/profile">{{ pd.UserName }}</a>
                     {% else %}
-                    <a href="/login">Войти</a>
+                    <a href="/login">Logout</a>
                     {% endif %}
                 </div>
             </div>
@@ -84,7 +84,7 @@
     <br></br>
     <footer class="border-top footer text-muted">
         <div class="container">
-            <p>&copy; 2021,2022 - MoneyBox</p>
+            <p>&copy; 2021,2023 - MoneyBox</p>
         </div>
     </footer>
 

@@ -14,10 +14,10 @@ var SameEmitentPolicies Domain[SameEmitentPolicy] = Domain[SameEmitentPolicy]{}
 func init() {
 
 	SameEmitentPolicies.init([]DomainItem[SameEmitentPolicy]{
-		{Id: SameEmitentPolicy_Allow, Descr: "допускать"},
-		{Id: SameEmitentPolicy_PreferPrefs, Descr: "предпочитать привилегированные"},
-		{Id: SameEmitentPolicy_PreferOrd, Descr: "предпочитать обычные"},
-		{Id: SameEmitentPolicy_AllowOnlyOne, Descr: "только один тикер"},
+		{Id: SameEmitentPolicy_Allow, Descr: "allow both"},
+		{Id: SameEmitentPolicy_PreferPrefs, Descr: "choose preferred"},
+		{Id: SameEmitentPolicy_PreferOrd, Descr: "choose common"},
+		{Id: SameEmitentPolicy_AllowOnlyOne, Descr: "choose best"},
 	})
 
 }

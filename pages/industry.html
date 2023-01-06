@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block title %}Отрасль {% endblock %}
+{% block title %}Industry {% endblock %}
 
 {% block content %}
 
@@ -11,10 +11,10 @@
         <table class="table table-sm">
             <thead>
                 <th>Тикер</th>
-                <th class="text-end">Капитализация, млн.руб.</th>
-                <th class="text-end">Стоимость компании, EV, млн.руб.</th>
-                <th class="text-end">EBITDA, млн.руб.</th>
-                <th class="text-end">EBITDA, рост г/г, %</th>
+                <th class="text-end">Market cap, mln</th>
+                <th class="text-end">Enterprise value, EV, mln</th>
+                <th class="text-end">EBITDA, mln</th>
+                <th class="text-end">EBITDA, y/y, %</th>
             </thead>
             <tbody>
                 {% for item in pd.Emitents %}

@@ -8,36 +8,36 @@
     {{ pd.TRI.Cell.Quote.Edges.Ticker.Descr }}
 </h1>
 
-<h6>Размер лота : {{ pd.TRI.Cell.Emission.LotSize }}</h6>
-<h6>Отрасль: <a href="/industry?id={{ pd.TRI.Cell.Industry.ID}}">{{ pd.TRI.Cell.Industry.Descr }}</a> </h6>
+<h6>Lot size : {{ pd.TRI.Cell.Emission.LotSize }}</h6>
+<h6>Industry: <a href="/industry?id={{ pd.TRI.Cell.Industry.ID}}">{{ pd.TRI.Cell.Industry.Descr }}</a> </h6>
 
 <div id="vueapp">
     <div ref="candlesref" style="height:600px;"></div>
     <div class="row">
         <div class="col-12 col-xl-4">
-            <h4>Доходы и расходы</h4>
-            <h6>в млн.руб.</h6>
+            <h4>Profit & lost</h4>
+            <h6>mln.</h6>
             <div ref="pnlView" style="height:400px;"></div>
         </div>
         <div class="col-12 col-xl-4">
-            <h4>Финансы</h4>
-            <h6>h6 в млн.руб.</h6>
+            <h4>Finances</h4>
+            <h6>mln.</h6>
             <div ref="cfView" style="height:400px;"></div>
         </div>
         <div class="col-12 col-xl-4">
-            <h4>Аналитика</h4>
+            <h4>Ratios</h4>
             <div ref="multView" style="height:400px;"></div>
         </div>
     </div>
     <div class="row">
         <div class="col-12 col-xl-4">
-            <h4>Дивиденды</h4>
+            <h4>Dividends</h4>
             <table class="table table-hover table-responsive table-sm">
                 <thead>
-                    <th>Закрытие реестра</th>
-                    <th>Период</th>
-                    <th class="text-end">Сумма</th>
-                    <th class="text-end">Доходность, %</th>
+                    <th>Close date</th>
+                    <th>Period</th>
+                    <th class="text-end">Qty</th>
+                    <th class="text-end">Yield, %</th>
                 </thead>
                 <tbody v-for="item in dpo">
                     <tr>
@@ -50,7 +50,7 @@
             </table>
         </div>
         <div class="col-12 col-xl-4">
-            <h4>Отчеты</h4>
+            <h4>Reports</h4>
             <table class="table table-hover table-responsive table-sm">
                 <thead>
                     <th>Q1</th>
@@ -71,7 +71,6 @@
 </div>
 
 <script type="text/javascript">
-    //window.tickerid = "{{ pd.TRI.Cell.Quote.Edges.Ticker.ID }}";
     window.tickerid = "{{ pd.TRI.Cell.TickerId() }}";
     window.tickerDescr = "{{ pd.TRI.Cell.Quote.Edges.Ticker.Descr }}";
 
@@ -270,7 +269,7 @@
 
                         },
                         {
-                            name: 'Объем',
+                            name: 'Volume',
                             type: 'bar',
                             xAxisIndex: 1,
                             yAxisIndex: 1,
@@ -309,49 +308,49 @@
                     ],
                     series: [
                         {
-                            name: 'Выручка',
+                            name: 'Revenue',
                             type: 'line',
-                            stack: 'Доходы',
+                            stack: 'Profit',
                             smooth: true,
                             emphasis: { focus: 'series' }, areaStyle: {}, symbol: 'none',
                             data: revenues
                         },
                         {
-                            name: 'Финансовые доходы',
+                            name: 'Interest income',
                             type: 'line',
-                            stack: 'Доходы',
+                            stack: 'Profit',
                             smooth: true,
                             emphasis: { focus: 'series' }, areaStyle: {}, symbol: 'none',
                             data: interestIncomes
                         },
                         {
-                            name: 'Амортизация',
+                            name: 'Amortization',
                             type: 'line',
-                            stack: 'Расходы',
+                            stack: 'Expences',
                             smooth: true,
                             emphasis: { focus: 'series' }, areaStyle: {}, symbol: 'none',
                             data: ammortizations
                         },
                         {
-                            name: 'Финансовые расходы',
+                            name: 'Interest expences',
                             type: 'line',
-                            stack: 'Расходы',
+                            stack: 'Expences',
                             smooth: true,
                             emphasis: { focus: 'series' }, areaStyle: {}, symbol: 'none',
                             data: interestExpenses
                         },
                         {
-                            name: 'Налог с прибыли',
+                            name: 'Income tax',
                             type: 'line',
-                            stack: 'Расходы',
+                            stack: 'Expences',
                             smooth: true,
                             emphasis: { focus: 'series' }, areaStyle: {}, symbol: 'none',
                             data: taxes
                         },
                         {
-                            name: 'Прибыль',
+                            name: 'Profit',
                             type: 'bar',
-                            stack: 'Прибыль',
+                            stack: 'Profit',
                             smooth: true,
                             emphasis: { focus: 'series' }, symbol: 'none',
                             data: incomes
@@ -396,7 +395,7 @@
                     ],
                     series: [
                         {
-                            name: 'Денежные средства',
+                            name: 'Cash',
                             type: 'line',
                             emphasis: { focus: 'series' },
                             symbol: 'none',
@@ -404,7 +403,7 @@
                             data: cash
                         },
                         {
-                            name: 'Акционерный капитал',
+                            name: 'Equity',
                             type: 'line',
                             stack: 'Total',
                             emphasis: { focus: 'series' },
@@ -414,7 +413,7 @@
                             data: equity
                         },
                         {
-                            name: 'Обязательства',
+                            name: 'Liabilities',
                             type: 'line',
                             stack: 'Total',
                             emphasis: { focus: 'series' },
@@ -424,17 +423,15 @@
                             data: debt
                         },
                         {
-                            name: 'Балансовая стоимость',
+                            name: 'Book value',
                             type: 'line',
-                            //stack: 'Total',
                             emphasis: { focus: 'series' },
-                            //areaStyle: {},
                             symbol: 'none',
                             smooth: true,
                             data: bookValue
                         },
                         {
-                            name: 'Капитализация',
+                            name: 'Market cap',
                             type: 'line',
                             emphasis: { focus: 'series' },
                             symbol: 'none',
@@ -473,7 +470,7 @@
                     ],
                     series: [
                         {
-                            name: 'Чистая рентабельность',
+                            name: 'Net margin',
                             type: 'line',
                             symbol: 'none',
                             smooth: true,
@@ -482,7 +479,7 @@
                             itemStyle: { color: '#5470c6' }
                         },
                         {
-                            name: 'Чистая рентабельность (отрасль)',
+                            name: 'Net margin (industry)',
                             type: 'line',
                             symbol: 'none',
                             smooth: true,
@@ -492,7 +489,7 @@
 
                         },
                         {
-                            name: 'Рентабельность EBITDA',
+                            name: 'EBITDA margin',
                             type: 'line',
                             symbol: 'none',
                             smooth: true,
@@ -501,7 +498,7 @@
                             itemStyle: { color: '#91cc75' }
                         },
                         {
-                            name: 'Рентабельность EBITDA (отрасль)',
+                            name: 'EBITDA margin (industry)',
                             type: 'line',
                             symbol: 'none',
                             smooth: true,
@@ -531,7 +528,7 @@
                         []
                     );
                 } else {
-                    alert("Проблема при получении данных Candles");
+                    alert("Error when get Candles");
                     return;
                 }
 
@@ -550,7 +547,7 @@
                         this.pnl.Incomes
                     );
                 } else {
-                    alert("Проблема при получении данных PNL");
+                    alert("Error when get P&L");
                     return;
                 }
 
@@ -567,7 +564,7 @@
                         this.cf.BookValue
                     );
                 } else {
-                    alert("Проблема при получении данных CF");
+                    alert("Error when get CF");
                     return;
                 }
 
@@ -577,21 +574,21 @@
                     this.mult = await res.json();
                     this.multView(this.$refs.multView);
                 } else {
-                    alert("Проблема при получении данных MULT");
+                    alert("Error when get MULT");
                     return;
                 }
 
                 res = await fetch(`/ticker?id=${window.tickerid}&mode=divpayouts`, { method: "GET" });
                 if (res.ok) this.dpo = await res.json();
                 else {
-                    alert("Проблема при получении данных дивидендов");
+                    alert("Error when get dividends");
                     return;
                 }
 
                 res = await fetch(`/ticker?id=${window.tickerid}&mode=reps`, { method: "GET" });
                 if (res.ok) this.reps = await res.json();
                 else {
-                    alert("Проблема при получении данных отчетов");
+                    alert("Error when get reports");
                     return;
                 }
 
@@ -604,6 +601,5 @@
     app.mount('#vueapp')
 
 </script>
-
 
 {% endblock %}

@@ -1,14 +1,14 @@
 {% extends "layout.html" %}
 
-{% block title %}Профить пользователя{% endblock %}
+{% block title %}User profile {% endblock %}
 
 {% block content %}
 
-<h1>Профиль пользователя</h1>
+<h1>User profile</h1>
 <div id="vueapp">
     <div class="row">
         <div class="col">
-            <button class="btn btn-primary" v-on:click.prevent="logout()">Выйти</button>
+            <button class="btn btn-primary" v-on:click.prevent="logout()">Logout</button>
         </div>
     </div>
 </div>

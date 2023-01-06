@@ -4,7 +4,7 @@
         <thead>
             <tr>
                 <td></td>
-                <td>Отбор</td>
+                <td>Filter</td>
                 <td class="text-end"><button class="btn" v-on:click='addFilter()'><i class="bi bi-file-earmark-plus"></i></button></td>
             </tr>
         </thead>
@@ -23,25 +23,25 @@
         </tbody>
     </table>
 
-    <!-- редактор отбора стратегии -->
+    <!-- edit filter -->
     <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="filterModalLabel">Редактирование отбора</h5>
+                    <h5 class="modal-title" id="filterModalLabel">Edit strategy filter</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
 
                     <div class="mb-3 row">
-                        <label class="col-sm-3 col-form-label">Используется</label>
+                        <label class="col-sm-3 col-form-label">Use</label>
                         <div class="col-sm-9">
                             <input class="form-check-input form-control-sm" type="checkbox" v-model='selectedFilter.IsUsed' />
                         </div>
                     </div>
 
                     <div class="mb-3 row">
-                        <label class="col-sm-3 col-form-label">Что отбирать</label>
+                        <label class="col-sm-3 col-form-label">Source</label>
                         <div class="col-sm-9">
                             <select class="form-select form-control-sm" v-model='selectedFilter.LeftValueKind'>
                                 <option></option>
@@ -53,7 +53,7 @@
                     </div>
 
                     <div class="mb-3 row" v-if='selectedFilter.LeftValueKind==300'>
-                        <label class="col-sm-3 col-form-label">Параметр отчета</label>
+                        <label class="col-sm-3 col-form-label">Report parameter</label>
                         <div class="col-sm-9">
                             <select class="form-select form-control-sm" v-model='selectedFilter.LeftReportValue'>
                                 <option></option>
@@ -65,7 +65,7 @@
                     </div>
 
                     <div class="mb-3 row" v-if='selectedFilter.LeftValueKind==300'>
-                        <label class="col-sm-3 col-form-label">Выберите расчет значения</label>
+                        <label class="col-sm-3 col-form-label">Parameter calc type</label>
                         <div class="col-sm-9">
                             <select class="form-select form-control-sm" v-model='selectedFilter.LeftReportValueType'>
                                 <option></option>
@@ -77,7 +77,7 @@
                     </div>
 
                     <div class="mb-3 row" v-if='selectedFilter.LeftValueKind==300'>
-                        <label class="col-sm-3 col-form-label">Вид сравнения</label>
+                        <label class="col-sm-3 col-form-label">Comparison type</label>
                         <div class="col-sm-9">
                             <select class="form-select form-control-sm" v-model='selectedFilter.Operation'>
                                 <option></option>
@@ -89,7 +89,7 @@
                     </div>
 
                     <div class="mb-3 row" v-if='selectedFilter.LeftValueKind!=300'>
-                        <label class="col-sm-3 col-form-label">Вид сравнения</label>
+                        <label class="col-sm-3 col-form-label">Comparison type</label>
                         <div class="col-sm-9">
                             <select class="form-select form-control-sm" v-model='selectedFilter.Operation'>
                                 <option></option>
@@ -101,7 +101,7 @@
                     </div>
 
                     <div class="mb-3 row" v-if='selectedFilter.LeftValueKind==100'>
-                        <label class="col-sm-3 col-form-label">Значение</label>
+                        <label class="col-sm-3 col-form-label">Value</label>
                         <div class="col-sm-9">
                             <select class="form-select form-control-sm" v-model='selectedFilter.RightValueStr'>
                                 <option></option>
@@ -113,7 +113,7 @@
                     </div>
 
                     <div class="mb-3 row" v-if='selectedFilter.LeftValueKind==200'>
-                        <label class="col-sm-3 col-form-label">Значение</label>
+                        <label class="col-sm-3 col-form-label">Value</label>
                         <div class="col-sm-9">
                             <select class="form-select form-control-sm" v-model='selectedFilter.RightValueStr'>
                                 <option></option>
@@ -125,7 +125,7 @@
                     </div>
 
                     <div class="mb-3 row" v-if='selectedFilter.LeftValueKind==300'>
-                        <label class="col-sm-3 col-form-label">Значение</label>
+                        <label class="col-sm-3 col-form-label">Value</label>
                         <div class="col-sm-9">
                             <input class="form-select form-control-sm" type="number" v-model='selectedFilter.RightValueFloat' />
                         </div>
@@ -133,7 +133,7 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -194,10 +194,10 @@
                 
                 if (this.renderinfo.Industries.length == 0) return '';
                 if (filter.LeftValueKind == 100) {
-                    return "Тикер " + this.OperationsMap.get(filter.Operation) + " " + filter.RightValueStr;
+                    return "Ticker " + this.OperationsMap.get(filter.Operation) + " " + filter.RightValueStr;
                 }
                 if (filter.LeftValueKind == 200) { // FVK_Industry
-                    return 'Отрасль ' + this.OperationsMap.get(filter.Operation) + this.IndustryMap.get(filter.RightValueStr);
+                    return 'Industry ' + this.OperationsMap.get(filter.Operation) + this.IndustryMap.get(filter.RightValueStr);
                 }
                 if (filter.LeftValueKind == 300) { // FVK_ReportValue
                     return this.ReportValuesMap.get(filter.LeftReportValue) + " " +
@@ -205,7 +205,7 @@
                         this.OperationsMap.get(filter.Operation) + " " +
                         filter.RightValueFloat;
                 }
-                return "Нажмите здесь для редактирования фильтра";
+                return "Click to edit filter";
 
             }
 

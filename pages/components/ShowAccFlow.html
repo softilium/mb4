@@ -1,20 +1,20 @@
 ﻿<template id="show-acc-flow">
-    <h3 class="text-center">Абсолютный доход</h3>
+    <h3 class="text-center">Invest results</h3>
     <div ref="totalYield" style="height:400px;"></div>
     <p>&nbsp;</p>
-    <h3 class="text-center">Понедельная динамика</h3>
+    <h3 class="text-center">Weekly dynamics</h3>
     <table class="table table-hover table-responsive table-sm">
         <thead style="position: sticky; top: 0; z-index: 1; background-color: white;">
             <tr>
                 <th class="text-end">#</th>
                 <th>Дата</th>
-                <th class="text-end">Портфель</th>
-                <th class="text-end">Пополнений</th>
-                <th class="text-end">Пополнение нед.</th>
-                <th class="text-end">Абс.доход</th>
-                <th class="text-end">Доход нед.</th>
-                <th class="text-end">Доходность абс, %</th>
-                <th class="text-end">Доходность годовая, %</th>
+                <th class="text-end">Valuation</th>
+                <th class="text-end">Top ups</th>
+                <th class="text-end">Top ups weekly</th>
+                <th class="text-end">Abs result</th>
+                <th class="text-end">Weekly result</th>
+                <th class="text-end">Yield abs, %</th>
+                <th class="text-end">Year yield, %</th>
             </tr>
         </thead>
         <tbody>
@@ -69,7 +69,7 @@
                 option = {
                     animation: false,
                     xAxis: {
-                        name: 'Недели',
+                        name: 'Weeks',
                         type: 'category',
                         data: dates,
                     },
@@ -82,7 +82,7 @@
                     },
                     series: [
                         {
-                            name: 'Результат',
+                            name: 'Result',
                             type: 'line',
                             data: yields,
                             smooth: true,

@@ -1,21 +1,21 @@
 {% extends "layout.html" %}
 
-{% block title %}Инвестиционные стратегии{% endblock %}
+{% block title %}Strategies{% endblock %}
 
 {% block content %}
 
-<h2> Ваши инвестиционные стратегии</h2>
+<h2>Strategies</h2>
 
 <table class="table table-hover">
     <thead>
         <tr>
-            <td>Стратегия</td>
-            <td class="text-end">Стартовая сумма</td>
-            <td class="text-end">Недельное пополнение</td>
-            <td class="text-end">Сумма дохода за год</td>
-            <td class="text-end">Доходность за год</td>
-            <td class="text-end">Сумма дохода за 3 года</td>
-            <td class="text-end">Доходность за 3 года</td>
+            <td>Strategy name</td>
+            <td class="text-end">Starting cash</td>
+            <td class="text-end">weekly top-up</td>
+            <td class="text-end">Year profit</td>
+            <td class="text-end">Year yield</td>
+            <td class="text-end">3-Year profit</td>
+            <td class="text-end">3-Year yield</td>
             <td>&nbsp;</td>
         </tr>
     </thead>
@@ -40,11 +40,10 @@
 <form method="POST">
 
     <div class="form-group">
-        <label for="strategyName">Добавление новой стратегии</label>
-        <input type="text" class="form-control" name="descr" placeholder="Название стратегии">
+        <label for="strategyName">New strategy</label>
+        <input type="text" class="form-control" name="descr" placeholder="Strategy name">
     </div>
-
-    <button type="submit" class="btn btn-primary">Добавить</button>
+    <button type="submit" class="btn btn-primary">Add</button>
 
 </form>
 

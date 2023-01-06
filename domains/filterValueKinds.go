@@ -13,9 +13,9 @@ var FilterValueKinds Domain[FilterValueKind] = Domain[FilterValueKind]{}
 func init() {
 
 	FilterValueKinds.init([]DomainItem[FilterValueKind]{
-		{Id: FVK_Ticker, Descr: "Тикер"},
-		{Id: FVK_Industry, Descr: "Отрасль"},
-		{Id: FVK_ReportValue, Descr: "Параметр отчета"},
+		{Id: FVK_Ticker, Descr: "Ticker"},
+		{Id: FVK_Industry, Descr: "Industry"},
+		{Id: FVK_ReportValue, Descr: "Report parameter"},
 	})
 
 }

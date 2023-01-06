@@ -70,7 +70,7 @@ func InvestAccount(w http.ResponseWriter, r *http.Request) {
 					HandleErr(err, w)
 				}
 			default:
-				http.Error(w, "mode not allowed", http.StatusInternalServerError)
+				http.Error(w, "mode isn't allowed", http.StatusInternalServerError)
 			}
 		}
 	case http.MethodDelete:
@@ -98,7 +98,7 @@ func InvestAccount(w http.ResponseWriter, r *http.Request) {
 					}
 				}
 			default:
-				http.Error(w, "mode not allowed", http.StatusInternalServerError)
+				http.Error(w, "mode isn't allowed", http.StatusInternalServerError)
 			}
 		}
 	case http.MethodPost:
@@ -143,12 +143,12 @@ func InvestAccount(w http.ResponseWriter, r *http.Request) {
 					HandleErr(err, w)
 				}
 			default:
-				http.Error(w, "mode not allowed", http.StatusInternalServerError)
+				http.Error(w, "mode isn't allowed", http.StatusInternalServerError)
 			}
 
 		}
 	default:
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		http.Error(w, "Method isn't allowed", http.StatusMethodNotAllowed)
 	}
 
 }

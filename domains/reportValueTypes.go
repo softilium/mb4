@@ -23,17 +23,17 @@ func init() {
 
 	ReportValueTypes.init([]DomainItem[ReportValueType]{
 
-		{Id: RVT_S, Descr: "Из отчета cashflow"},
-		{Id: RVT_YtdAdj, Descr: "Из отчета PnL, выравненное по году"},
+		{Id: RVT_S, Descr: "CashFlow"},
+		{Id: RVT_YtdAdj, Descr: "P&L, year aligned"},
 		{Id: RVT_Ltm, Descr: "LTM"},
 
-		{Id: RVT_AG, Descr: "Рост г/г"},
-		{Id: RVT_AG_YtdAdj, Descr: "Рост г/г, выравненное по году"},
-		{Id: RVT_AG_Ltm, Descr: "Рост г/г, LTM"},
+		{Id: RVT_AG, Descr: "Growth y/y"},
+		{Id: RVT_AG_YtdAdj, Descr: "Growth y/y, year aligned"},
+		{Id: RVT_AG_Ltm, Descr: "Growth y/y, LTM"},
 
-		{Id: RVT_IndUpside, Descr: "Отраслевой апсайд"},
-		{Id: RVT_IndUpside_YtdAdj, Descr: "Отраслевой апсайд, выравненно по году"},
-		{Id: RVT_IndUpside_Ltm, Descr: "Отраслевой апсайд, LTM"},
+		{Id: RVT_IndUpside, Descr: "Indistry upside"},
+		{Id: RVT_IndUpside_YtdAdj, Descr: "Industry upside, year aligned"},
+		{Id: RVT_IndUpside_Ltm, Descr: "Industry upside, LTM"},
 	})
 
 }
