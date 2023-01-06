@@ -15,10 +15,11 @@ unparam github.com/softilium/mb4/pages
 
 govulncheck ./...
 
-
 rem go build -ldflags "-s -w"
+set GOOS=linux
 go build
-
+set GOOS=
+go build
 
 
 rem go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
