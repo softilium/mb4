@@ -50,8 +50,8 @@ func init() {
 	} else {
 		if len(admins) == 0 {
 			_, err = DB.User.Create().
-				SetUserName("admin").
-				SetPasswordHash(PasswordHash("admin")).
+				SetUserName(config.C.AdminLogin).
+				SetPasswordHash(PasswordHash(config.C.AdminPassw)).
 				SetAdmin(true).
 				Save(context.Background())
 			if err != nil {

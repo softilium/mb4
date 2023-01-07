@@ -13,6 +13,8 @@ type ConfigData struct {
 	SessionCookieName  string
 	SessionCryptKey    string
 	Debug              bool
+	AdminLogin         string // initial values for empty database
+	AdminPassw         string
 }
 
 var C ConfigData
@@ -29,5 +31,7 @@ func init() {
 	C.SessionCookieName = os.Getenv("SESSION_COOKIE_NAME")
 	C.SessionCryptKey = os.Getenv("SESSION_CRYPT_KEY")
 	C.Debug = os.Getenv("DEBUG") == "true"
+	C.AdminLogin = os.Getenv("ADMIN_LOGIN")
+	C.AdminPassw = os.Getenv("ADMIN_PASSW")
 
 }
