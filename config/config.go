@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -33,5 +34,11 @@ func init() {
 	C.Debug = os.Getenv("DEBUG") == "true"
 	C.AdminLogin = os.Getenv("ADMIN_LOGIN")
 	C.AdminPassw = os.Getenv("ADMIN_PASSW")
+
+	if C.AdminLogin == "" || C.AdminPassw == "" {
+		C.AdminLogin = "admin"
+		C.AdminPassw = "admin"
+		log.Println("Using default admin credentials !")
+	}
 
 }
