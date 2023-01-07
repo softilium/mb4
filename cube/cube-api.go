@@ -19,7 +19,12 @@ func (c *Cube) TopDivYields5Y(HowMany int) []*Cell {
 	newslice := make([]*Cell, len(slice))
 	copy(newslice, slice)
 	sort.Slice(newslice, func(i, j int) bool { return newslice[i].DivYield5Y.S > newslice[j].DivYield5Y.S })
-	return newslice[:HowMany]
+
+	hm2 := HowMany
+	if hm2 > len(newslice) {
+		hm2 = len(newslice)
+	}
+	return newslice[:hm2]
 }
 
 func (c *Cube) TopDSI(HowMany int) []*Cell {
@@ -34,7 +39,11 @@ func (c *Cube) TopDSI(HowMany int) []*Cell {
 	newslice := make([]*Cell, len(slice))
 	copy(newslice, slice)
 	sort.Slice(newslice, func(i, j int) bool { return newslice[i].DSI.S > newslice[j].DSI.S })
-	return newslice[:HowMany]
+	hm2 := HowMany
+	if hm2 > len(newslice) {
+		hm2 = len(newslice)
+	}
+	return newslice[:hm2]
 }
 
 type ItemPriceChange struct {
@@ -71,7 +80,11 @@ func (c *Cube) TopFallenRaise(HowMany int, Raise bool) []ItemPriceChange {
 	} else {
 		sort.Slice(changes, func(i, j int) bool { return changes[i].PercentPriceChange > changes[j].PercentPriceChange })
 	}
-	return changes[:HowMany]
+	hm2 := HowMany
+	if hm2 > len(changes) {
+		hm2 = len(changes)
+	}
+	return changes[:hm2]
 
 }
 

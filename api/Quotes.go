@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/rs/xid"
@@ -79,7 +80,10 @@ func Quotes(w http.ResponseWriter, r *http.Request) {
 				SetL(v.L).
 				SetV(v.V).
 				Save(context.Background())
-			pages.HandleErr(err, w)
+			if err != nil {
+				log.Printf("D=%v, T=%v\n", v.D, v.Edges.Ticker.ID)
+				pages.HandleErr(err, w)
+			}
 		}
 
 		return
