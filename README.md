@@ -1,7 +1,7 @@
-# Moneybox
+# [Robust Money](https://robust.money)
 
-Moneybox is a personal investor toolset. It consist from:
-* stocks, quotas, reports database
+It is a personal investor toolset. It consist from:
+* stocks, quotas, reports explorer
 * strategy builder and backtest simulator also known as "Stock screener"
 * broker's account analysis.
 
