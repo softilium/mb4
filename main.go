@@ -62,6 +62,7 @@ func initServer(listenAddr string) *http.Server {
 	router.HandleFunc("/api/emitents", api.Emitents)
 	router.HandleFunc("/api/tickers", api.Tickers)
 	router.HandleFunc("/api/quotes", api.Quotes)
+	router.HandleFunc("/api/cube/reload", api.Cube)
 
 	server := &http.Server{
 		Addr:    listenAddr,
