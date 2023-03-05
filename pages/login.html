@@ -68,7 +68,7 @@
         methods: {
             async login() {
                 let res = await fetch(
-                    "/api/users/login?username=" + this.userName + "&password=" + this.password,
+                    `/api/users/login?username=${encodeURIComponent(this.userName)}&password=${encodeURIComponent(this.password)}`,
                     { method: 'POST' }
                 );
                 if (res.ok)
@@ -86,7 +86,7 @@
                     return;
                 }
                 let res = await fetch(
-                    `/api/users/register?username=${this.userNameReg}&password=${this.passwordReg}`,
+                    `/api/users/register?username=${encodeURIComponent(this.userNameReg)}&password=${encodeURIComponent(this.passwordReg)}`,
                     { method: 'POST' }
                 );
                 if (res.ok)

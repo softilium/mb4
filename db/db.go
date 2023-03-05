@@ -43,7 +43,7 @@ func init() {
 	}
 
 	if admins, err := DB.User.Query().
-		Where(user.UserNameEQ("admin")).
+		Where(user.UserNameEQ(config.C.AdminLogin)).
 		Limit(1).
 		All(context.Background()); err != nil {
 		log.Fatalf("Failed creating schema resources: %v", err)
